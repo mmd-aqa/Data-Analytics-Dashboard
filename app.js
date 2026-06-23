@@ -3,7 +3,8 @@ let DATA = [];          // آرایه‌ای از ردیف‌ها (هر ردیف
 let COLUMNS = [];       // نام ستون‌ها
 let isExample = false;  // آیا از مجموعه‌داده نمونه استفاده می‌شود؟
 
-const EXAMPLE_URL = "https://raw.githubusercontent.com/Sanju-srivatsa/VizCraft-Data-Science-App/main/titanic.csv";
+// پسوندهای مجاز برای بارگذاری
+const ALLOWED_EXT = ["csv", "xlsx", "xls"];
 
 // ===== ابزارهای کمکی =====
 const $ = (id) => document.getElementById(id);
@@ -79,32 +80,95 @@ function alertBox(type, text) {
 }
 
 // ===== خواندن فایل =====
-$("fileInput").addEventListener("change", (e) => {
-  const file = e.target.files[0];
+// پاک‌کردن محتوا و نمایش پیام خطا (هیچ جدولی نمایش داده نمی‌شود)
+function clearContent() {
+  DATA = [];
+  COLUMNS = [];
+  const c = $("content");
+  c.innerHTML = "";
+  c.classList.add("hidden");
+}
+
+function showFileError(text) {
+  clearContent();
+  $("fileStatus").innerHTML =
+    `<span class="text-red-600 dark:text-red-400 font-semibold">${text}</span>`;
+}
+
+function getExt(name) {
+  const parts = String(name).toLowerCase().split(".");
+  return parts.length > 1 ? parts.pop() : "";
+}
+
+// پردازش فایل انتخاب‌شده پس از اعتبارسنجی پسوند
+function handleFile(file) {
   if (!file) return;
   isExample = false;
-  const name = file.name.toLowerCase();
-  if (name.endsWith(".csv")) {
+  const ext = getExt(file.name);
+
+  // اعتبارسنجی پسوند: در صورت نامعتبر بودن، خطا نمایش داده و هیچ جدولی رندر نمی‌شود
+  if (!ALLOWED_EXT.includes(ext)) {
+    showFileError(
+      `❌ فرمت فایل پشتیبانی نمی‌شود. تنها فرمت‌های ${ALLOWED_EXT.join("، ")} مجاز هستند.`,
+    );
+    return;
+  }
+
+  if (ext === "csv") {
     Papa.parse(file, {
       header: true, dynamicTyping: true, skipEmptyLines: true,
       complete: (res) => loadData(res.data, file.name),
+      error: () => showFileError("❌ خطا در خواندن فایل CSV."),
     });
   } else {
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const wb = XLSX.read(new Uint8Array(ev.target.result), { type: "array" });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(ws, { defval: "" });
-      loadData(json, file.name);
+      try {
+        const wb = XLSX.read(new Uint8Array(ev.target.result), { type: "array" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(ws, { defval: "" });
+        loadData(json, file.name);
+      } catch (err) {
+        showFileError("❌ خطا در خواندن فایل اکسل.");
+      }
     };
+    reader.onerror = () => showFileError("❌ خطا در خواندن فایل.");
     reader.readAsArrayBuffer(file);
   }
+}
+
+$("fileInput").addEventListener("change", (e) => {
+  handleFile(e.target.files[0]);
+  e.target.value = ""; // اجازه انتخاب مجدد همان فایل
 });
+
+// پشتیبانی از کشیدن و رها کردن فایل روی ناحیه آپلود
+(function setupDragDrop() {
+  const dz = document.querySelector('label[for="fileInput"]');
+  if (!dz) return;
+  ["dragenter", "dragover"].forEach((ev) =>
+    dz.addEventListener(ev, (e) => {
+      e.preventDefault();
+      dz.classList.add("border-[#217346]", "bg-[#217346]/5");
+    }),
+  );
+  ["dragleave", "drop"].forEach((ev) =>
+    dz.addEventListener(ev, (e) => {
+      e.preventDefault();
+      dz.classList.remove("border-[#217346]", "bg-[#217346]/5");
+    }),
+  );
+  dz.addEventListener("drop", (e) => {
+    const file = e.dataTransfer && e.dataTransfer.files[0];
+    handleFile(file);
+  });
+})();
 
 $("exampleBtn").addEventListener("click", () => {
   $("fileStatus").textContent = "در حال بارگذاری مجموعه‌داده نمونه...";
-  Papa.parse(EXAMPLE_URL, {
-    download: true, header: true, dynamicTyping: true, skipEmptyLines: true,
+  // مجموعه‌داده نمونه به‌صورت آفلاین درون assets/sample-data.js جاسازی شده است
+  Papa.parse(window.SAMPLE_CSV, {
+    header: true, dynamicTyping: true, skipEmptyLines: true,
     complete: (res) => { isExample = true; loadData(res.data, "titanic.csv (نمونه)"); },
     error: () => { $("fileStatus").textContent = "خطا در بارگذاری مجموعه‌داده نمونه."; },
   });
@@ -127,9 +191,9 @@ function render() {
   c.classList.remove("hidden");
 
   // دیتافریم ورودی
+  c.appendChild(alertBox("info", "💡 فایل با موفقیت بارگذاری شد"));
   c.appendChild(el("h2", "text-lg font-bold mb-2", "دیتافریم ورودی"));
   c.appendChild(buildTable(DATA.slice(0, 100), COLUMNS));
-  c.appendChild(alertBox("info", "💡 فایل با موفقیت بارگذاری شد"));
   c.appendChild(el("hr", "border-gray-200 dark:border-gray-800 my-5"));
 
   // تب‌های اصلی
@@ -279,7 +343,7 @@ function renderValueCounts(root) {
   grid.appendChild(colW); grid.appendChild(topW);
   body.appendChild(grid);
 
-  const btn = el("button", "rounded-lg bg-pink-600 hover:bg-pink-700 text-white font-semibold px-4 py-2 w-max", "شمارش");
+  const btn = el("button", "rounded-lg bg-[#217346] hover:bg-[#1a5c38] text-white font-semibold px-4 py-2 w-max", "شمارش");
   body.appendChild(btn);
   const out = el("div"); body.appendChild(out);
 
@@ -297,7 +361,7 @@ function renderValueCounts(root) {
     if (!arr.length) { out.appendChild(alertBox("warn", "داده‌ای برای نمایش در نمودار وجود ندارد.")); return; }
     const x = arr.map((r) => String(r[col])), y = arr.map((r) => r.count);
     const d1 = el("div", "mb-4"); out.appendChild(d1);
-    Plotly.newPlot(d1, [{ type: "bar", x, y, text: y, textposition: "auto", marker: { color: "#f63366" } }], plLayout("نمودار میله‌ای"), { responsive: true });
+    Plotly.newPlot(d1, [{ type: "bar", x, y, text: y, textposition: "auto", marker: { color: "#217346" } }], plLayout("نمودار میله‌ای"), { responsive: true });
     const d2 = el("div", "mb-4"); out.appendChild(d2);
     Plotly.newPlot(d2, [{ type: "scatter", mode: "lines+markers+text", x, y, text: y }], plLayout("نمودار خطی"), { responsive: true });
     const d3 = el("div", "mb-4"); out.appendChild(d3);
@@ -334,7 +398,7 @@ function renderGroupby(root) {
   grid.appendChild(gW); grid.appendChild(opColW); grid.appendChild(opW);
   body.appendChild(grid);
 
-  const btn = el("button", "rounded-lg bg-pink-600 hover:bg-pink-700 text-white font-semibold px-4 py-2 w-max", "اعمال گروه‌بندی");
+  const btn = el("button", "rounded-lg bg-[#217346] hover:bg-[#1a5c38] text-white font-semibold px-4 py-2 w-max", "اعمال گروه‌بندی");
   body.appendChild(btn);
   const out = el("div"); body.appendChild(out);
 
@@ -362,15 +426,14 @@ function renderGroupby(root) {
       const x = result.map((r) => gbCols.map((c) => r[c]).join(" / "));
       const yv = result.map((r) => r.Result);
       if (g === "bar") {
-        Plotly.newPlot(chartDiv, [{ type: "bar", x, y: yv, marker: { color: "#f63366" } }], plLayout("نمودار میله‌ای"), { responsive: true });
+        Plotly.newPlot(chartDiv, [{ type: "bar", x, y: yv, marker: { color: "#217346" } }], plLayout("نمودار میله‌ای"), { responsive: true });
       } else if (g === "line") {
         Plotly.newPlot(chartDiv, [{ type: "scatter", mode: "lines+markers", x, y: yv }], plLayout("نمودار خطی"), { responsive: true });
       } else if (g === "scatter") {
-        Plotly.newPlot(chartDiv, [{ type: "scatter", mode: "markers", x, y: yv, marker: { size: 12, color: "#f63366" } }], plLayout("نمودار پراکندگی"), { responsive: true });
+        Plotly.newPlot(chartDiv, [{ type: "scatter", mode: "markers", x, y: yv, marker: { size: 12, color: "#217346" } }], plLayout("نمودار پراکندگی"), { responsive: true });
       } else if (g === "pie") {
         Plotly.newPlot(chartDiv, [{ type: "pie", labels: x, values: yv }], plLayout("نمودار دایره‌ای"), { responsive: true });
       } else if (g === "sunburst") {
-        // نمودار آفتاب‌پرتو سلسله‌مراتبی بر اساس ستون‌های گروه‌بندی
         const labels = [], parents = [], values = [];
         const seen = new Set();
         result.forEach((r) => {
@@ -427,7 +490,6 @@ function groupby(gbCols, opCol, op) {
   });
 }
 
-// چیدمان مشترک نمودارها (سازگار با حالت تاریک)
 function plLayout(title) {
   const dark = document.documentElement.classList.contains("dark");
   return {
@@ -439,7 +501,6 @@ function plLayout(title) {
   };
 }
 
-// ===== تغییر حالت روشن/تاریک =====
 function applyThemeButton() {
   const dark = document.documentElement.classList.contains("dark");
   const icon = $("themeIcon"), label = $("themeLabel");
@@ -455,11 +516,9 @@ function setupThemeToggle() {
     const dark = document.documentElement.classList.toggle("dark");
     localStorage.setItem("vizcraft-theme", dark ? "dark" : "light");
     applyThemeButton();
-    // در صورت بارگذاری داده، رابط را بازسازی می‌کنیم تا رنگ نمودارها با تم جدید هماهنگ شود
     if (DATA && DATA.length) render();
   });
 }
 
 document.addEventListener("DOMContentLoaded", setupThemeToggle);
-// اگر اسکریپت پس از بارگذاری DOM اجرا شد، بلافاصله راه‌اندازی کن
 if (document.readyState !== "loading") setupThemeToggle();
