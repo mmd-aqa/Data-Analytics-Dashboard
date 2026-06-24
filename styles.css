@@ -71,11 +71,11 @@ body {
 
 .df-wrapper {
   direction: ltr;
-  overflow-x: scroll;
+  overflow-x: auto;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   max-height: 460px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .dark .df-wrapper {
   border-color: #374151;
@@ -224,6 +224,11 @@ details.expander > summary::before {
 details.expander[open] > summary::before {
   content: "▾ ";
 }
-html {
+
+/* html {
   scrollbar-gutter: stable;
+} */
+
+html {
+  overflow-y: scroll;
 }
