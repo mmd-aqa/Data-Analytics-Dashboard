@@ -43,7 +43,6 @@ body {
   color: #33c481;
 }
 
-/* جدول‌ها و اسکرول آن‌ها کاملاً LTR هستند */
 .df-wrapper {
   direction: ltr;
   overflow-x: auto;
@@ -121,7 +120,6 @@ table.df tbody tr:nth-child(even) {
   border-color: #217346;
   box-shadow: 0 0 0 3px rgba(33, 115, 70, 0.2);
 }
-/* رنگ تأکیدی کلودفلر برای کنترل‌ها */
 input[type="range"] {
   accent-color: #217346;
 }
@@ -168,7 +166,6 @@ input[type="range"] {
   color: #86efac;
 }
 
-/* جمع‌شونده (Expander) */
 details.expander {
   border: 1px solid #e5e7eb;
   border-radius: 10px;
