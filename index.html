@@ -52,60 +52,94 @@
               </h1>
             </div>
           </div>
-          <button
-            id="themeToggle"
-            type="button"
-            aria-label="dark mode"
-            class="shrink-0 rounded-lg border border-gray-300 dark:border-[#33363b] bg-white dark:bg-[#1d1f23] hover:border-[#217346] transition px-3 py-2 flex items-center gap-2"
-          >
-            <span
-              id="themeIcon"
-              class="material-symbols-outlined text-xl"
-              aria-hidden="true"
-              >dark_mode</span
+          <div class="flex items-center gap-2 shrink-0">
+            <button
+              id="themeToggle"
+              type="button"
+              aria-label="dark mode"
+              class="rounded-lg border border-gray-300 dark:border-[#33363b] bg-white dark:bg-[#1d1f23] hover:border-[#217346] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#217346]/40 transition px-3 py-2 flex items-center gap-2"
             >
-          </button>
+              <span
+                id="themeIcon"
+                class="material-symbols-outlined text-xl"
+                aria-hidden="true"
+                >dark_mode</span
+              >
+            </button>
+          </div>
         </div>
       </header>
 
       <main class="flex-1 w-full max-w-[1400px] mx-auto p-5 sm:p-8">
+        <!-- Single, centered upload panel — the entire landing experience. -->
         <section
-          class="mb-6 rounded-xl border border-gray-200 dark:border-[#26282c] bg-white dark:bg-[#16181b] p-5 sm:p-6"
+          id="uploadSection"
+          class="flex items-center justify-center py-4 sm:py-10"
         >
-          <label
-            for="fileInput"
-            class="block cursor-pointer rounded-xl border-2 border-dashed border-gray-300 dark:border-[#33363b] hover:border-[#217346] hover:bg-[#217346]/5 transition p-7 text-center"
+          <div
+            class="upload-card fade-in w-full max-w-[680px] rounded-2xl border border-gray-200 dark:border-[#26282c] bg-white dark:bg-[#16181b] p-6 sm:p-8 text-center"
           >
             <span
-              class="material-symbols-outlined mb-3 text-[72px] text-[#217346]"
-              aria-hidden="true"
-              >upload_file</span
+              class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#217346]/10 mb-3"
             >
-            <div class="font-semibold">
-              فایل را اینجا بکشید و رها کنید یا برای انتخاب فایل کلیک کنید
-            </div>
-            <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              فرمت‌های پشتیبانی‌شده: csv · xlsx · xls
-            </div>
-            <input
-              id="fileInput"
-              type="file"
-              accept=".csv,.xlsx,.xls"
-              class="hidden"
-            />
-          </label>
-          <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <span
+              <span
+                class="material-symbols-outlined text-[34px] text-[#217346]"
+                aria-hidden="true"
+                >cloud_upload</span
+              >
+            </span>
+            <p class="text-base font-semibold mb-5">
+              فایل Excel یا CSV خود را اینجا رها کنید
+            </p>
+
+            <label
+              for="fileInput"
+              tabindex="0"
+              role="button"
+              aria-label="انتخاب یا رها کردن فایل برای بارگذاری"
+              class="block cursor-pointer rounded-xl border-2 border-dashed border-gray-300 dark:border-[#33363b] hover:border-[#217346] hover:bg-[#217346]/5 focus-visible:outline-none focus-visible:border-[#217346] focus-visible:ring-2 focus-visible:ring-[#217346]/30 transition p-6 sm:p-8"
+            >
+              <span
+                class="inline-flex items-center gap-2 rounded-lg bg-[#217346] hover:bg-[#1a5c38] text-white text-sm font-semibold px-5 py-2.5 transition pointer-events-none"
+              >
+                <span class="material-symbols-outlined text-base" aria-hidden="true"
+                  >upload_file</span
+                >
+                <span>انتخاب فایل</span>
+              </span>
+              <div class="text-xs text-gray-400 dark:text-gray-500 mt-3">
+                csv · xlsx · xls
+              </div>
+              <input
+                id="fileInput"
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                class="hidden"
+              />
+            </label>
+
+            <div
               id="fileStatus"
-              class="text-xs text-gray-500 dark:text-gray-400"
-              >فایلی انتخاب نشده است</span
+              class="text-xs text-gray-500 dark:text-gray-400 mt-4"
+              aria-live="polite"
             >
+              فایلی انتخاب نشده است
+            </div>
+
+            <div class="upload-divider my-6"><span>یا</span></div>
+
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              مجموعه داده ندارید؟
+            </p>
             <button
               id="exampleBtn"
               type="button"
-              class="rounded-lg bg-[#217346] hover:bg-[#1a5c38] text-white text-sm font-semibold px-4 py-2 transition"
+              class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-[#33363b] bg-white dark:bg-[#1d1f23] hover:border-[#217346] hover:text-[#185c37] dark:hover:text-[#33c481] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#217346]/30 text-sm font-semibold px-5 py-2.5 transition"
             >
-              استفاده از مجموعه‌داده نمونه
+              <span class="material-symbols-outlined text-base" aria-hidden="true"
+                >dataset</span
+              >
+              <span>استفاده از مجموعه داده نمونه</span>
             </button>
           </div>
         </section>
@@ -116,32 +150,60 @@
         >
           <div id="content"></div>
         </section>
-        <!-- <section
-          class="mb-6 rounded-xl border border-gray-200 dark:border-[#26282c] bg-white dark:bg-[#16181b] p-5 sm:p-6"
-        >
-        <div id="content" class="hidden"></div>
-        </section> -->
       </main>
 
       <footer
-        class="w-full bg-white dark:bg-[#16181b] border-t border-gray-200 dark:border-[#26282c] p-6 mt-8"
+        class="w-full bg-white dark:bg-[#16181b] border-t border-gray-200 dark:border-[#26282c] mt-8"
       >
-        <div class="max-w-3xl mx-auto text-center">
-          <p class="text-xs leading-6 text-gray-500 dark:text-gray-400">
-            داشبورد تحلیل داده یک برنامه وب است که به شما امکان می‌دهد
-            مجموعه‌داده‌ها را با فرمت CSV و اکسل بارگذاری، کاوش، تحلیل و
-            مصورسازی کنید. این ابزار برای تحلیل‌گران داده، دانشمندان و هر کسی که
-            می‌خواهد به‌سرعت از داده‌های خود بینش به‌دست آورد، ایده‌آل است.
-          </p>
-        </div>
         <div
-          class="text-center text-[10px] text-gray-400 dark:text-gray-600 pt-5"
+          class="w-full max-w-[1400px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-center"
         >
-          بدون نیاز به نصب · کاملاً در مرورگر اجرا می‌شود
+          <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
+            داشبورد تحلیل داده • کاملاً در مرورگر شما اجرا می‌شود • بدون نیاز به
+            نصب
+          </p>
         </div>
       </footer>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Floating primary action — reveals the upload panel again (same trigger
+         that used to live in the toolbar). Shown only while a dataset is loaded;
+         the dashboard orchestrator toggles the dock's [hidden]. The outer dock
+         provides the frosted-glass halo; the inner button carries the brand. -->
+    <div id="fabDock" class="fab-dock" hidden>
+      <button
+        id="floatingUploadBtn"
+        type="button"
+        class="fab-upload"
+        aria-label="بارگذاری فایل جدید"
+        title="بارگذاری فایل جدید"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">folder_open</span>
+        <span>بارگذاری فایل جدید</span>
+      </button>
+    </div>
+
+    <!-- App modules — loaded in dependency order (classic scripts, zero-build) -->
+    <script src="js/utils.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/ui.js"></script>
+    <!-- App.ui augmenters: the single toast + loading systems -->
+    <script src="js/dashboard/toast.js"></script>
+    <script src="js/dashboard/loading.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/statistics.js"></script>
+    <script src="js/correlation.js"></script>
+    <script src="js/insights.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/export.js"></script>
+    <!-- Dashboard presentation modules (loaded before the orchestrator) -->
+    <script src="js/dashboard/popover.js"></script>
+    <script src="js/dashboard/header.js"></script>
+    <script src="js/dashboard/summary.js"></script>
+    <script src="js/dashboard/preview.js"></script>
+    <script src="js/dashboard/toolbar.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/upload.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>

@@ -46,34 +46,44 @@ body {
 }
 
 .tab-btn {
-  font-weight: 700;
-  padding: 8px 16px;
-  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: #6b7280;
-  transition: all 0.15s;
+  transition:
+    background var(--transition),
+    color var(--transition);
   white-space: nowrap;
 }
 .tab-btn:hover {
-  color: #185c37;
+  background: #f3f4f6;
+  color: var(--brand-text);
 }
 .dark .tab-btn:hover {
-  color: #33c481;
+  background: #1d1f23;
+  color: var(--brand-text);
 }
 .tab-btn.active {
-  background: #e6f4ea;
-  color: #185c37;
+  background: var(--brand-tint);
+  color: var(--brand-text);
+  font-weight: 700;
 }
 .dark .tab-btn.active {
-  background: #103021;
-  color: #33c481;
+  background: var(--brand-tint);
+  color: var(--brand-text);
+}
+.tab-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .df-wrapper {
   direction: ltr;
   overflow-x: auto;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   max-height: 460px;
   overflow-y: auto;
 }
@@ -106,9 +116,16 @@ table.df thead th {
   background: #f9fafb;
   font-weight: 700;
   z-index: 1;
+  /* Subtle separation so the sticky header reads above scrolled rows. */
+  box-shadow:
+    inset 0 -1px 0 #e5e7eb,
+    0 2px 4px rgba(0, 0, 0, 0.04);
 }
 .dark table.df thead th {
   background: #111827;
+  box-shadow:
+    inset 0 -1px 0 #374151,
+    0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 table.df tbody tr:nth-child(even) {
@@ -116,6 +133,13 @@ table.df tbody tr:nth-child(even) {
 }
 .dark table.df tbody tr:nth-child(even) {
   background: #0b1220;
+}
+/* Row hover — wins over the zebra striping above. */
+table.df tbody tr:hover td {
+  background: #eef6f1;
+}
+.dark table.df tbody tr:hover td {
+  background: #14241b;
 }
 
 .widget label {
@@ -127,8 +151,8 @@ table.df tbody tr:nth-child(even) {
 .widget select,
 .widget input[type="number"] {
   width: 100%;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-sm);
   padding: 7px 10px;
   background: #fff;
   color: #111;
@@ -143,11 +167,11 @@ table.df tbody tr:nth-child(even) {
 .widget select:focus,
 .widget input[type="number"]:focus {
   outline: none;
-  border-color: #217346;
-  box-shadow: 0 0 0 3px rgba(33, 115, 70, 0.2);
+  border-color: var(--brand);
+  box-shadow: var(--focus-ring);
 }
 input[type="range"] {
-  accent-color: #217346;
+  accent-color: var(--brand);
 }
 .df-wrapper::-webkit-scrollbar {
   height: 10px;
@@ -155,14 +179,14 @@ input[type="range"] {
 }
 .df-wrapper::-webkit-scrollbar-thumb {
   background: #c9ccd1;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 .dark .df-wrapper::-webkit-scrollbar-thumb {
   background: #3a3d42;
 }
 
 .alert {
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 12px 16px;
   font-size: 13px;
   margin: 8px 0;
@@ -175,12 +199,12 @@ input[type="range"] {
   flex-shrink: 0;
 }
 .alert-info {
-  background: #e6f4ea;
-  color: #185c37;
+  background: var(--brand-tint);
+  color: var(--brand-text);
 }
 .dark .alert-info {
-  background: #103021;
-  color: #33c481;
+  background: var(--brand-tint);
+  color: var(--brand-text);
 }
 .alert-warn {
   background: #fef3c7;
@@ -201,7 +225,7 @@ input[type="range"] {
 
 details.expander {
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 4px 14px;
   background: #fff;
 }
@@ -225,10 +249,1457 @@ details.expander[open] > summary::before {
   content: "▾ ";
 }
 
-/* html {
-  scrollbar-gutter: stable;
-} */
-
 html {
   overflow-y: scroll;
+}
+
+/* ============================ KPI cards (Phase 2) ======================== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (min-width: 640px) {
+  .kpi-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+.kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--card-radius);
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  transition:
+    transform var(--transition-lift),
+    box-shadow var(--transition);
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+.dark .kpi-card {
+  background: #16181b;
+  border-color: #26282c;
+}
+.kpi-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.kpi-icon .material-symbols-outlined {
+  font-size: 24px;
+}
+.kpi-body {
+  min-width: 0;
+}
+.kpi-value {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  direction: ltr;
+  text-align: right;
+}
+.kpi-sub {
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 6px;
+  opacity: 0.7;
+}
+.kpi-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dark .kpi-label {
+  color: #9ca3af;
+}
+/* Tone variants — coloured icon chip only, card stays neutral. */
+.kpi-green .kpi-icon {
+  background: var(--brand-tint);
+  color: var(--brand-text);
+}
+.kpi-blue .kpi-icon {
+  background: #e0eefb;
+  color: #1e5fa8;
+}
+.kpi-amber .kpi-icon {
+  background: #fef3c7;
+  color: #92600a;
+}
+.kpi-red .kpi-icon {
+  background: #fde2e2;
+  color: #b91c1c;
+}
+.dark .kpi-green .kpi-icon {
+  background: var(--brand-tint);
+  color: var(--brand-text);
+}
+.dark .kpi-blue .kpi-icon {
+  background: #0e2438;
+  color: #6cb6f5;
+}
+.dark .kpi-amber .kpi-icon {
+  background: #3a2e0c;
+  color: #fcd34d;
+}
+.dark .kpi-red .kpi-icon {
+  background: #3a1414;
+  color: #f87171;
+}
+
+/* ===================== Sortable / highlighted tables ==================== */
+table.df th.th-sort {
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+table.df th.th-sort:hover {
+  color: var(--brand-text);
+}
+.dark table.df th.th-sort:hover {
+  color: var(--brand-text);
+}
+table.df tr.row-warn td {
+  background: #fef3c7 !important;
+  color: #7c4a03;
+}
+.dark table.df tr.row-warn td {
+  background: #3a2e0c !important;
+  color: #fcd34d;
+}
+mark.search-hit {
+  background: #ffe066;
+  color: #000;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.dark mark.search-hit {
+  background: #b59000;
+  color: #fff;
+}
+
+/* ============================== Pagination ============================== */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.pager-info {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 8px;
+}
+.dark .pager-info {
+  color: #9ca3af;
+}
+.pager-btn {
+  min-width: 34px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--control-border);
+  background: #fff;
+  color: #1d1f20;
+  font-weight: 700;
+  transition: all var(--transition);
+}
+.pager-btn:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+.pager-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.pager-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.dark .pager-btn {
+  background: #1d1f23;
+  border-color: var(--control-border);
+  color: #e5e7eb;
+}
+
+/* ====================== Filters & search (Phase 6/7) ==================== */
+.search-wrap {
+  position: relative;
+  max-width: 520px;
+}
+.search-wrap .search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 20px;
+  pointer-events: none;
+}
+.search-wrap input {
+  width: 100%;
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-md);
+  padding: 10px 42px 10px 12px;
+  background: #fff;
+  color: #111;
+  font-size: 14px;
+}
+.dark .search-wrap input {
+  background: #16181b;
+  color: #f9fafb;
+  border-color: var(--control-border);
+}
+.search-wrap input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: var(--focus-ring);
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  background: #fafafa;
+}
+.dark .filter-row {
+  background: #111317;
+}
+.filter-row select,
+.filter-row input {
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  background: #fff;
+  color: #111;
+  font-size: 13px;
+}
+.dark .filter-row select,
+.dark .filter-row input {
+  background: #16181b;
+  color: #f9fafb;
+  border-color: var(--control-border);
+}
+.filter-row .filter-col {
+  min-width: 150px;
+  flex: 1 1 150px;
+}
+.filter-row .filter-op {
+  min-width: 130px;
+}
+.filter-row .filter-val {
+  min-width: 110px;
+  flex: 1 1 110px;
+}
+.filter-row .filter-multi {
+  min-width: 160px;
+}
+.filter-remove {
+  margin-inline-start: auto;
+  color: #b91c1c;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  padding: 4px;
+}
+.filter-remove:hover {
+  background: #fde2e2;
+}
+.dark .filter-remove:hover {
+  background: #3a1414;
+}
+
+/* ============================ Shared buttons =========================== */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--control-border);
+  background: #fff;
+  color: #1d1f20;
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all var(--transition);
+}
+.btn-secondary:hover {
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+.dark .btn-secondary {
+  background: #1d1f23;
+  border-color: var(--control-border);
+  color: #e5e7eb;
+}
+.dark .btn-secondary:hover {
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+.btn-ghost {
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #6b7280;
+  transition: all var(--transition);
+}
+.btn-ghost:hover {
+  color: #b91c1c;
+}
+
+/* ===================== Search / Filter toolbar (UI/UX) ================== */
+/* One cohesive, sticky command bar that stays visible under the app header. */
+.data-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  position: sticky;
+  top: 64px; /* header is h-16 = 64px */
+  z-index: 15;
+  background: var(--card-bg);
+  padding: 10px 8px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 6px 14px -10px rgba(0, 0, 0, 0.35);
+}
+/* Every command shares the same height, radius and spacing so the bar reads as
+   one cohesive unit. */
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  border: 1px solid var(--control-border);
+  background: #fff;
+  color: #1d1f20;
+  border-radius: var(--radius-md);
+  padding: 0 16px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.toolbar-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+.toolbar-btn:focus-visible {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: var(--focus-ring);
+}
+.dark .toolbar-btn {
+  background: #1d1f23;
+  border-color: var(--control-border);
+  color: #e5e7eb;
+}
+.dark .toolbar-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+/* Highlight when the panel is open (active-toggle) or its query/filters are active. */
+.toolbar-btn.active,
+.toolbar-btn.active-toggle {
+  background: var(--brand-tint);
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+.dark .toolbar-btn.active,
+.dark .toolbar-btn.active-toggle {
+  background: var(--brand-tint);
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+.toolbar-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+/* Floating primary action — "بارگذاری فایل جدید" is the app's one persistent
+   primary command. It is a two-layer Material FAB: an outer glass "dock"
+   (#fabDock) provides a soft blurred halo that separates the action from the
+   content scrolling behind it, and the inner green button carries the brand.
+   Fixed bottom-centre; JS toggles the dock's [hidden]. The fullscreen loading
+   overlay (z-index 9998) sits above it, so it is covered while overlays are up.
+   Bottom offset respects the iOS gesture bar via env(safe-area-inset-bottom). */
+.fab-dock {
+  position: fixed;
+  left: 50%;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 40;
+  padding: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  transition:
+    transform var(--transition-lift),
+    box-shadow var(--transition-lift);
+}
+/* Lift the whole FAB (glass halo + button together) on hover/focus-within. */
+.fab-dock:hover,
+.fab-dock:focus-within {
+  transform: translate(-50%, -2px) scale(1.02);
+  box-shadow:
+    0 14px 34px -8px rgba(16, 24, 40, 0.24),
+    var(--glass-shadow);
+}
+.dark .fab-dock:hover,
+.dark .fab-dock:focus-within {
+  box-shadow:
+    0 16px 36px -8px rgba(0, 0, 0, 0.6),
+    var(--glass-shadow);
+}
+.fab-dock[hidden] {
+  display: none;
+}
+/* Graceful fallback where backdrop-filter is unavailable — use a near-opaque
+   surface so the halo still reads as a soft floating panel. */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .fab-dock {
+    background: var(--glass-bg-solid);
+  }
+}
+
+.fab-upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 1px solid var(--brand);
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow-fab);
+  transition:
+    background var(--transition),
+    border-color var(--transition);
+}
+.fab-upload:hover {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+}
+.fab-upload:focus-visible {
+  outline: none;
+  box-shadow:
+    var(--shadow-fab),
+    0 0 0 3px rgba(33, 115, 70, 0.45);
+}
+.fab-upload .material-symbols-outlined {
+  font-size: 20px;
+  color: #fff;
+}
+@media (max-width: 1024px) {
+  .fab-dock {
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (max-width: 640px) {
+  .fab-dock {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: calc(100% - 32px);
+    max-width: 360px;
+  }
+  .fab-upload {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fab-dock {
+    transition: none;
+  }
+  .fab-dock:hover,
+  .fab-dock:focus-within {
+    transform: translateX(-50%);
+  }
+}
+
+/* Active-state badges: a dot for search, a count for filters. */
+.toolbar-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-md);
+  background: var(--brand);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  direction: ltr;
+}
+.toolbar-badge[hidden] {
+  display: none;
+}
+.toolbar-badge-dot {
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* Collapsible panels — animate via grid-template-rows for arbitrary height.
+   Closed panels are removed from the tab order once the animation finishes. */
+.toolbar-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.2s var(--ease),
+    opacity 0.2s var(--ease),
+    margin-top 0.2s var(--ease),
+    visibility 0s linear 0.2s;
+}
+.toolbar-panel.open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  margin-top: 10px;
+  transition:
+    grid-template-rows 0.2s var(--ease),
+    opacity 0.2s var(--ease),
+    margin-top 0.2s var(--ease),
+    visibility 0s;
+}
+/* Lighter than a free-standing card — these panels belong to the toolbar. */
+.toolbar-panel-inner {
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  background: #fafafa;
+  padding: 12px;
+}
+.dark .toolbar-panel-inner {
+  background: #111317;
+}
+
+/* Search panel layout: input grows, clear button trails. */
+.search-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.search-panel .search-wrap {
+  flex: 1 1 280px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toolbar-panel {
+    transition: none;
+  }
+}
+.toolbar-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: var(--control-border);
+  color: #1d1f20;
+  background: #fff;
+}
+.dark .toolbar-btn:disabled {
+  background: #1d1f23;
+  border-color: var(--control-border);
+  color: #e5e7eb;
+}
+.toolbar-caret {
+  font-size: 18px !important;
+  opacity: 0.7;
+}
+
+/* Export popover — a floating command-menu, portalled to <body> and anchored
+   with position:fixed (JS positionPopover sets top/left + flips up/down), so it
+   can never be clipped by the table/card or spill off-screen. */
+.toolbar-dropdown {
+  position: relative;
+}
+.dropdown-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  max-width: calc(100vw - 16px);
+  max-height: 320px; /* JS narrows this to the available space; scrolls if taller */
+  z-index: 9990; /* above charts/table; below toasts (9999) and overlay (9998) */
+  padding: 6px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-pop);
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.dropdown-menu.open {
+  display: flex;
+  animation: dropdown-in 0.15s var(--ease);
+}
+.dropdown-menu[data-placement="top"] {
+  transform-origin: bottom;
+}
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dropdown-menu.open {
+    animation: none;
+  }
+}
+.dark .dropdown-menu {
+  background: #1d1f23;
+  border-color: var(--control-border);
+  box-shadow: var(--shadow-pop);
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 13px;
+  color: #1d1f20;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    color var(--transition);
+}
+/* Hover + roving keyboard focus share the same highlight (programmatic .focus()
+   on menuitems, so we target :focus, not only :focus-visible). */
+.dropdown-item:hover,
+.dropdown-item:focus {
+  outline: none;
+  background: var(--brand-tint);
+  color: var(--brand-text);
+}
+.dropdown-item:active {
+  background: #d7ecdf;
+}
+.dark .dropdown-item {
+  color: #e5e7eb;
+}
+.dark .dropdown-item:hover,
+.dark .dropdown-item:focus {
+  background: var(--brand-tint);
+  color: var(--brand-text);
+}
+.dark .dropdown-item:active {
+  background: #16432c;
+}
+/* Fixed-width icon box → labels align perfectly down the column. */
+.dropdown-item .material-symbols-outlined {
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+  color: var(--brand);
+}
+.dark .dropdown-item .material-symbols-outlined {
+  color: var(--brand-text);
+}
+
+/* Live status line above the table. */
+.toolbar-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #6b7280;
+  min-height: 20px;
+}
+.dark .toolbar-status {
+  color: #9ca3af;
+}
+.toolbar-status:empty {
+  display: none;
+}
+.toolbar-status b {
+  color: #1d1f20;
+  font-weight: 800;
+}
+.dark .toolbar-status b {
+  color: #f3f4f6;
+}
+.toolbar-status .status-icon {
+  font-size: 18px;
+  color: var(--brand);
+}
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: #fef3c7;
+  color: #92600a;
+}
+.dark .status-badge {
+  background: #3a2e0c;
+  color: #fcd34d;
+}
+
+@media (max-width: 480px) {
+  .data-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .toolbar-btn {
+    justify-content: center;
+  }
+  .toolbar-dropdown {
+    width: 100%;
+  }
+  .dropdown-menu {
+    width: 100%;
+  }
+}
+
+/* =========================== Empty states ============================= */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  border: 1px dashed var(--control-border);
+  border-radius: var(--card-radius);
+  background: #fafafa;
+}
+.dark .empty-state {
+  background: #111317;
+  border-color: var(--control-border);
+}
+.empty-state .empty-icon {
+  font-size: 56px;
+  color: #9ca3af;
+}
+.dark .empty-state .empty-icon {
+  color: #6b7280;
+}
+.empty-title {
+  font-weight: 800;
+  font-size: 15px;
+  margin-top: 8px;
+}
+.empty-text {
+  font-size: 12.5px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+.dark .empty-text {
+  color: #9ca3af;
+}
+
+/* ========================= Landing upload card ======================== */
+.upload-card {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 10px 34px rgba(0, 0, 0, 0.06);
+}
+.dark .upload-card {
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.4);
+}
+/* "یا" separator with a rule on each side. */
+.upload-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #9ca3af;
+  font-size: 12px;
+}
+.upload-divider::before,
+.upload-divider::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: #e5e7eb;
+}
+.dark .upload-divider::before,
+.dark .upload-divider::after {
+  background: #26282c;
+}
+
+/* Subtle fade/scale used for the landing card and the dashboard reveal. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.992);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fade-in {
+  animation: fade-in 0.2s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-in {
+    animation: none;
+  }
+}
+
+/* ===================== Correlation lists (Phase 4) ===================== */
+.corr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.corr-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+}
+.corr-pair {
+  font-weight: 600;
+  font-size: 13px;
+}
+.corr-val {
+  font-weight: 800;
+  font-size: 14px;
+  direction: ltr;
+}
+.corr-pos {
+  color: var(--brand-text);
+}
+.corr-neg {
+  color: #b91c1c;
+}
+.dark .corr-pos {
+  color: var(--brand-text);
+}
+.dark .corr-neg {
+  color: #f87171;
+}
+
+/* ===================== Data-quality stats (Phase 8) ==================== */
+.quality-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+}
+.quality-stat-icon {
+  font-size: 28px;
+  color: var(--brand);
+}
+.quality-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+}
+.quality-stat-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+.dark .quality-stat-label {
+  color: #9ca3af;
+}
+
+/* ====================== Quality score gauge (Phase 7) =================== */
+.quality-score {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--card-radius);
+  background: #fff;
+}
+.dark .quality-score {
+  background: #16181b;
+  border-color: #26282c;
+}
+/* Conic-gradient ring driven by --pct (0..100). */
+.qs-ring {
+  --pct: 0;
+  --ring: var(--brand);
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: conic-gradient(var(--ring) calc(var(--pct) * 1%), #e5e7eb 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dark .qs-ring {
+  background: conic-gradient(var(--ring) calc(var(--pct) * 1%), #2a2d31 0);
+}
+.qs-ring-inner {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 1px;
+}
+.dark .qs-ring-inner {
+  background: #16181b;
+}
+.qs-num {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+.qs-unit {
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.7;
+}
+.qs-title {
+  font-size: 13px;
+  color: #6b7280;
+}
+.dark .qs-title {
+  color: #9ca3af;
+}
+.qs-rating {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 2px 0 8px;
+}
+.qs-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.dark .qs-breakdown {
+  color: #9ca3af;
+}
+/* Tone → ring + rating colour. */
+.quality-score-green .qs-ring {
+  --ring: var(--brand);
+}
+.quality-score-green .qs-rating {
+  color: var(--brand-text);
+}
+.quality-score-blue .qs-ring {
+  --ring: #1e5fa8;
+}
+.quality-score-blue .qs-rating {
+  color: #1e5fa8;
+}
+.quality-score-amber .qs-ring {
+  --ring: #d97706;
+}
+.quality-score-amber .qs-rating {
+  color: #b45309;
+}
+.quality-score-red .qs-ring {
+  --ring: #dc2626;
+}
+.quality-score-red .qs-rating {
+  color: #b91c1c;
+}
+.dark .quality-score-green .qs-rating {
+  color: var(--brand-text);
+}
+.dark .quality-score-blue .qs-rating {
+  color: #6cb6f5;
+}
+.dark .quality-score-amber .qs-rating {
+  color: #fcd34d;
+}
+.dark .quality-score-red .qs-rating {
+  color: #f87171;
+}
+
+/* ====================== Auto-insights card (Phase 8) =================== */
+/* Uses the shared card tokens (see :root --card-*) like every other card. */
+.insight-card {
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  background: var(--card-bg);
+  padding: 16px 18px;
+}
+.insight-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 15px; /* card-title tier */
+  margin-bottom: 12px;
+  color: var(--brand-text);
+}
+.dark .insight-head {
+  color: var(--brand-text);
+}
+.insight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.insight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: #fafafa;
+}
+.dark .insight-item {
+  background: #111317;
+}
+.insight-item .insight-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.insight-info .insight-icon {
+  color: #1e5fa8;
+}
+.insight-ok .insight-icon {
+  color: var(--brand-text);
+}
+.insight-warn .insight-icon {
+  color: #b45309;
+}
+.dark .insight-info .insight-icon {
+  color: #6cb6f5;
+}
+.dark .insight-ok .insight-icon {
+  color: var(--brand-text);
+}
+.dark .insight-warn .insight-icon {
+  color: #fcd34d;
+}
+
+/* ============================ Toasts (UI/UX) =========================== */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: min(360px, calc(100vw - 40px));
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--success);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast .material-symbols-outlined {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.toast-ok {
+  background: var(--success);
+}
+.toast-info {
+  background: #1e5fa8;
+}
+.toast-warn {
+  background: #b45309;
+}
+.toast-error {
+  background: #b91c1c;
+}
+.dark .toast {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ====================== Spinner + loading overlay ===================== */
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+.spinner-sm {
+  width: 15px;
+  height: 15px;
+  border-width: 2px;
+}
+.spinner-lg {
+  width: 40px;
+  height: 40px;
+  border-width: 3px;
+  color: #fff;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1.4s;
+  }
+}
+button.is-busy {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(15, 16, 18, 0.55);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    visibility 0s linear 0.2s;
+}
+.loading-overlay.show {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease;
+}
+.loading-text {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ====================================================================== */
+/* ======================= Final UI polish pass ========================= */
+/* ====================================================================== */
+
+/* Shared card tokens — a single source of truth so every dashboard card
+   (header, KPI, insights, info, quality) shares radius / shadow / border. */
+:root {
+  /* Brand palette — the green identity (values unchanged, now centralised). */
+  --brand: #217346; /* primary green (fills, accents) */
+  --brand-hover: #1a5c38; /* hover/pressed fill */
+  --brand-text: #185c37; /* green for text + icon accents */
+  --brand-tint: #e6f4ea; /* soft green surface */
+  --success: #185c37; /* solid success fill (toasts) — theme-stable */
+
+  /* Radius scale — one rhythm for every rounded element. */
+  --radius-sm: 8px; /* chips, small controls, inputs */
+  --radius-md: 10px; /* buttons, toolbar, panels */
+  --radius-lg: 12px; /* toolbar, popovers */
+  --card-radius: 14px; /* cards, dashboard surfaces */
+  --radius-pill: 999px; /* pills, badges, the floating action */
+
+  /* Elevation scale. */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --card-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px rgba(16, 24, 40, 0.05);
+  --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.16);
+  --shadow-fab:
+    0 8px 20px -6px rgba(16, 24, 40, 0.28),
+    0 4px 10px -4px rgba(16, 24, 40, 0.2);
+
+  /* Surfaces & borders. */
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --control-border: #d1d5db; /* form controls, outlined buttons */
+
+  /* Motion & focus — one easing, one timing (<=200ms), one focus ring. */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.15s var(--ease);
+  --transition-lift: 0.18s var(--ease); /* transform/elevation moves */
+  --focus-ring: 0 0 0 3px rgba(33, 115, 70, 0.2);
+
+  /* Glass halo behind the floating action (translucent, blurred). */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-solid: rgba(255, 255, 255, 0.92); /* no-backdrop-filter fallback */
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 8px 30px rgba(16, 24, 40, 0.14);
+}
+.dark {
+  --brand-text: #33c481; /* brighter green for contrast on dark */
+  --brand-tint: #103021;
+  --card-bg: #16181b;
+  --card-border: #26282c;
+  --control-border: #33363b;
+  --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.26);
+  --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.5);
+  --shadow-fab:
+    0 10px 24px -6px rgba(0, 0, 0, 0.6),
+    0 4px 10px -4px rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(22, 24, 27, 0.5);
+  --glass-bg-solid: rgba(22, 24, 27, 0.92);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Unify the top-level cards onto the shared tokens (softer, consistent). */
+.kpi-card,
+.insight-card,
+.quality-score {
+  border-radius: var(--card-radius);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+/* --- KPI cards: equal heights, stronger numbers, softer shadow --- */
+.kpi-grid {
+  gap: 16px;
+}
+.kpi-card {
+  min-height: 86px;
+  padding: 18px;
+}
+.kpi-value {
+  font-size: 24px;
+  letter-spacing: -0.01em;
+}
+.kpi-label {
+  font-size: 12px;
+}
+
+/* --- Section title (e.g. "پیش‌نمایش داده") --- */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 800;
+}
+.section-title .material-symbols-outlined {
+  font-size: 22px;
+  color: var(--brand);
+}
+.dark .section-title .material-symbols-outlined {
+  color: var(--brand-text);
+}
+
+/* --- Dashboard header strip (above the KPI cards) --- */
+.dash-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+}
+.dash-header-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.dash-header-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-tint);
+  color: var(--brand-text);
+}
+.dark .dash-header-icon {
+  background: var(--brand-tint);
+  color: var(--brand-text);
+}
+.dash-header-icon .material-symbols-outlined {
+  font-size: 28px;
+}
+.dash-header-titles {
+  min-width: 0;
+}
+.dash-header-title {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dash-header-sub {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+.dark .dash-header-sub {
+  color: #9ca3af;
+}
+.dash-header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.dash-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.dark .dash-chip {
+  background: #1d1f23;
+  color: #cbd5e1;
+}
+.dash-chip b {
+  font-weight: 800;
+  color: #1d1f20;
+}
+.dark .dash-chip b {
+  color: #f3f4f6;
+}
+.dash-chip .material-symbols-outlined {
+  font-size: 17px;
+  color: var(--brand);
+}
+.dark .dash-chip .material-symbols-outlined {
+  color: var(--brand-text);
+}
+
+@media (max-width: 480px) {
+  /* On phones the sticky bar would eat too much viewport — let it scroll. */
+  .data-toolbar {
+    position: static;
+    box-shadow: none;
+    padding: 0;
+  }
+}
+
+/* --- Localized (non-blocking) section loading indicator --- */
+.section-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 20px;
+  color: #6b7280;
+}
+.dark .section-loading {
+  color: #9ca3af;
+}
+.spinner-section {
+  width: 34px;
+  height: 34px;
+  border-width: 3px;
+  color: var(--brand);
+}
+.dark .spinner-section {
+  color: var(--brand-text);
+}
+.section-loading-text {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* --- Subtle entrance for dashboard sections (respects reduced-motion) --- */
+@keyframes section-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fade-in > #content > * {
+  animation: section-rise 0.2s ease both;
+}
+.fade-in > #content > *:nth-child(2) {
+  animation-delay: 0.03s;
+}
+.fade-in > #content > *:nth-child(3) {
+  animation-delay: 0.06s;
+}
+.fade-in > #content > *:nth-child(4) {
+  animation-delay: 0.09s;
+}
+.fade-in > #content > *:nth-child(n + 5) {
+  animation-delay: 0.12s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-in > #content > * {
+    animation: none;
+  }
 }
