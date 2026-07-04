@@ -92,7 +92,6 @@ window.App = window.App || {};
     function updateStatus() {
       const total = S.raw().length;
       const shown = S.getView().length;
-      status.innerHTML = `نمایش <b>${fmtInt(shown)}</b> از <b>${fmtInt(total)}</b> ردیف`;
     }
 
     function apply() {
