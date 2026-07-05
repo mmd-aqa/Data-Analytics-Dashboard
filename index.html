@@ -12,11 +12,8 @@
     </style>
     <script>
       (function () {
-        const saved = localStorage.getItem("theme");
-        const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)",
-        ).matches;
-        const dark = saved ? saved === "dark" : prefersDark;
+        // Default to Light Mode on first visit; respect the saved choice otherwise.
+        const dark = localStorage.getItem("theme") === "dark";
         document.documentElement.classList.toggle("dark", dark);
       })();
     </script>
