@@ -983,15 +983,33 @@ mark.search-hit {
 }
 
 @media (max-width: 480px) {
+  /* Two-button rows instead of one-per-row. A 2-column grid forces equal widths
+     regardless of each label's intrinsic width (a plain flex-basis:50% wraps
+     unevenly because "نمودار جدید" is wider than half). In DOM order the children
+     are search · filter · new-chart · export · reset, so auto-flow yields:
+       row 1  [ جستجو ] [ فیلتر ]
+       row 2  [ نمودار جدید ] [ خروجی ]
+       row 3  [ بازنشانی ]  (spans both columns → full width)
+     RTL: column 1 is the right-hand cell, so first-in-DOM sits right. */
   .data-toolbar {
-    flex-direction: column;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .data-toolbar > .toolbar-btn,
+  .data-toolbar > .toolbar-dropdown {
+    min-width: 0; /* let cells shrink to the 1fr track instead of overflowing */
+  }
+  .data-toolbar > .toolbar-btn:last-child {
+    grid-column: 1 / -1; /* Reset is alone on its row — keep it full width */
   }
   .toolbar-btn {
     justify-content: center;
+    padding: 0 10px; /* a touch tighter so icon+label fit down to 320px */
+    white-space: nowrap; /* never let a label wrap to a 2nd line inside the 40px pill */
   }
-  .toolbar-dropdown {
-    width: 100%;
+  .toolbar-dropdown > .toolbar-btn {
+    width: 100%; /* export button fills its grid cell */
   }
   .dropdown-menu {
     width: 100%;
@@ -1528,6 +1546,31 @@ button.is-busy {
 }
 .kpi-label {
   font-size: 12px;
+}
+
+/* Mobile only: let labels like "ستون‌ دسته‌ای" / "مقادیر گمشده" wrap to two
+   lines instead of truncating, and trim the icon chip ~14% so the row breathes.
+   Desktop (≥481px) keeps the single-line ellipsis look untouched. */
+@media (max-width: 480px) {
+  .kpi-card {
+    /* a little tighter internally to buy the label horizontal room */
+    gap: 8px;
+    padding: 12px;
+  }
+  .kpi-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+  }
+  .kpi-icon .material-symbols-outlined {
+    font-size: 20px;
+  }
+  .kpi-label {
+    white-space: normal; /* was nowrap+ellipsis — allow up to two lines */
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.25;
+  }
 }
 
 /* --- Section title (e.g. "پیش‌نمایش داده") --- */
