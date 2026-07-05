@@ -779,18 +779,21 @@ mark.search-hit {
   transition:
     grid-template-rows 0.2s var(--ease),
     opacity 0.2s var(--ease),
-    margin-top 0.2s var(--ease),
+    margin 0.2s var(--ease),
     visibility 0s linear 0.2s;
 }
 .toolbar-panel.open {
   grid-template-rows: 1fr;
   opacity: 1;
   visibility: visible;
-  margin-top: 10px;
+  /* 8px rhythm: 16px above (toolbar → panel), 24px below so there is clear
+     separation before the status line that follows in the flow. */
+  margin-top: 16px;
+  margin-bottom: 24px;
   transition:
     grid-template-rows 0.2s var(--ease),
     opacity 0.2s var(--ease),
-    margin-top 0.2s var(--ease),
+    margin 0.2s var(--ease),
     visibility 0s;
 }
 /* Lighter than a free-standing card — these panels belong to the toolbar. */
