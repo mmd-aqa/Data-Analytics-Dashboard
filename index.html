@@ -10,13 +10,7 @@
     <style type="text/tailwindcss">
       @custom-variant dark (&:where(.dark, .dark *));
     </style>
-    <script>
-      (function () {
-        // Default to Light Mode on first visit; respect the saved choice otherwise.
-        const dark = localStorage.getItem("theme") === "dark";
-        document.documentElement.classList.toggle("dark", dark);
-      })();
-    </script>
+    <script src="js/theme-init.js"></script>
     <script src="libs/papaparse.min.js"></script>
     <script src="libs/xlsx.full.min.js"></script>
     <script src="libs/plotly.min.js"></script>
