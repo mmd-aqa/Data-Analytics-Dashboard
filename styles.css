@@ -1392,6 +1392,23 @@ mark.search-hit {
 .dark .toast {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
+/* On phones (≤640px) the FAB dock spans the bottom edge full-width, directly
+   under the bottom-left toast stack. When the dock is present (not [hidden]),
+   lift the toasts to rest a consistent 16px above it. Pure CSS via :has(), so it
+   tracks the dock's visibility with no JS or app-logic changes; when the dock is
+   hidden (e.g. the upload screen) the toasts fall back to their normal bottom.
+   env(safe-area-inset-bottom) is preserved, matching the FAB's own offset.
+   Scoped to ≤640px — the only range where the two overlap; desktop is untouched. */
+@media (max-width: 640px) {
+  body:has(#fabDock:not([hidden])) .toast-container {
+    bottom: calc(
+      16px /* .fab-dock bottom offset @≤640px */ +
+        env(safe-area-inset-bottom, 0px) /* same inset the FAB respects */ +
+        var(--fab-h) /* rendered FAB dock height */ +
+        16px /* required gap above the FAB */
+    );
+  }
+}
 
 /* ====================== Spinner + loading overlay ===================== */
 .spinner {
@@ -1505,6 +1522,11 @@ button.is-busy {
   --glass-bg-solid: rgba(255, 255, 255, 0.92); /* no-backdrop-filter fallback */
   --glass-border: rgba(255, 255, 255, 0.7);
   --glass-shadow: 0 8px 30px rgba(16, 24, 40, 0.14);
+
+  /* Rendered height of the floating-action dock (.fab-dock), border-box:
+     48px button + 10px dock padding (2×5) + 2px dock border (2×1) = 60px.
+     Used to lift mobile toasts clear of the dock — see the toast rule. */
+  --fab-h: calc(48px + 10px + 2px);
 }
 .dark {
   --brand-text: #33c481; /* brighter green for contrast on dark */
