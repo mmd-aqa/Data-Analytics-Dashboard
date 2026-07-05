@@ -16,8 +16,8 @@ window.App = window.App || {};
   function buildKpiCards() {
     const s = stats.computeSummary();
     const cards = [
-      { icon: "rows", label: "تعداد ردیف‌ها", value: fmtInt(s.rows), tone: "green" },
-      { icon: "columns", label: "تعداد ستون‌ها", value: fmtInt(s.columns), tone: "green" },
+      { icon: "rows", label: "ردیف", value: fmtInt(s.rows), tone: "green" },
+      { icon: "columns", label: "ستون‌", value: fmtInt(s.columns), tone: "green" },
       { icon: "numeric", label: "ستون‌های عددی", value: fmtInt(s.numeric), tone: "blue" },
       { icon: "category", label: "ستون‌های دسته‌ای", value: fmtInt(s.categorical), tone: "blue" },
       { icon: "missing", label: "مقادیر گمشده", value: fmtInt(s.missing), tone: s.missing ? "amber" : "green",
