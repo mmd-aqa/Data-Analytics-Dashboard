@@ -117,7 +117,7 @@ window.App = window.App || {};
       const update = () => {
         const start = page * pageSize + 1;
         const end = Math.min(total, (page + 1) * pageSize);
-        info.textContent = `صفحه ${fmtInt(page + 1)} از ${fmtInt(pages)} — ردیف ${fmtInt(start)}…${fmtInt(end)} از ${fmtInt(total)}`;
+        info.textContent = `صفحه ${fmtInt(page + 1)} از ${fmtInt(pages)}`;
         first.disabled = prev.disabled = page === 0;
         last.disabled = next.disabled = page === pages - 1;
       };
