@@ -10,7 +10,7 @@
 
 ---
 
-## ✨ Features | امکانات
+## ✨ امکانات | Features
 
 <div dir="rtl">
 
@@ -31,7 +31,7 @@
 
 ---
 
-## 🛠️ Technologies | فناوری‌ها
+## 🛠️ فناوری‌ها | Technologies
 
 - **Vanilla JavaScript (ES6+)** — بدون فریم‌ورک و بدون باندلر
 - **HTML5** و **CSS3** — به‌همراه سیستم design token
@@ -48,7 +48,7 @@
 
 ---
 
-## 🏗️ Architecture | معماری
+## 🏗️ معماری | Architecture
 
 <div dir="rtl">
 
@@ -73,7 +73,7 @@
 
 ---
 
-## 📁 Project Structure | ساختار پروژه
+## 📁 ساختار پروژه | Project Structure 
 
 ```
 Data-Analytics-Dashboard/
@@ -91,7 +91,7 @@ Data-Analytics-Dashboard/
 
 ---
 
-## 🚀 Getting Started | راه‌اندازی
+## 🚀 راه‌اندازی | Getting Started
 
 <div dir="rtl">
 
@@ -122,7 +122,7 @@ node test/smoke-test.js
 
 ---
 
-## 🎯 Design Philosophy | فلسفه‌ی طراحی
+## 🎯 فلسفه‌ی طراحی | Design Philosophy
 
 <div dir="rtl">
 
@@ -138,7 +138,7 @@ node test/smoke-test.js
 
 ---
 
-## ⚠️ Known Limitations | محدودیت‌ها
+## ⚠️ محدودیت‌ها | Known Limitations
 
 <div dir="rtl">
 
@@ -151,7 +151,7 @@ node test/smoke-test.js
 
 ---
 
-## 📄 License
+## 📄 لایسنس | License
 
 <div dir="rtl">
 
