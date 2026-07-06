@@ -62,13 +62,13 @@ window.App = window.App || {};
     // Landing → dashboard: hide the upload card and fade the dashboard in.
     const uploadSection = $("uploadSection");
     if (uploadSection) uploadSection.classList.add("hidden");
-    // Reveal the floating primary action ("بارگذاری فایل جدید") — the single
-    // persistent way to load another file while a dataset is on screen. The
-    // glass dock wraps the button; toggle the dock, click stays on the button.
-    const fabDock = $("fabDock");
-    if (fabDock) fabDock.hidden = false;
-    const fab = $("floatingUploadBtn");
-    if (fab) fab.onclick = showUpload;
+    // Reveal the header primary action ("بارگذاری فایل جدید") — the single
+    // persistent way to load another file while a dataset is on screen.
+    const headerUpload = $("headerUploadBtn");
+    if (headerUpload) {
+      headerUpload.hidden = false;
+      headerUpload.onclick = showUpload;
+    }
     results.classList.remove("fade-in");
     void results.offsetWidth; // reflow so the animation re-triggers each load
     results.classList.add("fade-in");
@@ -426,9 +426,9 @@ window.App = window.App || {};
   function showUpload() {
     const results = $("resultsSection");
     if (results) results.classList.add("hidden");
-    // Upload screen already has the main upload area — hide the floating action.
-    const fabDock = $("fabDock");
-    if (fabDock) fabDock.hidden = true;
+    // Upload screen already has the main upload area — hide the header action.
+    const headerUpload = $("headerUploadBtn");
+    if (headerUpload) headerUpload.hidden = true;
     const uploadSection = $("uploadSection");
     if (uploadSection) {
       uploadSection.classList.remove("hidden");

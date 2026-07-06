@@ -87,7 +87,7 @@ window.App = window.App || {};
     const toolbar = el("div", "data-toolbar");
 
     // Note: "بارگذاری فایل جدید" is no longer a toolbar button — it is now the
-    // app's floating primary action (see #floatingUploadBtn in index.html,
+    // app's header primary action (see #headerUploadBtn in index.html,
     // wired in dashboard.js). Same trigger, same behaviour.
 
     // Search toggle.

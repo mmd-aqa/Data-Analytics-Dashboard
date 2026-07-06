@@ -25,7 +25,7 @@
         class="sticky top-0 z-20 w-full bg-white dark:bg-[#16181b] border-b border-gray-200 dark:border-[#26282c]"
       >
         <div
-          class="w-full max-w-[1400px] mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-3"
+          class="w-full max-w-[1400px] mx-auto px-5 sm:px-8 min-h-16 flex flex-wrap items-center justify-between gap-3"
         >
           <div class="flex items-center gap-3 min-w-0">
             <span
@@ -43,7 +43,25 @@
               </h1>
             </div>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <!-- Persistent primary action — reveals the upload panel again while a
+                 dataset is loaded. Shown only on the dashboard (the landing screen
+                 already has the upload card); dashboard.js toggles [hidden]. In
+                 RTL this renders to the right of the theme toggle. -->
+            <button
+              id="headerUploadBtn"
+              type="button"
+              aria-label="بارگذاری فایل جدید"
+              hidden
+              class="rounded-lg border border-[#217346] bg-[#217346] hover:bg-[#1a5c38] hover:border-[#1a5c38] text-white font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#217346]/40 transition px-3 py-2 flex items-center gap-2"
+            >
+              <span
+                class="material-symbols-outlined text-xl"
+                aria-hidden="true"
+                >add</span
+              >
+              <span class="hidden sm:inline">بارگذاری فایل جدید</span>
+            </button>
             <button
               id="themeToggle"
               type="button"
@@ -151,23 +169,6 @@
           </p>
         </div>
       </footer>
-    </div>
-
-    <!-- Floating primary action — reveals the upload panel again (same trigger
-         that used to live in the toolbar). Shown only while a dataset is loaded;
-         the dashboard orchestrator toggles the dock's [hidden]. The outer dock
-         provides the frosted-glass halo; the inner button carries the brand. -->
-    <div id="fabDock" class="fab-dock" hidden>
-      <button
-        id="floatingUploadBtn"
-        type="button"
-        class="fab-upload"
-        aria-label="بارگذاری فایل جدید"
-        title="بارگذاری فایل جدید"
-      >
-        <span class="material-symbols-outlined" aria-hidden="true">folder_open</span>
-        <span>بارگذاری فایل جدید</span>
-      </button>
     </div>
 
     <!-- App modules — loaded in dependency order (classic scripts, zero-build) -->

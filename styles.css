@@ -567,6 +567,15 @@ mark.search-hit {
   color: #b91c1c;
 }
 
+/* Header controls (theme toggle + upload) — on touch-width viewports guarantee
+   a ≥48px hit target even though the compact desktop padding is smaller. */
+@media (max-width: 640px) {
+  #themeToggle,
+  #headerUploadBtn {
+    min-height: 48px;
+  }
+}
+
 /* ===================== Search / Filter toolbar (UI/UX) ================== */
 /* One cohesive, sticky command bar that stays visible under the app header. */
 .data-toolbar {
@@ -632,115 +641,6 @@ mark.search-hit {
 }
 .toolbar-btn .material-symbols-outlined {
   font-size: 20px;
-}
-
-/* Floating primary action — "بارگذاری فایل جدید" is the app's one persistent
-   primary command. It is a two-layer Material FAB: an outer glass "dock"
-   (#fabDock) provides a soft blurred halo that separates the action from the
-   content scrolling behind it, and the inner green button carries the brand.
-   Fixed bottom-centre; JS toggles the dock's [hidden]. The fullscreen loading
-   overlay (z-index 9998) sits above it, so it is covered while overlays are up.
-   Bottom offset respects the iOS gesture bar via env(safe-area-inset-bottom). */
-.fab-dock {
-  position: fixed;
-  left: 50%;
-  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
-  z-index: 40;
-  padding: 5px;
-  border-radius: var(--radius-pill);
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  backdrop-filter: blur(12px) saturate(160%);
-  transition:
-    transform var(--transition-lift),
-    box-shadow var(--transition-lift);
-}
-/* Lift the whole FAB (glass halo + button together) on hover/focus-within. */
-.fab-dock:hover,
-.fab-dock:focus-within {
-  transform: translate(-50%, -2px) scale(1.02);
-  box-shadow:
-    0 14px 34px -8px rgba(16, 24, 40, 0.24),
-    var(--glass-shadow);
-}
-.dark .fab-dock:hover,
-.dark .fab-dock:focus-within {
-  box-shadow:
-    0 16px 36px -8px rgba(0, 0, 0, 0.6),
-    var(--glass-shadow);
-}
-.fab-dock[hidden] {
-  display: none;
-}
-/* Graceful fallback where backdrop-filter is unavailable — use a near-opaque
-   surface so the halo still reads as a soft floating panel. */
-@supports not (
-  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
-) {
-  .fab-dock {
-    background: var(--glass-bg-solid);
-  }
-}
-
-.fab-upload {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 24px;
-  border: 1px solid var(--brand);
-  border-radius: var(--radius-pill);
-  background: var(--brand);
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  box-shadow: var(--shadow-fab);
-  transition:
-    background var(--transition),
-    border-color var(--transition);
-}
-.fab-upload:hover {
-  background: var(--brand-hover);
-  border-color: var(--brand-hover);
-}
-.fab-upload:focus-visible {
-  outline: none;
-  box-shadow:
-    var(--shadow-fab),
-    0 0 0 3px rgba(33, 115, 70, 0.45);
-}
-.fab-upload .material-symbols-outlined {
-  font-size: 20px;
-  color: #fff;
-}
-@media (max-width: 1024px) {
-  .fab-dock {
-    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-  }
-}
-@media (max-width: 640px) {
-  .fab-dock {
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    width: calc(100% - 32px);
-    max-width: 360px;
-  }
-  .fab-upload {
-    width: 100%;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .fab-dock {
-    transition: none;
-  }
-  .fab-dock:hover,
-  .fab-dock:focus-within {
-    transform: translateX(-50%);
-  }
 }
 
 /* Active-state badges: a dot for search, a count for filters. */
@@ -1392,23 +1292,6 @@ mark.search-hit {
 .dark .toast {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
-/* On phones (≤640px) the FAB dock spans the bottom edge full-width, directly
-   under the bottom-left toast stack. When the dock is present (not [hidden]),
-   lift the toasts to rest a consistent 16px above it. Pure CSS via :has(), so it
-   tracks the dock's visibility with no JS or app-logic changes; when the dock is
-   hidden (e.g. the upload screen) the toasts fall back to their normal bottom.
-   env(safe-area-inset-bottom) is preserved, matching the FAB's own offset.
-   Scoped to ≤640px — the only range where the two overlap; desktop is untouched. */
-@media (max-width: 640px) {
-  body:has(#fabDock:not([hidden])) .toast-container {
-    bottom: calc(
-      16px /* .fab-dock bottom offset @≤640px */ +
-        env(safe-area-inset-bottom, 0px) /* same inset the FAB respects */ +
-        var(--fab-h) /* rendered FAB dock height */ +
-        16px /* required gap above the FAB */
-    );
-  }
-}
 
 /* ====================== Spinner + loading overlay ===================== */
 .spinner {
@@ -1502,9 +1385,6 @@ button.is-busy {
   --card-shadow:
     0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px rgba(16, 24, 40, 0.05);
   --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.16);
-  --shadow-fab:
-    0 8px 20px -6px rgba(16, 24, 40, 0.28),
-    0 4px 10px -4px rgba(16, 24, 40, 0.2);
 
   /* Surfaces & borders. */
   --card-bg: #ffffff;
@@ -1516,17 +1396,6 @@ button.is-busy {
   --transition: 0.15s var(--ease);
   --transition-lift: 0.18s var(--ease); /* transform/elevation moves */
   --focus-ring: 0 0 0 3px rgba(33, 115, 70, 0.2);
-
-  /* Glass halo behind the floating action (translucent, blurred). */
-  --glass-bg: rgba(255, 255, 255, 0.55);
-  --glass-bg-solid: rgba(255, 255, 255, 0.92); /* no-backdrop-filter fallback */
-  --glass-border: rgba(255, 255, 255, 0.7);
-  --glass-shadow: 0 8px 30px rgba(16, 24, 40, 0.14);
-
-  /* Rendered height of the floating-action dock (.fab-dock), border-box:
-     48px button + 10px dock padding (2×5) + 2px dock border (2×1) = 60px.
-     Used to lift mobile toasts clear of the dock — see the toast rule. */
-  --fab-h: calc(48px + 10px + 2px);
 }
 .dark {
   --brand-text: #33c481; /* brighter green for contrast on dark */
@@ -1536,13 +1405,6 @@ button.is-busy {
   --control-border: #33363b;
   --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.26);
   --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.5);
-  --shadow-fab:
-    0 10px 24px -6px rgba(0, 0, 0, 0.6),
-    0 4px 10px -4px rgba(0, 0, 0, 0.5);
-  --glass-bg: rgba(22, 24, 27, 0.5);
-  --glass-bg-solid: rgba(22, 24, 27, 0.92);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* Unify the top-level cards onto the shared tokens (softer, consistent). */
