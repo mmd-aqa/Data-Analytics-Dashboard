@@ -66,7 +66,7 @@ window.App = window.App || {};
       <div class="dash-header-main">
         <span class="dash-header-icon">${iconHTML("analytics")}</span>
         <div class="dash-header-titles">
-          <h2 class="dash-header-title"><bdi>${escapeHTML(title)}</bdi></h2>
+          <h2 class="dash-header-title" title="${escapeHTML(title)}"><bdi>${escapeHTML(title)}</bdi></h2>
           <div class="dash-header-sub">نمای کلی داشبورد تحلیل داده</div>
         </div>
       </div>

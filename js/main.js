@@ -7,6 +7,7 @@
   function init() {
     window.App.upload.setup();
     window.App.dashboard.setupThemeToggle();
+    window.App.dashboard.setupHeaderScroll();
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

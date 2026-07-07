@@ -465,11 +465,25 @@ window.App = window.App || {};
     });
   }
 
+  /* --------------------------- Sticky header ----------------------------- */
+  // Toggle `.is-scrolled` on the header past a small threshold so it gains its
+  // soft shadow only once the page has moved. Presentation only — no state.
+  function setupHeaderScroll() {
+    const header = document.querySelector(".app-header");
+    if (!header) return;
+    const sync = () => {
+      header.classList.toggle("is-scrolled", window.scrollY > 8);
+    };
+    sync(); // reflect the position on load (e.g. restored scroll)
+    window.addEventListener("scroll", sync, { passive: true });
+  }
+
   App.dashboard = {
     render,
     clear,
     showUpload,
     buildKpiCards: (...a) => App.dashSummary.buildKpiCards(...a),
     setupThemeToggle,
+    setupHeaderScroll,
   };
 })(window.App);

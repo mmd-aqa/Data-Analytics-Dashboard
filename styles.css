@@ -567,12 +567,114 @@ mark.search-hit {
   color: #b91c1c;
 }
 
-/* Header controls (theme toggle + upload) — on touch-width viewports guarantee
-   a ≥48px hit target even though the compact desktop padding is smaller. */
+/* ===================== App header — sticky glass ======================= */
+/* Sticky, translucent, BI-tool style. The header stays above all page content
+   and layers a subtle blur over what scrolls beneath it. Solid-colour fallback
+   (the base rule below) covers browsers without backdrop-filter. */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--card-bg);
+  /* Border starts transparent so the header reads flat on load; the scroll
+     animation fades it (and the soft shadow) in — see @supports block. */
+  border-bottom: 1px solid transparent;
+  transition:
+    box-shadow var(--transition),
+    border-color var(--transition),
+    background var(--transition);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .app-header {
+    background: var(--header-bg);
+    -webkit-backdrop-filter: blur(9px);
+    backdrop-filter: blur(9px);
+  }
+}
+
+/* Lightweight on load, a very soft elevation once scrolled. dashboard.js adds
+   `.is-scrolled` past ~8px of scroll (see setupHeaderScroll); the transition
+   above animates the change. Header stays flat (still fully sticky) until then. */
+.app-header.is-scrolled {
+  box-shadow: var(--shadow-sm);
+  border-bottom-color: var(--card-border);
+}
+
+/* ===================== Header action group (UI/UX) ===================== */
+/* Upload (primary) + theme toggle (secondary) read as one toolbar: identical
+   height, radius, motion and focus ring — only fill and weight differ. Built on
+   the same tokens as .toolbar-btn so every control in the app stays consistent. */
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.header-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+/* Same optical weight as the theme glyph; line-height:1 + flex centring keeps
+   the icon on the text baseline (no high/low drift). */
+.header-btn .material-symbols-outlined {
+  font-size: 20px;
+  line-height: 1;
+}
+/* Icon-only controls sit in a clean square so the glyph is optically centred. */
+.header-btn--icon {
+  width: 40px;
+  padding: 0;
+}
+
+/* Primary — brand fill. The main action, kept subtle: same size as its
+   neighbour, no shadow and no lift, so it leads without dominating. */
+.header-btn--primary {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.header-btn--primary:hover {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+}
+
+/* Secondary — outlined ghost, matching the toolbar's default button exactly. */
+.header-btn--ghost {
+  background: var(--card-bg);
+  border-color: var(--control-border);
+  color: #1d1f20;
+}
+.header-btn--ghost:hover {
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+.dark .header-btn--ghost {
+  background: #1d1f23;
+  color: #e5e7eb;
+}
+.dark .header-btn--ghost:hover {
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+
+/* On touch-width viewports guarantee a ≥48px hit target, and prefer tighter
+   horizontal padding over wrapping so the pair always stays on one line. */
 @media (max-width: 640px) {
-  #themeToggle,
-  #headerUploadBtn {
+  #headerUploadBtn,
+  #themeToggle {
     min-height: 48px;
+  }
+  .header-btn:not(.header-btn--icon) {
+    padding: 0 12px;
   }
 }
 
@@ -1378,7 +1480,7 @@ button.is-busy {
   --radius-md: 10px; /* buttons, toolbar, panels */
   --radius-lg: 12px; /* toolbar, popovers */
   --card-radius: 14px; /* cards, dashboard surfaces */
-  --radius-pill: 999px; /* pills, badges, the floating action */
+  --radius-pill: 999px; /* pills, badges */
 
   /* Elevation scale. */
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
@@ -1390,6 +1492,7 @@ button.is-busy {
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
   --control-border: #d1d5db; /* form controls, outlined buttons */
+  --header-bg: rgba(255, 255, 255, 0.84); /* translucent sticky header (glass) */
 
   /* Motion & focus — one easing, one timing (<=200ms), one focus ring. */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -1405,6 +1508,7 @@ button.is-busy {
   --control-border: #33363b;
   --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.26);
   --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.5);
+  --header-bg: rgba(22, 24, 27, 0.84); /* translucent sticky header (glass) */
 }
 
 /* Unify the top-level cards onto the shared tokens (softer, consistent). */

@@ -21,11 +21,9 @@
     class="min-h-dvh text-sm antialiased bg-[#f4f5f6] dark:bg-[#0e0f11] text-[#1d1f20] dark:text-gray-100"
   >
     <div class="flex flex-col min-h-dvh">
-      <header
-        class="sticky top-0 z-20 w-full bg-white dark:bg-[#16181b] border-b border-gray-200 dark:border-[#26282c]"
-      >
+      <header class="app-header w-full">
         <div
-          class="w-full max-w-[1400px] mx-auto px-5 sm:px-8 min-h-16 flex flex-wrap items-center justify-between gap-3"
+          class="w-full max-w-[1400px] mx-auto px-5 sm:px-8 min-h-16 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:gap-x-5"
         >
           <div class="flex items-center gap-3 min-w-0">
             <span
@@ -43,21 +41,21 @@
               </h1>
             </div>
           </div>
-          <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <div class="flex items-center gap-2 shrink-0">
             <!-- Persistent primary action — reveals the upload panel again while a
                  dataset is loaded. Shown only on the dashboard (the landing screen
                  already has the upload card); dashboard.js toggles [hidden]. In
-                 RTL this renders to the right of the theme toggle. -->
+                 RTL this renders to the right of the theme toggle. Upload and the
+                 theme toggle share the .header-btn system so they read as one
+                 toolbar (see styles.css → Header action group). -->
             <button
               id="headerUploadBtn"
               type="button"
               aria-label="بارگذاری فایل جدید"
               hidden
-              class="rounded-lg border border-[#217346] bg-[#217346] hover:bg-[#1a5c38] hover:border-[#1a5c38] text-white font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#217346]/40 transition px-3 py-2 flex items-center gap-2"
+              class="header-btn header-btn--primary"
             >
-              <span
-                class="material-symbols-outlined text-xl"
-                aria-hidden="true"
+              <span class="material-symbols-outlined" aria-hidden="true"
                 >add</span
               >
               <span class="hidden sm:inline">بارگذاری فایل جدید</span>
@@ -66,11 +64,11 @@
               id="themeToggle"
               type="button"
               aria-label="dark mode"
-              class="rounded-lg border border-gray-300 dark:border-[#33363b] bg-white dark:bg-[#1d1f23] hover:border-[#217346] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#217346]/40 transition px-3 py-2 flex items-center gap-2"
+              class="header-btn header-btn--ghost header-btn--icon"
             >
               <span
                 id="themeIcon"
-                class="material-symbols-outlined text-xl"
+                class="material-symbols-outlined"
                 aria-hidden="true"
                 >dark_mode</span
               >
