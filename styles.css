@@ -396,6 +396,7 @@ mark.search-hit {
 /* ============================== Pagination ============================== */
 .pager {
   display: flex;
+  direction: ltr;
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -584,7 +585,9 @@ mark.search-hit {
     border-color var(--transition),
     background var(--transition);
 }
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+@supports (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
   .app-header {
     background: var(--header-bg);
     -webkit-backdrop-filter: blur(9px);
@@ -1492,7 +1495,12 @@ button.is-busy {
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
   --control-border: #d1d5db; /* form controls, outlined buttons */
-  --header-bg: rgba(255, 255, 255, 0.84); /* translucent sticky header (glass) */
+  --header-bg: rgba(
+    255,
+    255,
+    255,
+    0.84
+  ); /* translucent sticky header (glass) */
 
   /* Motion & focus — one easing, one timing (<=200ms), one focus ring. */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
