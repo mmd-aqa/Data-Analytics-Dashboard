@@ -1,16 +1,19 @@
 /*
  * dashboard/toolbar.js — The data-table command bar: one cohesive group of
- * actions (upload · search · filter · new-chart · export · reset), the
- * collapsible search/filter panels, the live status host, and the Export
- * popover menu (positioned by App.popover).
+ * actions (search · filter · reset) and the collapsible search/filter panels
+ * plus the live status host.
  *
- * It only relocates/wraps existing behaviour — search/filter/export/reset logic
- * is reused from App.filters / App.exporter / App.state. Exposed as App.toolbar.
+ * It only relocates/wraps existing behaviour — search/filter/reset logic is
+ * reused from App.filters / App.state. The Export popover menu is also built
+ * here (buildExportMenu) but now lives in the app header, not this bar; see
+ * index.html #headerActions and dashboard.js. Chart creation is NOT offered
+ * here — the نمودارساز rail section is its single home. Exposed as App.toolbar.
  *
  * build(host, handlers) returns:
  *   { refs, statusHost, updateBadges }
- * where handlers = { onUpload, onNewChart, onReset } and refs carries the
- * elements the orchestrator needs for live refresh and reset.
+ * where handlers = { onUpload, onNewChart, onReset } (onNewChart is accepted
+ * for API stability but no longer bound to any toolbar button) and refs
+ * carries the elements the orchestrator needs for live refresh and reset.
  */
 window.App = window.App || {};
 
@@ -30,9 +33,16 @@ window.App = window.App || {};
     ["svg", "SVG", "image"],
   ];
 
-  function buildExportMenu() {
-    const wrap = el("div", "toolbar-dropdown");
-    const btn = el("button", "toolbar-btn",
+  // Builds the Export popover (trigger button + portalled command menu). The
+  // trigger's look is parameterised so the SAME menu can live in the in-content
+  // toolbar (.toolbar-btn) or in the app header (.header-btn) — one export
+  // implementation, no duplicated popover/roving-focus wiring. Per the redesign
+  // the header is now the only home for Export (see dashboard.js).
+  function buildExportMenu(opts = {}) {
+    const wrapClass = opts.wrapClass || "toolbar-dropdown";
+    const triggerClass = opts.triggerClass || "toolbar-btn";
+    const wrap = el("div", wrapClass);
+    const btn = el("button", triggerClass,
       `${iconHTML("download", "text-lg")}<span>خروجی</span>${iconHTML("expand", "toolbar-caret")}`);
     btn.type = "button";
     btn.id = "exportMenuBtn";
@@ -106,28 +116,16 @@ window.App = window.App || {};
     filterBtn.setAttribute("aria-expanded", "false");
     filterBtn.setAttribute("aria-controls", "filterPanel");
 
-    // New chart — jumps to the chart-builder tab.
-    const newChartBtn = el("button", "toolbar-btn",
-      `${iconHTML("newChart", "text-lg")}<span>نمودار جدید</span>`);
-    newChartBtn.type = "button";
-    newChartBtn.title = "ساخت نمودار جدید";
-    newChartBtn.onclick = () => handlers.onNewChart && handlers.onNewChart();
-
     // Reset all (disabled until search/filters are active — see updateBadges).
     const resetBtn = el("button", "toolbar-btn",
       `${iconHTML("reset", "text-lg")}<span>بازنشانی</span>`);
     resetBtn.type = "button";
     resetBtn.onclick = () => handlers.onReset && handlers.onReset();
 
-    // Export popover (floating command-menu).
-    const exportWrap = buildExportMenu();
-
-    // One cohesive command bar — a single contiguous group, no separating
-    // spacer. RTL reading order: search · filter · new-chart · export · reset.
-    // Export sits beside its neighbours so its popover stays attached.
-    [searchBtn, filterBtn, newChartBtn].forEach((b) => toolbar.appendChild(b));
-    toolbar.appendChild(exportWrap);
-    toolbar.appendChild(resetBtn);
+    // One cohesive command bar — a single contiguous group. RTL reading order:
+    // search · filter · reset. Chart creation lives in its own rail section
+    // (نمودارساز) and Export in the app header — neither is duplicated here.
+    [searchBtn, filterBtn, resetBtn].forEach((b) => toolbar.appendChild(b));
     host.appendChild(toolbar);
 
     popover.ensureGlobalCloser();
@@ -228,5 +226,5 @@ window.App = window.App || {};
     }
   }
 
-  App.toolbar = { build };
+  App.toolbar = { build, buildExportMenu };
 })(window.App);

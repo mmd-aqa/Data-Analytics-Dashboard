@@ -16,50 +16,60 @@
     <script src="libs/plotly.min.js"></script>
     <script src="assets/sample-data.js"></script>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="sidebar.css" />
   </head>
   <body
     class="min-h-dvh text-sm antialiased bg-[#f4f5f6] dark:bg-[#0e0f11] text-[#1d1f20] dark:text-gray-100"
   >
     <div class="flex flex-col min-h-dvh">
       <header class="app-header w-full">
+        <!-- RTL-native header: exactly TWO groups with flexible empty space
+             between them (justify-between). Branding is anchored to the RIGHT
+             edge (reading start), the action toolbar to the LEFT edge (reading
+             end). The groups are explicit — layout does not rely on RTL
+             auto-ordering, the logo never sits in the toolbar, and the action
+             buttons never sit near the branding. -->
         <div
-          class="w-full max-w-[1400px] mx-auto px-5 sm:px-8 min-h-16 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:gap-x-5"
+          class="w-full px-5 sm:px-8 min-h-[var(--header-height)] flex items-center justify-between gap-4"
         >
-          <div class="flex items-center gap-3 min-w-0">
+          <!-- Branding group — pinned to the right edge. A small neutral mark
+               immediately before the wordmark; no coloured icon container. -->
+          <div class="flex items-center gap-2 min-w-0">
             <span
-              class="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-lg bg-[#217346]/8"
+              class="material-symbols-outlined shrink-0 text-[26px] text-gray-700 dark:text-gray-300"
+              aria-hidden="true"
+              >analytics</span
             >
-              <span
-                class="material-symbols-outlined text-[32px] text-[#217346]"
-                aria-hidden="true"
-                >analytics</span
-              >
-            </span>
-            <div class="min-w-0">
-              <h1 class="text-base sm:text-lg font-bold leading-tight truncate">
-                داشبورد تحلیل داده
-              </h1>
-            </div>
+            <h1
+              class="text-base sm:text-[17px] font-semibold leading-tight truncate"
+            >
+              داشبورد تحلیل داده
+            </h1>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <!-- Persistent primary action — reveals the upload panel again while a
-                 dataset is loaded. Shown only on the dashboard (the landing screen
-                 already has the upload card); dashboard.js toggles [hidden]. In
-                 RTL this renders to the right of the theme toggle. Upload and the
-                 theme toggle share the .header-btn system so they read as one
-                 toolbar (see styles.css → Header action group). -->
-            <button
-              id="headerUploadBtn"
-              type="button"
-              aria-label="بارگذاری فایل جدید"
-              hidden
-              class="header-btn header-btn--primary"
-            >
-              <span class="material-symbols-outlined" aria-hidden="true"
-                >add</span
+
+          <!-- Toolbar group — pinned to the left edge. Two independent, equal-
+               weight buttons (Load New File + Export) sit side by side with a
+               small gap; the theme toggle follows with a larger gap as a
+               separate control. IDs preserved: dashboard.js reveals the actions
+               + mounts Export into #headerActionGroup; sidebar.js injects the
+               mobile toggle into #headerActions. -->
+          <div id="headerActions" class="flex items-center gap-4 shrink-0">
+            <div id="headerActionGroup" class="header-action-group">
+              <button
+                id="headerUploadBtn"
+                type="button"
+                aria-label="بارگذاری فایل جدید"
+                hidden
+                class="header-btn header-btn--ghost"
               >
-              <span class="hidden sm:inline">بارگذاری فایل جدید</span>
-            </button>
+                <span class="material-symbols-outlined" aria-hidden="true"
+                  >add</span
+                >
+                <span class="hidden sm:inline">بارگذاری فایل جدید</span>
+              </button>
+              <!-- Export menu (App.toolbar.buildExportMenu) is appended here by
+                   dashboard.js on load — it no longer lives in the data toolbar. -->
+            </div>
             <button
               id="themeToggle"
               type="button"
@@ -77,44 +87,63 @@
         </div>
       </header>
 
-      <main class="flex-1 w-full max-w-[1400px] mx-auto p-5 sm:p-8">
-        <!-- Single, centered upload panel — the entire landing experience. -->
-        <section
-          id="uploadSection"
-          class="flex items-center justify-center py-4 sm:py-10"
-        >
+      <!-- Vertical rhythm: 24px from the app header to the dataset header
+           (the flat page title needs air), generous side/bottom padding. -->
+      <main
+        class="flex-1 w-full max-w-[1400px] mx-auto px-5 sm:px-8 pt-6 pb-5 sm:pb-8"
+      >
+        <!-- Landing (empty state) — a desktop-application empty state, not a
+             marketing page: quiet title → one-line hint → the dropzone as the
+             single primary action → a ghost sample-data button as its quiet
+             companion. Everything lives inside #uploadSection (dashboard.js
+             hides/shows it as one unit) and .upload-card (dashboard.js
+             re-triggers fade-in on it). Whitespace and type carry the
+             hierarchy — no cards, badges or decoration. -->
+        <!-- Fluid top spacing: scales with viewport height (clamped 56–128px)
+             so the hero sits at the optical centre on tall monitors without
+             drifting off-screen on short ones. -->
+        <section id="uploadSection" class="pt-[clamp(3.5rem,12vh,8rem)] pb-8">
           <div
-            class="upload-card fade-in w-full max-w-[680px] rounded-2xl border border-gray-200 dark:border-[#26282c] bg-white dark:bg-[#16181b] p-6 sm:p-8 text-center"
+            class="upload-card fade-in w-full max-w-[560px] mx-auto text-center"
           >
-            <span
-              class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#217346]/10 mb-3"
-            >
-              <span
-                class="material-symbols-outlined text-[34px] text-[#217346]"
-                aria-hidden="true"
-                >cloud_upload</span
-              >
-            </span>
-            <p class="text-base font-semibold mb-5">
-              فایل Excel یا CSV خود را اینجا رها کنید
+            <!-- Quiet page title: states what the application does, at app
+                 scale (not hero scale). No letter-spacing tweaks — Persian
+                 script is connected; tracking hurts more than it helps. -->
+            <h1 class="text-xl font-semibold">تحلیل داده‌های Excel و CSV</h1>
+            <p class="text-[13px] text-gray-500 dark:text-gray-400 mt-2">
+              تمام پردازش‌ها به‌صورت محلی در مرورگر شما انجام می‌شوند.
             </p>
 
+            <!-- The dropzone IS the single upload action: label→input for
+                 click-to-pick; upload.js binds drag + keyboard handlers to
+                 this label (the document's only label[for=fileInput]).
+                 Children stay pointer-events-none so drag events fire on the
+                 label itself, never flicker on inner elements. -->
             <label
               for="fileInput"
               tabindex="0"
               role="button"
               aria-label="انتخاب یا رها کردن فایل برای بارگذاری"
-              class="block cursor-pointer rounded-xl border-2 border-dashed border-gray-300 dark:border-[#33363b] hover:border-[#217346] hover:bg-[#217346]/5 focus-visible:outline-none focus-visible:border-[#217346] focus-visible:ring-2 focus-visible:ring-[#217346]/30 transition p-6 sm:p-8"
+              class="block cursor-pointer rounded-xl border-2 border-dashed border-gray-400/85 dark:border-[#474c54] bg-white dark:bg-[#1a1d21] hover:border-[#217346] hover:bg-[#217346]/5 focus-visible:outline-none focus-visible:border-[#217346] focus-visible:ring-2 focus-visible:ring-[#217346]/30 transition mt-7 px-6 py-11"
             >
               <span
-                class="inline-flex items-center gap-2 rounded-lg bg-[#217346] hover:bg-[#1a5c38] text-white text-sm font-semibold px-5 py-2.5 transition pointer-events-none"
+                class="material-symbols-outlined text-[28px] text-gray-400 dark:text-gray-500 pointer-events-none"
+                aria-hidden="true"
+                >cloud_upload</span
               >
-                <span class="material-symbols-outlined text-base" aria-hidden="true"
-                  >upload_file</span
-                >
-                <span>انتخاب فایل</span>
-              </span>
-              <div class="text-xs text-gray-400 dark:text-gray-500 mt-3">
+              <p
+                class="text-sm font-medium text-gray-700 dark:text-gray-200 mt-3 pointer-events-none"
+              >
+                فایل Excel یا CSV خود را انتخاب کنید
+              </p>
+              <p
+                class="text-[12.5px] text-gray-500 dark:text-gray-400 mt-1 pointer-events-none"
+              >
+                یا فایل را اینجا رها کنید
+              </p>
+              <div
+                class="text-[11px] text-gray-400 dark:text-gray-500 mt-3 pointer-events-none"
+              >
                 csv · xlsx · xls
               </div>
               <input
@@ -125,21 +154,25 @@
               />
             </label>
 
-            <div
-              id="fileStatus"
-              class="text-xs text-gray-500 dark:text-gray-400 mt-4"
-              aria-live="polite"
-            >
-              فایلی انتخاب نشده است
-            </div>
+            <!-- Visually-hidden live region: upload.js still writes progress /
+                 success / error text here (all visually surfaced via toasts and
+                 the loading overlay), and screen readers keep the announcements.
+                 No default "no file selected" text — the zone speaks for itself. -->
+            <div id="fileStatus" class="sr-only" aria-live="polite"></div>
 
-            <div class="upload-divider my-6"><span>یا</span></div>
+            <!-- Sample dataset — the dropzone's quiet companion (16px below,
+                 half the title→zone gap, so the two read as one interaction
+                 group). Transparent at rest so it sits on the canvas; hover
+                 darkens the surface and firms the border — never green, the
+                 dropzone owns the brand accent. -->
             <button
               id="exampleBtn"
               type="button"
-              class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-[#33363b] bg-white dark:bg-[#1d1f23] hover:border-[#217346] hover:text-[#185c37] dark:hover:text-[#33c481] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#217346]/30 text-sm font-semibold px-5 py-2.5 transition"
+              class="inline-flex items-center gap-1.5 mt-4 rounded-md border border-gray-300/80 dark:border-[#2f3237] bg-transparent text-[12.5px] font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-200/50 dark:hover:bg-[#1d1f23] hover:border-gray-400 dark:hover:border-[#41454c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#217346]/30 px-4 h-8 transition"
             >
-              <span class="material-symbols-outlined text-base" aria-hidden="true"
+              <span
+                class="material-symbols-outlined text-sm text-gray-400 dark:text-gray-500"
+                aria-hidden="true"
                 >dataset</span
               >
               <span>استفاده از مجموعه داده نمونه</span>
@@ -147,23 +180,28 @@
           </div>
         </section>
 
-        <section
-          id="resultsSection"
-          class="hidden mb-6 rounded-xl border border-gray-200 dark:border-[#26282c] bg-white dark:bg-[#16181b] p-5 sm:p-6"
-        >
+        <!-- Flat workspace — no outer card. The page itself is the canvas
+             (Cloudflare-style): the summary, insights and data-preview render as
+             independent flat sections separated by spacing/dividers, and only the
+             data table carries its own thin frame. -->
+        <section id="resultsSection" class="hidden mb-6">
           <div id="content"></div>
         </section>
       </main>
 
+      <!-- App footer — a subtle status bar: hairline divider, minimal height,
+           low-contrast micro-type. Pure chrome — it must never compete with
+           the page content above it. -->
       <footer
-        class="w-full bg-white dark:bg-[#16181b] border-t border-gray-200 dark:border-[#26282c] mt-8"
+        class="w-full bg-white dark:bg-[#16181b] border-t border-gray-200 dark:border-[#26282c] mt-6"
       >
         <div
-          class="w-full max-w-[1400px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-center"
+          class="w-full max-w-[1400px] mx-auto px-5 sm:px-8 h-8 flex items-center justify-center"
         >
-          <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
-            کاملاً در مرورگر شما اجرا می‌شود • بدون نیاز به
-            نصب
+          <p
+            class="text-[11px] text-gray-400 dark:text-gray-500 opacity-80 text-center"
+          >
+            کاملاً در مرورگر شما اجرا می‌شود • بدون نیاز به نصب
           </p>
         </div>
       </footer>
@@ -191,5 +229,7 @@
     <script src="js/dashboard.js"></script>
     <script src="js/upload.js"></script>
     <script src="js/main.js"></script>
+    <!-- Collapsible analysis-navigation panel (UI/UX only; drives existing tabs) -->
+    <script src="js/sidebar.js"></script>
   </body>
 </html>

@@ -1,0 +1,363 @@
+/*
+ * sidebar.css — Minimal analysis-navigation rail.
+ *
+ * A presentation-only layer on top of the existing dashboard: it never changes
+ * the app's markup or logic, it only styles the rail that sidebar.js injects and
+ * the small right-edge offset the shell gains while the rail is on screen. Every
+ * colour, radius, shadow, motion and focus value comes from the shared design
+ * tokens in styles.css (:root / .dark), so the rail reads as part of the same UI
+ * in both light and dark themes. The app is RTL, so the rail sits on the
+ * physical right (the reading start edge); layout uses plain physical properties
+ * to keep that unambiguous, while text inside inherits the document's dir="rtl".
+ */
+
+:root {
+  /* Desktop rail width — a local alias of the shared --sidebar-width shell token
+     (defined in styles.css) so every rail rule below can read the short name
+     while a single value still governs the whole layout. */
+  --sb-w: var(--sidebar-width);
+  --sb-drawer-w: min(288px, 84vw); /* mobile drawer width (comfortable list) */
+  /* Two stacking slots, one per role:
+     — docked desktop rail: chrome that sits BELOW the sticky header (z 30,
+       .app-header in styles.css). The header always owns the top edge; if the
+       header ever renders taller than --header-height (wrapped title, large
+       fonts), it covers the rail's top rather than the reverse.
+     — mobile drawer: a modal layer WITH backdrop, above all chrome but below
+       the loading overlay (9998) and toasts (9999). */
+  --sb-z-rail: 20;
+  --sb-z-drawer: 9995;
+}
+
+/* ----------------------------- Shell offset ---------------------------- */
+/* On desktop the rail is a fixed column that starts BELOW the header. The header
+   itself spans the full viewport width (one continuous bar), so ONLY the main
+   content and footer are inset left of the rail — the header is never offset and
+   no empty strip is reserved for the rail beside the branding. The rail's top
+   edge meets the header's bottom border (see the desktop rules further down), so
+   header and rail share a single boundary. Mobile keeps no offset — the rail
+   overlays as a drawer. The main inset preserves its own gutter (+--content-gap)
+   so content clears the rail with breathing room instead of butting against it. */
+@media (min-width: 1024px) {
+  .dash-has-sidebar > main {
+    padding-right: calc(var(--sb-w) + var(--content-gap));
+    transition: padding-right var(--transition-lift);
+  }
+  .dash-has-sidebar > footer {
+    padding-right: var(--sb-w);
+    transition: padding-right var(--transition-lift);
+  }
+}
+
+/* -------------------------------- Rail --------------------------------- */
+/* Base geometry = the desktop docked rail: starts at the header's bottom
+   border (shared shell tokens — no magic numbers) and runs to the viewport
+   bottom. The mobile media query overrides top/height/z-index for the
+   full-height drawer role. */
+.app-sidebar {
+  position: fixed;
+  top: calc(var(--header-height) + var(--header-border-width));
+  right: 0;
+  height: calc(100vh - var(--header-height) - var(--header-border-width));
+  width: var(--sb-w);
+  z-index: var(--sb-z-rail);
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border-left: 1px solid var(--card-border);
+  /* Hidden until a dataset loads; sidebar.js toggles .is-visible. */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(12px);
+  transition:
+    opacity var(--transition),
+    transform var(--transition-lift),
+    visibility var(--transition);
+}
+.app-sidebar.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+/* Rail head — mobile drawer only: it holds the drawer's close button. Hidden on
+   desktop, where the rail starts just below the full-width header (see the
+   desktop media query) so no head strip is needed. */
+.app-sidebar__head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: var(--header-height); /* match the app-header height (shared token) */
+  padding: 0 var(--space-3);
+  border-bottom: 1px solid var(--card-border);
+}
+
+/* Close button — visible only in the mobile drawer (see media query). */
+.app-sidebar__close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.app-sidebar__close::before {
+  content: "\00d7"; /* × — a text glyph, not the (subset) icon font */
+  font-size: 22px;
+  line-height: 1;
+}
+.app-sidebar__close:hover {
+  background: var(--surface-muted);
+  color: var(--text);
+}
+.dark .app-sidebar__close:hover {
+  background: var(--surface-muted);
+}
+.app-sidebar__close:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ------------------------------- Nav list ------------------------------ */
+/* A flat list of the seven analysis sections — a quiet rail, not a menu. */
+.app-sidebar__nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Item — icon above a whisper-quiet label, centred in the narrow rail; one
+   click activates the matching existing tab. Inactive items almost disappear
+   (subtle ink, no chrome); hover raises them only halfway. The active item is
+   the ONLY emphasis the rail carries. */
+.sb-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-2) var(--space-1);
+  border-radius: var(--radius-md);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-subtle);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    color var(--transition);
+}
+.sb-item:hover {
+  background: var(--surface-muted);
+  color: var(--text-muted);
+}
+.sb-item:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.sb-item__icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  color: inherit; /* the icon always matches the item's ink — one hierarchy */
+  transition: color var(--transition);
+}
+/* Label wraps to at most two tight lines so two-word section names still fit
+   the narrow rail without overflowing. */
+.sb-item__label {
+  width: 100%;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Active item — the one green touchpoint in the rail: a soft brand tint, full
+   brand ink and a slim accent bar on the start (right) edge. Mirrors
+   .tab-btn.active so the two navigation systems read the same. */
+.sb-item.is-active {
+  background: var(--brand-tint);
+  color: var(--brand-text);
+  font-weight: 700;
+}
+.sb-item.is-active .sb-item__icon {
+  color: var(--brand-text);
+}
+.sb-item.is-active::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0; /* flush with the item's start edge */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+}
+
+/* ------------------------- Mobile drawer toggle ------------------------ */
+/* Injected into the existing header action group; reuses .header-btn so it
+   matches the upload/theme controls. Hidden on desktop and until data loads. */
+.sb-toggle {
+  display: none;
+}
+.sb-toggle__bars,
+.sb-toggle__bars::before,
+.sb-toggle__bars::after {
+  content: "";
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform var(--transition), opacity var(--transition);
+}
+.sb-toggle__bars {
+  position: relative;
+}
+.sb-toggle__bars::before {
+  position: absolute;
+  top: -6px;
+}
+.sb-toggle__bars::after {
+  position: absolute;
+  top: 6px;
+}
+/* Morph to an × while the drawer is open. */
+.sb-toggle.is-open .sb-toggle__bars {
+  background: transparent;
+}
+.sb-toggle.is-open .sb-toggle__bars::before {
+  transform: translateY(6px) rotate(45deg);
+}
+.sb-toggle.is-open .sb-toggle__bars::after {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Backdrop behind the mobile drawer. */
+.app-sidebar__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--sb-z-drawer) - 1);
+  background: rgba(0, 0, 0, 0.44);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition), visibility var(--transition);
+}
+.app-sidebar__backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ============================ Responsive =============================== */
+/* Below the desktop breakpoint the rail becomes an off-canvas drawer that
+   slides in from the right; the shell keeps its full width. */
+@media (max-width: 1023px) {
+  .app-sidebar {
+    /* Drawer role: a modal overlay — full viewport height, above the header
+       (its own head strip carries the close button), backdrop behind it. */
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    z-index: var(--sb-z-drawer);
+    width: var(--sb-drawer-w);
+    box-shadow: var(--shadow-pop);
+    /* Off-canvas to the right until opened. */
+    transform: translateX(100%);
+    opacity: 1;
+    visibility: hidden;
+    transition:
+      transform var(--transition-lift),
+      visibility var(--transition);
+  }
+  /* Loaded but closed: ready off-screen, not yet interactive. */
+  .app-sidebar.is-visible {
+    transform: translateX(100%);
+    visibility: hidden;
+  }
+  .app-sidebar.is-visible.is-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  .app-sidebar__close {
+    display: inline-flex;
+  }
+  /* In the wider drawer the items read as a normal list again: icon beside a
+     full, left-aligned label rather than the stacked narrow-rail form. */
+  .app-sidebar__nav {
+    padding: var(--space-3);
+    gap: var(--space-2);
+  }
+  .sb-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-muted); /* the drawer is a full menu — readable, not whispered */
+    text-align: start;
+  }
+  .sb-item__icon {
+    font-size: 21px;
+  }
+  .sb-item__label {
+    width: auto;
+    flex: 1;
+    min-width: 0;
+    -webkit-line-clamp: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .sb-item.is-active::before {
+    height: 18px;
+    inset-inline-start: 0;
+  }
+  /* Toggle appears once a dataset is loaded (sidebar.js clears [hidden]). */
+  .sb-toggle:not([hidden]) {
+    display: inline-flex;
+  }
+}
+
+/* Desktop: the rail is an integrated part of the application shell — a proper
+   docked column with its own quiet surface (card background) and a single
+   hairline on its content edge, exactly like the header's divider. Its
+   geometry (top below the header's full-width bottom border, height to the
+   viewport bottom) comes from the base .app-sidebar rules; here we only drop
+   the drawer-only chrome. */
+@media (min-width: 1024px) {
+  .app-sidebar__head {
+    display: none;
+  }
+  .app-sidebar__backdrop {
+    display: none;
+  }
+}
+
+/* Respect reduced-motion: keep state changes, drop the movement. */
+@media (prefers-reduced-motion: reduce) {
+  .dash-has-sidebar > main,
+  .dash-has-sidebar > footer,
+  .app-sidebar,
+  .sb-item,
+  .sb-item__icon,
+  .app-sidebar__backdrop,
+  .sb-toggle__bars,
+  .sb-toggle__bars::before,
+  .sb-toggle__bars::after {
+    transition: none !important;
+  }
+  .sb-item:active,
+  .sb-item:hover .sb-item__icon {
+    transform: none !important;
+  }
+}

@@ -69,11 +69,11 @@ window.App = window.App || {};
     root.innerHTML = "";
     draft = S.filters().map((f) => ({ ...f }));
 
-    root.appendChild(el("h3", "text-base font-bold mb-1", "فیلتر داده‌ها"));
-    root.appendChild(
-      el("p", "mb-4 text-gray-500 dark:text-gray-400",
-        "چند فیلتر را هم‌زمان اعمال کنید. جدول‌ها، نمودارها و شاخص‌ها به‌صورت زنده به‌روزرسانی می‌شوند."),
-    );
+    root.appendChild(el("h3", "section-title", `${iconHTML("filter")}<span>فیلتر داده‌ها</span>`));
+    // root.appendChild(
+    //   el("p", "section-desc",
+    //     "چند فیلتر را هم‌زمان اعمال کنید. جدول‌ها، نمودارها و شاخص‌ها به‌صورت زنده به‌روزرسانی می‌شوند."),
+    // );
 
     /* --------------------------- Filter rows ----------------------------- */
     const rowsBox = el("div", "flex flex-col gap-3 mb-3");

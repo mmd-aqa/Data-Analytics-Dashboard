@@ -6,7 +6,7 @@ window.App = window.App || {};
 
 (function (App) {
   "use strict";
-  const { el } = App.dom;
+  const { el, iconHTML } = App.dom;
   const { round } = App.fmt;
   const { alertBox, buildTable } = App.ui;
   const charts = App.charts;
@@ -57,9 +57,9 @@ window.App = window.App || {};
 
   function renderCorrelation(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "text-base font-bold mb-1", "ماتریس همبستگی"));
+    root.appendChild(el("h3", "section-title", `${iconHTML("grid")}<span>ماتریس همبستگی</span>`));
     root.appendChild(
-      el("p", "mb-4 text-gray-500 dark:text-gray-400",
+      el("p", "section-desc",
         "همبستگی پیرسون بین ستون‌های عددی. مقیاس رنگ از ۱- (همبستگی منفی) تا ۱+ (همبستگی مثبت) است."),
     );
 
@@ -109,7 +109,7 @@ window.App = window.App || {};
 
   function corrList(title, items, kind) {
     const box = el("div");
-    box.appendChild(el("h4", "font-bold mb-2", title));
+    box.appendChild(el("h4", "subsection-title", title));
     if (!items.length) {
       box.appendChild(alertBox("info", "موردی برای نمایش وجود ندارد."));
       return box;

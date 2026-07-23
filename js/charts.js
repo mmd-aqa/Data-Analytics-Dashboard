@@ -105,9 +105,9 @@ window.App = window.App || {};
 
   function renderBuilder(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "text-base font-bold mb-1", "نمودارساز پیشرفته"));
+    root.appendChild(el("h3", "section-title", `${iconHTML("chart")}<span>نمودارساز پیشرفته</span>`));
     root.appendChild(
-      el("p", "mb-4 text-gray-500 dark:text-gray-400",
+      el("p", "section-desc",
         "نوع نمودار، محورها و روش تجمیع را انتخاب کنید تا نمودار به‌صورت زنده ساخته شود."),
     );
 

@@ -32,14 +32,44 @@ window.App = window.App || {};
     ];
   }
 
+  // Re-trigger the subtle view-entrance animation on a freshly shown region so
+  // switching Home ↔ Analysis fades in instead of snapping. No-op if absent.
+  function fadeIn(node) {
+    if (!node) return;
+    node.classList.remove("view-fade");
+    void node.offsetWidth; // reflow to restart the animation
+    node.classList.add("view-fade");
+  }
+
+  // Fill the dataset-summary panel: the identity head (mark + name + subtitle),
+  // then the panel body — three hairline-divided groups: the file-metadata facts,
+  // the structural counts, and the data-quality flags. Rebuilt on first render and
+  // on every refresh. No business logic — just composition of the three builders.
+  function fillSummaryBar(host) {
+    host.innerHTML = "";
+    host.appendChild(App.dashHeader.build());
+    const body = el("div", "dash-panel__body");
+    body.appendChild(App.dashHeader.buildMeta());
+    body.appendChild(App.dashSummary.buildKpiCards());
+    host.appendChild(body);
+  }
+
   // Shared layout state, owned here so the extracted modules can stay stateless.
-  let headerHost = null;
-  let kpiHost = null;
+  let summaryHost = null; // the unified dataset-summary card (identity + stats)
   let insightsHost = null;
   let previewHost = null;
+  let previewSection = null; // wrapper around the whole Data Preview block (toggled as one)
   let toolbarApi = null; // { refs, statusHost, updateBadges } from App.toolbar.build
-  let activateTabFn = null; // set in render(); lets the toolbar switch tabs
-  let activeTabId = "overview";
+  let headerExportEl = null; // Export popover mounted into the header action group
+  // The sidebar rail is the only visible navigator (the top tab bar is hidden).
+  // These are set in render() and drive the two views WITHOUT duplicating any
+  // render logic — they reuse the existing tab machinery:
+  let showHomeView = null;     // () => Dataset Information + Auto-insights + Data Preview
+  let showAnalysisView = null; // (id) => a single analysis section; insights + preview hidden
+  // No analysis section is open on load: the landing view is Dataset Information +
+  // Auto-insights + Data Preview, and nothing is highlighted in the rail. Sections
+  // render lazily on first open. `null` = home/landing, nothing selected.
+  let activeTabId = null;
 
   // Reset-all: clear search + every filter, restoring the original dataset. A
   // single S.refresh() re-renders KPIs, insights, preview and the live tabs.
@@ -58,6 +88,8 @@ window.App = window.App || {};
   function render() {
     const c = $("content");
     const results = $("resultsSection");
+    // Fresh load → summary-only: no analysis tab is pre-selected or pre-rendered.
+    activeTabId = null;
     results.classList.remove("hidden");
     // Landing → dashboard: hide the upload card and fade the dashboard in.
     const uploadSection = $("uploadSection");
@@ -69,6 +101,18 @@ window.App = window.App || {};
       headerUpload.hidden = false;
       headerUpload.onclick = showUpload;
     }
+    // Export now lives beside "Load New File" in the header, joined into the
+    // segmented action group (#headerActionGroup). Build the popover once and
+    // reveal it whenever a dataset is on screen; it reuses
+    // App.toolbar.buildExportMenu / App.exporter unchanged.
+    const actionGroup = $("headerActionGroup");
+    if (actionGroup && !headerExportEl) {
+      headerExportEl = App.toolbar.buildExportMenu({
+        triggerClass: "header-btn header-btn--ghost",
+      });
+      actionGroup.appendChild(headerExportEl);
+    }
+    if (headerExportEl) headerExportEl.hidden = false;
     results.classList.remove("fade-in");
     void results.offsetWidth; // reflow so the animation re-triggers each load
     results.classList.add("fade-in");
@@ -78,40 +122,49 @@ window.App = window.App || {};
     // Drop subscribers from any previous render so they don't pile up.
     S.clearSubscribers();
 
-    // Dashboard header — dataset identity strip above the KPI cards (24px gap).
-    headerHost = el("div", "mb-6");
-    headerHost.appendChild(App.dashHeader.build());
-    c.appendChild(headerHost);
+    // Dataset summary — a single compact information PANEL (Cloudflare style): a
+    // bordered block with the dataset name as its hero head, then hairline-divided
+    // groups for the file-metadata facts, the structural counts and the quality
+    // flags. Bold values, muted labels — scannable top-to-bottom (16px gap below).
+    summaryHost = el("div", "mb-4 dash-panel");
+    fillSummaryBar(summaryHost);
+    c.appendChild(summaryHost);
 
-    // KPI cards — the single home for the metric breakdown (32px gap below).
-    kpiHost = el("div", "mb-8");
-    kpiHost.appendChild(App.dashSummary.buildKpiCards());
-    c.appendChild(kpiHost);
-
-    // Auto-insights — analytical findings only, full width (32px gap below).
-    insightsHost = el("div", "mb-8");
+    // Auto-insights — analytical findings only, full width. A 16px gap keeps the
+    // rhythm tight so the Data Preview (the primary content) sits high on the page.
+    insightsHost = el("div", "mb-4");
     c.appendChild(insightsHost);
     App.insights.render(insightsHost);
 
     // Data preview: section title, the sticky search/filter toolbar (with its
     // live status line), then the paginated table — no repeated summary chips.
-    c.appendChild(el("h2", "section-title mb-4", `${iconHTML("table")}<span>پیش‌نمایش داده</span>`));
+    // The Data Preview block lives in one wrapper so the whole thing (title,
+    // toolbar, status line, table) can be shown on the home view and hidden when
+    // an analysis section is open — as a unit, without touching its internals.
+    previewSection = el("div");
+    previewSection.appendChild(el("h2", "section-title section-title--primary", `${iconHTML("table")}<span>پیش‌نمایش داده</span>`));
+    previewSection.appendChild(el("p", "section-desc", "جست‌وجو، فیلتر و مرور ردیف‌های مجموعه‌داده"));
     const toolbarHost = el("div");
-    c.appendChild(toolbarHost);
+    previewSection.appendChild(toolbarHost);
     toolbarApi = App.toolbar.build(toolbarHost, {
-      onNewChart: () => { if (activateTabFn) activateTabFn("charts"); },
+      onNewChart: () => { if (showAnalysisView) showAnalysisView("charts"); },
       onReset: resetAll,
     });
     App.preview.updateStatusLine(toolbarApi.statusHost);
     previewHost = el("div", "mt-4"); // 16px: toolbar → table
-    c.appendChild(previewHost);
+    previewSection.appendChild(previewHost);
     App.preview.draw(previewHost, resetAll);
-    c.appendChild(el("hr", "border-gray-200 dark:border-gray-800 my-8"));
+    c.appendChild(previewSection);
 
-    // Tabs
+    // Tabs — the tab bar stays in the DOM (it still owns each section's stable id,
+    // aria-selected state, lazy-render onclick and keyboard handling that the
+    // sidebar drives), but it is hidden: the rail is the only visible navigator.
+    // Inline display:none so no layout space is used and no class can override it.
     const defs = tabDefs();
     const tabBar = el("div", "flex gap-2 flex-wrap mb-4 border-b border-gray-200 dark:border-gray-800 pb-2");
     tabBar.setAttribute("role", "tablist");
+    tabBar.setAttribute("aria-hidden", "true");
+    tabBar.style.display = "none";
     const panels = el("div");
     const panelMap = {};
     const tabBtns = {};
@@ -126,8 +179,12 @@ window.App = window.App || {};
       btn.type = "button";
       btn.setAttribute("role", "tab");
       btn.setAttribute("aria-selected", isActive ? "true" : "false");
+      // Stable, position-independent identifier for external navigators (the
+      // sidebar rail) to bind to — no reliance on tab order or DOM index.
+      btn.dataset.section = def.id;
       const panel = el("div", isActive ? "" : "hidden");
       panel.setAttribute("role", "tabpanel");
+      panel.dataset.section = def.id;
       panelMap[def.id] = { panel, def };
       tabBtns[def.id] = btn;
       btn.onclick = () => {
@@ -176,17 +233,47 @@ window.App = window.App || {};
     c.appendChild(tabBar);
     c.appendChild(panels);
 
-    // Let the toolbar (e.g. "نمودار جدید") switch tabs programmatically.
-    activateTabFn = (id) => {
-      const btn = tabBtns[id];
-      if (!btn) return;
-      btn.onclick();
-      btn.scrollIntoView({ behavior: "smooth", block: "start" });
+    // ---- View controllers (the sidebar rail's two navigation outcomes) -------
+    // Show/hide the home region (Auto-insights + Data Preview) as a unit.
+    const setHomeVisible = (on) => {
+      if (insightsHost) insightsHost.classList.toggle("hidden", !on);
+      if (previewSection) previewSection.classList.toggle("hidden", !on);
+    };
+    // Reflect the active section on the (hidden) tab buttons so the sidebar's
+    // aria-selected mirror highlights the right rail item. Renders nothing.
+    const selectOnly = (id) => {
+      Object.entries(tabBtns).forEach(([tid, b]) => {
+        const on = tid === id;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
     };
 
-    // Render the active tab now; others render lazily on first open.
-    panelMap[activeTabId].def.render(panelMap[activeTabId].panel);
-    rendered[activeTabId] = true;
+    // Home = the landing screen: Dataset Information + Auto-insights + Data
+    // Preview, every analysis panel hidden. The overview panel itself is never
+    // rendered — "Overview" simply IS the home region.
+    showHomeView = () => {
+      activeTabId = "overview";
+      Object.values(panelMap).forEach((x) => x.panel.classList.add("hidden"));
+      selectOnly("overview");
+      setHomeVisible(true);
+      fadeIn(insightsHost);
+      fadeIn(previewSection);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    // Analysis = exactly one section visible; insights + preview hidden. Reuses
+    // the tab's own onclick (lazy render on first open, show panel, hide others,
+    // set aria-selected) — no render logic duplicated, state preserved on reopen.
+    showAnalysisView = (id) => {
+      if (!tabBtns[id]) return;
+      setHomeVisible(false);
+      tabBtns[id].onclick();
+      fadeIn(panelMap[id] && panelMap[id].panel);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // Nothing renders up front: the landing view is the home region only. Every
+    // analysis section stays lazy until the user opens it from the rail.
 
     // Live refresh: when filters/search change, update the header, KPIs, insights,
     // the preview, the toolbar badges/status, and (only) the data-display tabs
@@ -195,8 +282,7 @@ window.App = window.App || {};
     // user's in-tab selections survive a filter change.
     const LIVE_TABS = { overview: 1, missing: 1, correlation: 1, quality: 1 };
     S.subscribe(() => {
-      if (headerHost) { headerHost.innerHTML = ""; headerHost.appendChild(App.dashHeader.build()); }
-      if (kpiHost) { kpiHost.innerHTML = ""; kpiHost.appendChild(App.dashSummary.buildKpiCards()); }
+      if (summaryHost) fillSummaryBar(summaryHost);
       if (insightsHost) App.insights.render(insightsHost);
       App.preview.draw(previewHost, resetAll);
       if (toolbarApi) {
@@ -213,7 +299,7 @@ window.App = window.App || {};
   /* --------------------------- Overview section -------------------------- */
   function renderOverview(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "text-base font-bold mb-3", "نمای کلی مجموعه‌داده"));
+    root.appendChild(el("h3", "section-title", `${iconHTML("analytics")}<span>نمای کلی مجموعه‌داده</span>`));
 
     const subNames = ["خلاصه", "ستون‌ها", "انواع داده", "سطرهای ابتدایی و انتهایی"];
     const bar = el("div", "flex gap-2 flex-wrap mb-4");
@@ -233,14 +319,14 @@ window.App = window.App || {};
     root.appendChild(bar); root.appendChild(wrap);
 
     const rows = S.getView();
-    sub[0].appendChild(el("p", "mb-2", `تعداد <b>${fmtInt(rows.length)}</b> سطر و <b>${S.columns().length}</b> ستون در نمای فعلی وجود دارد`));
-    sub[0].appendChild(el("h4", "font-bold mb-2", "خلاصه آماری مجموعه‌داده"));
+    sub[0].appendChild(el("p", "section-desc", `تعداد <b>${fmtInt(rows.length)}</b> سطر و <b>${S.columns().length}</b> ستون در نمای فعلی وجود دارد`));
+    sub[0].appendChild(el("h4", "subsection-title", "خلاصه آماری مجموعه‌داده"));
     sub[0].appendChild(stats.buildDescribe());
 
-    sub[1].appendChild(el("h4", "font-bold mb-2", "نام ستون‌ها"));
+    sub[1].appendChild(el("h4", "subsection-title", "نام ستون‌ها"));
     sub[1].appendChild(buildTable(S.columns().map((c) => ({ "0": c })), ["0"]));
 
-    sub[2].appendChild(el("h4", "font-bold mb-2", "انواع داده ستون‌ها"));
+    sub[2].appendChild(el("h4", "subsection-title", "انواع داده ستون‌ها"));
     sub[2].appendChild(buildTable(S.columns().map((c) => ({ "ستون": c, "نوع": S.dtypeOf(c) })), ["ستون", "نوع"]));
 
     buildHeadTail(sub[3]);
@@ -251,7 +337,7 @@ window.App = window.App || {};
     const max = rows.length;
     if (max === 0) { root.appendChild(alertBox("warn", "ردیفی وجود ندارد.")); return; }
 
-    root.appendChild(el("h4", "font-bold mb-1 mt-2", "سطرهای ابتدایی"));
+    root.appendChild(el("h4", "subsection-title", "سطرهای ابتدایی"));
     const topW = el("div", "widget mb-2");
     topW.innerHTML = `<label>تعداد سطرهای ابتدایی موردنظر: <span id="topVal">5</span></label>
       <input type="range" min="1" max="${Math.min(max, 100)}" value="5" id="topSlider" class="w-full">`;
@@ -261,7 +347,7 @@ window.App = window.App || {};
     topW.querySelector("#topSlider").oninput = (e) => { topW.querySelector("#topVal").textContent = e.target.value; drawTop(+e.target.value); };
     drawTop(5);
 
-    root.appendChild(el("h4", "font-bold mb-1 mt-4", "سطرهای انتهایی"));
+    root.appendChild(el("h4", "subsection-title", "سطرهای انتهایی"));
     const botW = el("div", "widget mb-2");
     botW.innerHTML = `<label>تعداد سطرهای انتهایی موردنظر: <span id="botVal">5</span></label>
       <input type="range" min="1" max="${Math.min(max, 100)}" value="5" id="botSlider" class="w-full">`;
@@ -275,7 +361,7 @@ window.App = window.App || {};
   /* ------------------------- Value-counts section ------------------------ */
   function renderValueCounts(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "text-base font-bold mb-3", "شمارش مقادیر ستون‌ها"));
+    root.appendChild(el("h3", "section-title", `${iconHTML("rows")}<span>شمارش مقادیر ستون‌ها</span>`));
 
     const det = el("details", "expander");
     det.open = true;
@@ -291,7 +377,7 @@ window.App = window.App || {};
     grid.appendChild(colW); grid.appendChild(topW);
     body.appendChild(grid);
 
-    const btn = el("button", "rounded-lg bg-[#217346] hover:bg-[#1a5c38] text-white font-semibold px-4 py-2 w-max", "شمارش");
+    const btn = el("button", "btn-primary w-max", "شمارش");
     body.appendChild(btn);
     const out = el("div"); body.appendChild(out);
 
@@ -305,7 +391,7 @@ window.App = window.App || {};
       arr.sort((a, b) => b.count - a.count);
       arr = arr.slice(0, topN);
       out.appendChild(buildTable(arr, [col, "count"]));
-      out.appendChild(el("h4", "font-bold mt-4 mb-2", "مصورسازی"));
+      out.appendChild(el("h4", "subsection-title", "مصورسازی"));
       if (!arr.length) { out.appendChild(alertBox("warn", "داده‌ای برای نمایش در نمودار وجود ندارد.")); return; }
       const x = arr.map((r) => String(r[col])), y = arr.map((r) => r.count);
       const d1 = el("div", "mb-4"); out.appendChild(d1);
@@ -323,8 +409,8 @@ window.App = window.App || {};
   /* --------------------------- Group-by section -------------------------- */
   function renderGroupby(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "text-base font-bold mb-3", "گروه‌بندی"));
-    root.appendChild(el("p", "mb-3 text-gray-500 dark:text-gray-400", "گروه‌بندی به شما امکان می‌دهد داده‌های خود را بر اساس دسته‌ها و گروه‌های خاص خلاصه کنید"));
+    root.appendChild(el("h3", "section-title", `${iconHTML("category")}<span>گروه‌بندی</span>`));
+    root.appendChild(el("p", "section-desc", "گروه‌بندی به شما امکان می‌دهد داده‌های خود را بر اساس دسته‌ها و گروه‌های خاص خلاصه کنید"));
 
     const det = el("details", "expander");
     det.open = true;
@@ -344,7 +430,7 @@ window.App = window.App || {};
     grid.appendChild(gW); grid.appendChild(opColW); grid.appendChild(opW);
     body.appendChild(grid);
 
-    const btn = el("button", "rounded-lg bg-[#217346] hover:bg-[#1a5c38] text-white font-semibold px-4 py-2 w-max", "اعمال گروه‌بندی");
+    const btn = el("button", "btn-primary w-max", "اعمال گروه‌بندی");
     body.appendChild(btn);
     const out = el("div"); body.appendChild(out);
 
@@ -357,7 +443,7 @@ window.App = window.App || {};
       const result = stats.groupby(gbCols, opCol, op);
       const cols = [...gbCols, "Result"];
       out.appendChild(buildTable(result, cols));
-      out.appendChild(el("h4", "font-bold mt-4 mb-2", "مصورسازی داده"));
+      out.appendChild(el("h4", "subsection-title", "مصورسازی داده"));
 
       const chartW = el("div", "widget mb-3 max-w-xs");
       chartW.innerHTML = `<label>نمودار خود را انتخاب کنید</label>
@@ -411,12 +497,13 @@ window.App = window.App || {};
     if (c) { c.innerHTML = ""; c.classList.add("hidden"); }
     $("resultsSection").classList.add("hidden");
     showUpload();
-    headerHost = null;
-    kpiHost = null;
+    summaryHost = null;
     insightsHost = null;
     previewHost = null;
+    previewSection = null;
     toolbarApi = null;
-    activateTabFn = null;
+    showHomeView = null;
+    showAnalysisView = null;
     charts.clearRegistry();
   }
 
@@ -426,9 +513,10 @@ window.App = window.App || {};
   function showUpload() {
     const results = $("resultsSection");
     if (results) results.classList.add("hidden");
-    // Upload screen already has the main upload area — hide the header action.
+    // Upload screen already has the main upload area — hide the header actions.
     const headerUpload = $("headerUploadBtn");
     if (headerUpload) headerUpload.hidden = true;
+    if (headerExportEl) headerExportEl.hidden = true;
     const uploadSection = $("uploadSection");
     if (uploadSection) {
       uploadSection.classList.remove("hidden");
@@ -482,6 +570,16 @@ window.App = window.App || {};
     render,
     clear,
     showUpload,
+    // Public navigation entry point for the sidebar rail — the app's single
+    // navigator. Binds by STABLE section id (see tabDefs), never tab order/DOM
+    // position. "overview" is the home screen (Dataset Information + Auto-insights
+    // + Data Preview, all analysis hidden); any other id shows just that section
+    // (insights + preview hidden), lazy-rendering on first open and reusing the
+    // already-rendered panel thereafter. No-op until the dashboard has rendered.
+    showSection: (id) => {
+      if (id === "overview") { if (showHomeView) showHomeView(); }
+      else if (id) { if (showAnalysisView) showAnalysisView(id); }
+    },
     buildKpiCards: (...a) => App.dashSummary.buildKpiCards(...a),
     setupThemeToggle,
     setupHeaderScroll,

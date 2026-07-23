@@ -51,19 +51,19 @@ body {
   padding: 6px 12px;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: #6b7280;
+  color: var(--text-muted);
   transition:
     background var(--transition),
     color var(--transition);
   white-space: nowrap;
 }
 .tab-btn:hover {
-  background: #f3f4f6;
-  color: var(--brand-text);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .dark .tab-btn:hover {
-  background: #1d1f23;
-  color: var(--brand-text);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .tab-btn.active {
   background: var(--brand-tint);
@@ -79,74 +79,86 @@ body {
   box-shadow: var(--focus-ring);
 }
 
+/* The data table is the ONE framed surface on the page — everything above it is
+   flat, so the frame itself marks "this is the content". Inside, rows are
+   separated by horizontal hairlines only (GitHub/Linear style): no vertical
+   grid, no zebra striping — padding and the row rule carry the structure. */
 .df-wrapper {
   direction: ltr;
   overflow-x: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-md);
-  max-height: 460px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  background: var(--card-bg);
+  max-height: 520px;
   overflow-y: auto;
 }
 .dark .df-wrapper {
-  border-color: #374151;
+  border-color: var(--card-border);
 }
 
 table.df {
   border-collapse: collapse;
   width: 100%;
-  font-size: 13px;
+  font-size: var(--font-body);
   direction: ltr;
 }
 table.df th,
 table.df td {
-  border: 1px solid #e5e7eb;
-  padding: 6px 10px;
+  border-bottom: 1px solid var(--divider);
+  padding: 9px var(--space-4); /* comfortable cells: dense but never cramped */
   text-align: left;
   direction: ltr;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums; /* columns of figures align digit-for-digit */
 }
 .dark table.df th,
 .dark table.df td {
-  border-color: #374151;
+  border-color: var(--divider);
+}
+/* Numbers/body read at full contrast; the index column steps back. */
+table.df td:first-child b {
+  font-weight: 500;
+  color: var(--text-subtle);
+}
+/* No double line against the wrapper's own frame. */
+table.df tbody tr:last-child td {
+  border-bottom: none;
 }
 
+/* Header — a quiet muted band (GitHub file-browser style): the tinted strip
+   marks "this is the instrument's head", caption type keeps it subordinate to
+   the data; a single inset hairline keeps the boundary while it sticks. */
 table.df thead th {
   position: sticky;
   top: 0;
-  background: #f9fafb;
-  font-weight: 700;
+  background: var(--surface-muted);
+  border-bottom: none; /* the inset hairline below does the separating */
+  font-size: var(--font-meta);
+  font-weight: 600;
+  color: var(--text-muted);
   z-index: 1;
-  /* Subtle separation so the sticky header reads above scrolled rows. */
-  box-shadow:
-    inset 0 -1px 0 #e5e7eb,
-    0 2px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: inset 0 -1px 0 var(--card-border);
 }
 .dark table.df thead th {
-  background: #111827;
-  box-shadow:
-    inset 0 -1px 0 #374151,
-    0 2px 6px rgba(0, 0, 0, 0.3);
+  background: var(--surface-muted);
+  box-shadow: inset 0 -1px 0 var(--card-border);
 }
 
-table.df tbody tr:nth-child(even) {
-  background: #fafafa;
-}
-.dark table.df tbody tr:nth-child(even) {
-  background: #0b1220;
-}
-/* Row hover — wins over the zebra striping above. */
+/* Row hover — barely-there (the pointer already tells you where you are);
+   the only row treatment. */
 table.df tbody tr:hover td {
-  background: #eef6f1;
+  background: var(--surface-muted);
 }
 .dark table.df tbody tr:hover td {
-  background: #14241b;
+  background: #1a1c20;
 }
 
 .widget label {
   display: block;
   font-weight: 600;
-  margin-bottom: 4px;
-  font-size: 13px;
+  margin-bottom: var(--space-1);
+  font-size: var(--font-body);
+  color: var(--text);
 }
 .widget select,
 .widget input[type="number"] {
@@ -154,15 +166,16 @@ table.df tbody tr:hover td {
   border: 1px solid var(--control-border);
   border-radius: var(--radius-sm);
   padding: 7px 10px;
-  background: #fff;
-  color: #111;
-  font-size: 13px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: var(--font-body);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 .dark .widget select,
 .dark .widget input[type="number"] {
-  background: #111827;
-  color: #f9fafb;
-  border-color: #374151;
+  background: var(--surface-muted);
+  color: var(--text);
+  border-color: var(--control-border);
 }
 .widget select:focus,
 .widget input[type="number"]:focus {
@@ -173,38 +186,45 @@ table.df tbody tr:hover td {
 input[type="range"] {
   accent-color: var(--brand);
 }
+/* Slim, quiet scrollbars — visible on hover-intent, never heavy chrome. */
 .df-wrapper::-webkit-scrollbar {
-  height: 10px;
-  width: 10px;
+  height: 8px;
+  width: 8px;
 }
 .df-wrapper::-webkit-scrollbar-thumb {
-  background: #c9ccd1;
-  border-radius: var(--radius-sm);
+  background: #d3d6da;
+  border-radius: var(--radius-pill);
+}
+.df-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #b9bdc3;
 }
 .dark .df-wrapper::-webkit-scrollbar-thumb {
   background: #3a3d42;
 }
+.dark .df-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #4a4e54;
+}
 
 .alert {
   border-radius: var(--radius-md);
-  padding: 12px 16px;
-  font-size: 13px;
-  margin: 8px 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-body);
+  margin: var(--space-2) 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 .alert .material-symbols-outlined {
   font-size: 18px;
   flex-shrink: 0;
 }
 .alert-info {
-  background: var(--brand-tint);
-  color: var(--brand-text);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .dark .alert-info {
-  background: var(--brand-tint);
-  color: var(--brand-text);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .alert-warn {
   background: #fef3c7;
@@ -223,20 +243,23 @@ input[type="range"] {
   color: #86efac;
 }
 
+/* Expanders are flat disclosure regions, not cards: the summary line reads as a
+   subsection header with a caret; content simply flows beneath it on the canvas. */
 details.expander {
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-md);
-  padding: 4px 14px;
-  background: #fff;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
 }
 .dark details.expander {
-  border-color: #374151;
-  background: #0f172a;
+  background: transparent;
 }
 details.expander > summary {
   cursor: pointer;
   font-weight: 700;
-  padding: 8px 0;
+  font-size: 13px;
+  color: var(--text);
+  padding: 4px 0;
   list-style: none;
 }
 details.expander > summary::-webkit-details-marker {
@@ -253,114 +276,11 @@ html {
   overflow-y: scroll;
 }
 
-/* ============================ KPI cards (Phase 2) ======================== */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-@media (min-width: 640px) {
-  .kpi-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1024px) {
-  .kpi-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-}
-.kpi-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border-radius: var(--card-radius);
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  transition:
-    transform var(--transition-lift),
-    box-shadow var(--transition);
-}
-.kpi-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-}
-.dark .kpi-card {
-  background: #16181b;
-  border-color: #26282c;
-}
-.kpi-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.kpi-icon .material-symbols-outlined {
-  font-size: 24px;
-}
-.kpi-body {
-  min-width: 0;
-}
-.kpi-value {
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1.1;
-  direction: ltr;
-  text-align: right;
-}
-.kpi-sub {
-  font-size: 11px;
-  font-weight: 600;
-  margin-right: 6px;
-  opacity: 0.7;
-}
-.kpi-label {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.dark .kpi-label {
-  color: #9ca3af;
-}
-/* Tone variants — coloured icon chip only, card stays neutral. */
-.kpi-green .kpi-icon {
-  background: var(--brand-tint);
-  color: var(--brand-text);
-}
-.kpi-blue .kpi-icon {
-  background: #e0eefb;
-  color: #1e5fa8;
-}
-.kpi-amber .kpi-icon {
-  background: #fef3c7;
-  color: #92600a;
-}
-.kpi-red .kpi-icon {
-  background: #fde2e2;
-  color: #b91c1c;
-}
-.dark .kpi-green .kpi-icon {
-  background: var(--brand-tint);
-  color: var(--brand-text);
-}
-.dark .kpi-blue .kpi-icon {
-  background: #0e2438;
-  color: #6cb6f5;
-}
-.dark .kpi-amber .kpi-icon {
-  background: #3a2e0c;
-  color: #fcd34d;
-}
-.dark .kpi-red .kpi-icon {
-  background: #3a1414;
-  color: #f87171;
-}
+/* The dataset metric breakdown (rows · columns · numeric · categorical ·
+   missing · duplicates) no longer renders as six KPI cards — it is now a set of
+   compact `.dash-cell` figures inside the bordered `.dash-panel` information block
+   (see that block near the end of this file). The former .kpi-* rules were removed
+   with that redesign. */
 
 /* ===================== Sortable / highlighted tables ==================== */
 table.df th.th-sort {
@@ -368,11 +288,15 @@ table.df th.th-sort {
   -webkit-user-select: none;
   user-select: none;
 }
+/* Hover darkens the caption to full text colour — no brand tint; sorting is a
+   neutral interaction. */
 table.df th.th-sort:hover {
-  color: var(--brand-text);
+  color: var(--text);
+  background: var(--surface-muted);
 }
 .dark table.df th.th-sort:hover {
-  color: var(--brand-text);
+  color: var(--text);
+  background: var(--surface-muted);
 }
 table.df tr.row-warn td {
   background: #fef3c7 !important;
@@ -394,49 +318,55 @@ mark.search-hit {
 }
 
 /* ============================== Pagination ============================== */
+/* Quiet ghost controls (GitHub-style): no boxes at rest — the chevrons and the
+   page info read as one caption-level line; a soft fill appears on hover. */
 .pager {
   display: flex;
   direction: ltr;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin-top: 10px;
+  gap: 2px;
+  margin-top: var(--space-2);
   flex-wrap: wrap;
 }
 .pager-info {
   font-size: 12px;
-  color: #6b7280;
-  margin: 0 8px;
+  color: var(--text-muted);
+  margin: 0 10px;
 }
 .dark .pager-info {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 .pager-btn {
-  min-width: 34px;
-  height: 32px;
+  min-width: 30px;
+  height: 28px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--control-border);
-  background: #fff;
-  color: #1d1f20;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
   font-weight: 700;
   transition: all var(--transition);
 }
 .pager-btn:hover:not(:disabled) {
-  border-color: var(--brand);
-  color: var(--brand-text);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .pager-btn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
 .pager-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 .dark .pager-btn {
-  background: #1d1f23;
-  border-color: var(--control-border);
-  color: #e5e7eb;
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+}
+.dark .pager-btn:hover:not(:disabled) {
+  background: var(--surface-muted);
+  color: var(--text);
 }
 
 /* ====================== Filters & search (Phase 6/7) ==================== */
@@ -449,7 +379,7 @@ mark.search-hit {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 20px;
   pointer-events: none;
 }
@@ -457,14 +387,15 @@ mark.search-hit {
   width: 100%;
   border: 1px solid var(--control-border);
   border-radius: var(--radius-md);
-  padding: 10px 42px 10px 12px;
-  background: #fff;
-  color: #111;
-  font-size: 14px;
+  padding: var(--space-2) 40px var(--space-2) var(--space-3);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: var(--font-body);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 .dark .search-wrap input {
-  background: #16181b;
-  color: #f9fafb;
+  background: var(--card-bg);
+  color: var(--text);
   border-color: var(--control-border);
 }
 .search-wrap input:focus {
@@ -475,30 +406,38 @@ mark.search-hit {
 .filter-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
   align-items: center;
-  padding: 8px 10px;
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-md);
-  background: #fafafa;
+  padding: var(--space-1) 0;
+}
+.filter-row + .filter-row {
+  border-top: 1px solid var(--divider); /* hairline between stacked conditions */
+  padding-top: var(--space-2);
 }
 .dark .filter-row {
-  background: #111317;
+  background: transparent;
 }
 .filter-row select,
 .filter-row input {
   border: 1px solid var(--control-border);
   border-radius: var(--radius-sm);
   padding: 7px 10px;
-  background: #fff;
-  color: #111;
-  font-size: 13px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: var(--font-body);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 .dark .filter-row select,
 .dark .filter-row input {
-  background: #16181b;
-  color: #f9fafb;
+  background: var(--card-bg);
+  color: var(--text);
   border-color: var(--control-border);
+}
+.filter-row select:focus,
+.filter-row input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: var(--focus-ring);
 }
 .filter-row .filter-col {
   min-width: 150px;
@@ -530,77 +469,97 @@ mark.search-hit {
 }
 
 /* ============================ Shared buttons =========================== */
+/* One button family — every action in the app is one of these three, all sharing
+   height (34px), radius and focus ring so the interface has a single button
+   language. Primary = brand fill (the one place a solid action lives); secondary
+   = outlined; ghost = text-only. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  background: var(--brand);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-body);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.btn-primary:hover {
+  background: var(--brand-hover);
+}
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
 .btn-secondary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  height: 34px;
   border: 1px solid var(--control-border);
-  background: #fff;
-  color: #1d1f20;
+  background: var(--card-bg);
+  color: var(--text);
   border-radius: var(--radius-md);
-  padding: 8px 14px;
+  padding: 0 14px;
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--font-body);
   transition: all var(--transition);
 }
 .btn-secondary:hover {
-  border-color: var(--brand);
-  color: var(--brand-text);
+  border-color: var(--text-subtle);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .dark .btn-secondary {
-  background: #1d1f23;
+  background: var(--surface-muted);
   border-color: var(--control-border);
-  color: #e5e7eb;
+  color: var(--text);
 }
 .dark .btn-secondary:hover {
-  border-color: var(--brand);
-  color: var(--brand-text);
+  border-color: var(--text-subtle);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
   border-radius: var(--radius-md);
-  padding: 8px 14px;
+  padding: 0 14px;
   font-weight: 600;
-  font-size: 13px;
-  color: #6b7280;
+  font-size: var(--font-body);
+  color: var(--text-muted);
   transition: all var(--transition);
 }
 .btn-ghost:hover {
   color: #b91c1c;
 }
 
-/* ===================== App header — sticky glass ======================= */
-/* Sticky, translucent, BI-tool style. The header stays above all page content
-   and layers a subtle blur over what scrolls beneath it. Solid-colour fallback
-   (the base rule below) covers browsers without backdrop-filter. */
+/* ===================== App header — flat toolbar ====================== */
+/* Sticky, solid, flat SaaS style. No glass/blur and no scroll elevation — a
+   single hairline bottom border is the only separation, forming the boundary the
+   sidebar rail docks beneath so header + rail read as one connected surface. */
 .app-header {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: var(--card-bg);
-  /* Border starts transparent so the header reads flat on load; the scroll
-     animation fades it (and the soft shadow) in — see @supports block. */
-  border-bottom: 1px solid transparent;
-  transition:
-    box-shadow var(--transition),
-    border-color var(--transition),
-    background var(--transition);
-}
-@supports (
-  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
-) {
-  .app-header {
-    background: var(--header-bg);
-    -webkit-backdrop-filter: blur(9px);
-    backdrop-filter: blur(9px);
-  }
+  background: var(--surface);
+  border-bottom: var(--header-border-width) solid var(--card-border);
 }
 
-/* Lightweight on load, a very soft elevation once scrolled. dashboard.js adds
-   `.is-scrolled` past ~8px of scroll (see setupHeaderScroll); the transition
-   above animates the change. Header stays flat (still fully sticky) until then. */
+/* Flat on load and while scrolled — no shadow. The `.is-scrolled` class is still
+   toggled by dashboard.js but intentionally carries no elevation now; the thin
+   border alone separates the header from scrolled content. */
 .app-header.is-scrolled {
-  box-shadow: var(--shadow-sm);
-  border-bottom-color: var(--card-border);
+  box-shadow: none;
 }
 
 /* ===================== Header action group (UI/UX) ===================== */
@@ -611,7 +570,7 @@ mark.search-hit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-2);
   height: 40px;
   padding: 0 14px;
   border: 1px solid transparent;
@@ -638,42 +597,82 @@ mark.search-hit {
   padding: 0;
 }
 
-/* Primary — brand fill. The main action, kept subtle: same size as its
-   neighbour, no shadow and no lift, so it leads without dominating. */
-.header-btn--primary {
-  background: var(--brand);
-  border-color: var(--brand);
-  color: #fff;
-}
-.header-btn--primary:hover {
-  background: var(--brand-hover);
-  border-color: var(--brand-hover);
-}
-
 /* Secondary — outlined ghost, matching the toolbar's default button exactly. */
 .header-btn--ghost {
   background: var(--card-bg);
   border-color: var(--control-border);
-  color: #1d1f20;
+  color: var(--text);
 }
 .header-btn--ghost:hover {
-  border-color: var(--brand);
-  color: var(--brand-text);
+  border-color: var(--text-subtle);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .dark .header-btn--ghost {
-  background: #1d1f23;
-  color: #e5e7eb;
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .dark .header-btn--ghost:hover {
-  border-color: var(--brand);
-  color: var(--brand-text);
+  border-color: var(--text-subtle);
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+/* A gentle press feedback shared by header/toolbar buttons — a barely-there
+   settle that makes clicks feel physical without motion for its own sake. */
+.header-btn:active {
+  transform: translateY(0.5px);
+}
+
+/* --- Header actions: two independent, equal-weight buttons --- */
+/* "Load New File" + "Export" sit side by side as separate buttons with a small
+   gap — NOT a segmented control. Each keeps its own .header-btn shape, height,
+   padding, radius and (ghost) weight, so the two read as identical peers. The
+   wrapper only handles spacing and hides itself until at least one action is
+   revealed, so no empty box shows on the landing screen. */
+.header-action-group {
+  display: none;
+  align-items: center;
+  gap: var(--space-3); /* one 12px step between the two buttons */
+}
+.header-action-group:has(> :not([hidden])) {
+  display: inline-flex;
+}
+
+/* --- View entrance fade (Home ↔ Analysis switch) --- */
+@keyframes view-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* The second selector outranks the persistent `.fade-in > #content > *`
+   section-rise rule so the home region (direct #content children) replays the
+   fade on every switch, not just on initial load. Analysis panels are deeper
+   descendants, so the plain class already wins for them. */
+.view-fade,
+.fade-in > #content > .view-fade {
+  animation: view-fade var(--transition-lift) var(--ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .view-fade,
+  .fade-in > #content > .view-fade,
+  .header-btn:active {
+    transition: none;
+    animation: none;
+    transform: none;
+  }
 }
 
 /* On touch-width viewports guarantee a ≥48px hit target, and prefer tighter
-   horizontal padding over wrapping so the pair always stays on one line. */
+   horizontal padding over wrapping so the header actions always stay on one
+   line. Applies to every header control (upload, export, theme, sidebar toggle). */
 @media (max-width: 640px) {
-  #headerUploadBtn,
-  #themeToggle {
+  .app-header .header-btn {
     min-height: 48px;
   }
   .header-btn:not(.header-btn--icon) {
@@ -682,40 +681,39 @@ mark.search-hit {
 }
 
 /* ===================== Search / Filter toolbar (UI/UX) ================== */
-/* One cohesive, sticky command bar that stays visible under the app header. */
+/* The table's command bar — not a floating strip of independent controls. It
+   lives inside the Data Preview surface's header band (see the hero rules near
+   the end of this file), so it carries no chrome of its own: the quiet ghost
+   commands ARE the bar. */
 .data-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  position: sticky;
-  top: 64px; /* header is h-16 = 64px */
-  z-index: 15;
-  background: var(--card-bg);
-  padding: 10px 8px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 6px 14px -10px rgba(0, 0, 0, 0.35);
+  gap: var(--space-1);
 }
 /* Every command shares the same height, radius and spacing so the bar reads as
-   one cohesive unit. */
+   one cohesive unit. Commands are QUIET ghosts (GitHub-style): no box at rest —
+   a soft fill on hover, and chrome only when a command carries active state.
+   Four equal outlined boxes read as four competing controls; four quiet labels
+   read as one toolbar. */
 .toolbar-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  height: 40px;
-  border: 1px solid var(--control-border);
-  background: #fff;
-  color: #1d1f20;
+  gap: 6px;
+  height: 32px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
   border-radius: var(--radius-md);
-  padding: 0 16px;
-  font-weight: 700;
-  font-size: 14px;
+  padding: 0 10px;
+  font-weight: 600;
+  font-size: var(--font-body);
   cursor: pointer;
   transition: all var(--transition);
 }
 .toolbar-btn:hover {
-  border-color: var(--brand);
-  color: var(--brand-text);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 .toolbar-btn:focus-visible {
   outline: none;
@@ -723,13 +721,12 @@ mark.search-hit {
   box-shadow: var(--focus-ring);
 }
 .dark .toolbar-btn {
-  background: #1d1f23;
-  border-color: var(--control-border);
-  color: #e5e7eb;
+  background: transparent;
+  color: var(--text-muted);
 }
 .dark .toolbar-btn:hover {
-  border-color: var(--brand);
-  color: var(--brand-text);
+  background: var(--surface-muted);
+  color: var(--text);
 }
 /* Highlight when the panel is open (active-toggle) or its query/filters are active. */
 .toolbar-btn.active,
@@ -745,7 +742,7 @@ mark.search-hit {
   color: var(--brand-text);
 }
 .toolbar-btn .material-symbols-outlined {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* Active-state badges: a dot for search, a count for filters. */
@@ -760,7 +757,7 @@ mark.search-hit {
   background: var(--brand);
   color: #fff;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   direction: ltr;
 }
 .toolbar-badge[hidden] {
@@ -791,23 +788,28 @@ mark.search-hit {
   grid-template-rows: 1fr;
   opacity: 1;
   visibility: visible;
-  /* 8px rhythm: 16px above (toolbar → panel), 24px below so there is clear
-     separation before the status line that follows in the flow. */
-  margin-top: 16px;
-  margin-bottom: 24px;
+  /* 8px rhythm: the panel belongs to the toolbar above it, so it hangs tight
+     (8px) and leaves a modest 12px before the status line below. */
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-3);
   transition:
     grid-template-rows 0.2s var(--ease),
     opacity 0.2s var(--ease),
     margin 0.2s var(--ease),
     visibility 0s;
 }
-/* Lighter than a free-standing card — these panels belong to the toolbar. */
+/* An inset tray, not a card: the muted fill alone marks the region (no border). */
 .toolbar-panel-inner {
   overflow: hidden;
-  border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
-  background: #fafafa;
-  padding: 12px;
+  background: var(--surface-muted);
+  padding: var(--space-3);
+  transition: padding 0.2s var(--ease);
+}
+/* Closed trays must occupy zero height — the 0fr row collapses the content,
+   and this collapses the inner padding (otherwise a dead 24px strip remains). */
+.toolbar-panel:not(.open) .toolbar-panel-inner {
+  padding-block: 0;
 }
 .dark .toolbar-panel-inner {
   background: #111317;
@@ -818,7 +820,7 @@ mark.search-hit {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-3);
 }
 .search-panel .search-wrap {
   flex: 1 1 280px;
@@ -830,16 +832,14 @@ mark.search-hit {
   }
 }
 .toolbar-btn:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
-  border-color: var(--control-border);
-  color: #1d1f20;
-  background: #fff;
+  background: transparent;
+  color: var(--text-muted);
 }
 .dark .toolbar-btn:disabled {
-  background: #1d1f23;
-  border-color: var(--control-border);
-  color: #e5e7eb;
+  background: transparent;
+  color: var(--text-muted);
 }
 .toolbar-caret {
   font-size: 18px !important;
@@ -901,14 +901,14 @@ mark.search-hit {
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-3);
   width: 100%;
   min-height: 44px;
-  padding: 0 12px;
+  padding: 0 var(--space-3);
   border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 13px;
-  color: #1d1f20;
+  font-size: var(--font-body);
+  color: var(--text);
   text-align: start;
   cursor: pointer;
   transition:
@@ -927,7 +927,7 @@ mark.search-hit {
   background: #d7ecdf;
 }
 .dark .dropdown-item {
-  color: #e5e7eb;
+  color: var(--text);
 }
 .dark .dropdown-item:hover,
 .dark .dropdown-item:focus {
@@ -937,42 +937,40 @@ mark.search-hit {
 .dark .dropdown-item:active {
   background: #16432c;
 }
-/* Fixed-width icon box → labels align perfectly down the column. */
+/* Fixed-width icon box → labels align perfectly down the column. Icons follow
+   the item's text colour: neutral at rest, brand accent when highlighted. */
 .dropdown-item .material-symbols-outlined {
   font-size: 18px;
   width: 20px;
   text-align: center;
-  color: var(--brand);
-}
-.dark .dropdown-item .material-symbols-outlined {
-  color: var(--brand-text);
+  color: inherit;
 }
 
 /* Live status line above the table. */
 .toolbar-status {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   font-size: 12.5px;
-  color: #6b7280;
+  color: var(--text-muted);
   min-height: 20px;
 }
 .dark .toolbar-status {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 .toolbar-status:empty {
   display: none;
 }
 .toolbar-status b {
-  color: #1d1f20;
-  font-weight: 800;
+  color: var(--text);
+  font-weight: 700;
 }
 .dark .toolbar-status b {
-  color: #f3f4f6;
+  color: var(--text);
 }
 .toolbar-status .status-icon {
   font-size: 18px;
-  color: var(--brand);
+  color: var(--icon);
 }
 .status-badge {
   font-size: 11px;
@@ -989,17 +987,16 @@ mark.search-hit {
 
 @media (max-width: 480px) {
   /* Two-button rows instead of one-per-row. A 2-column grid forces equal widths
-     regardless of each label's intrinsic width (a plain flex-basis:50% wraps
-     unevenly because "نمودار جدید" is wider than half). In DOM order the children
-     are search · filter · new-chart · export · reset, so auto-flow yields:
+     regardless of each label's intrinsic width. In DOM order the children are
+     search · filter · reset (Export moved to the header, chart creation lives
+     only in the rail), so auto-flow yields:
        row 1  [ جستجو ] [ فیلتر ]
-       row 2  [ نمودار جدید ] [ خروجی ]
-       row 3  [ بازنشانی ]  (spans both columns → full width)
+       row 2  [ بازنشانی ]  (spans both columns → full width)
      RTL: column 1 is the right-hand cell, so first-in-DOM sits right. */
   .data-toolbar {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: var(--space-2);
   }
   .data-toolbar > .toolbar-btn,
   .data-toolbar > .toolbar-dropdown {
@@ -1013,78 +1010,62 @@ mark.search-hit {
     padding: 0 10px; /* a touch tighter so icon+label fit down to 320px */
     white-space: nowrap; /* never let a label wrap to a 2nd line inside the 40px pill */
   }
-  .toolbar-dropdown > .toolbar-btn {
-    width: 100%; /* export button fills its grid cell */
-  }
   .dropdown-menu {
     width: 100%;
   }
 }
 
 /* =========================== Empty states ============================= */
+/* Flat and quiet — type and whitespace, no dashed box (the surrounding surface
+   already frames the region). */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px 20px;
-  border: 1px dashed var(--control-border);
-  border-radius: var(--card-radius);
-  background: #fafafa;
-}
-.dark .empty-state {
-  background: #111317;
-  border-color: var(--control-border);
+  padding: 48px var(--space-5);
 }
 .empty-state .empty-icon {
-  font-size: 56px;
-  color: #9ca3af;
-}
-.dark .empty-state .empty-icon {
-  color: #6b7280;
+  font-size: 40px;
+  color: var(--text-subtle);
 }
 .empty-title {
-  font-weight: 800;
-  font-size: 15px;
-  margin-top: 8px;
+  font-weight: 700;
+  font-size: var(--font-title);
+  margin-top: var(--space-3);
 }
 .empty-text {
   font-size: 12.5px;
-  color: #6b7280;
-  margin-top: 4px;
-}
-.dark .empty-text {
-  color: #9ca3af;
+  color: var(--text-muted);
+  margin-top: var(--space-1);
 }
 
 /* ========================= Landing upload card ======================== */
 .upload-card {
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 10px 34px rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 }
 .dark .upload-card {
-  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.4);
+  box-shadow: none;
 }
 /* "یا" separator with a rule on each side. */
 .upload-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: #9ca3af;
-  font-size: 12px;
+  gap: var(--space-3);
+  color: var(--text-subtle);
+  font-size: var(--font-meta);
 }
 .upload-divider::before,
 .upload-divider::after {
   content: "";
   flex: 1 1 auto;
   height: 1px;
-  background: #e5e7eb;
+  background: var(--divider);
 }
 .dark .upload-divider::before,
 .dark .upload-divider::after {
-  background: #26282c;
+  background: var(--divider);
 }
 
 /* Subtle fade/scale used for the landing card and the dashboard reveal. */
@@ -1108,27 +1089,27 @@ mark.search-hit {
 }
 
 /* ===================== Correlation lists (Phase 4) ===================== */
+/* A flat, borderless divided list — the SAME idiom as the auto-insights feed:
+   bare rows separated by spacing alone, no per-row chrome. One list component
+   language across the app. */
 .corr-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 .corr-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 9px 12px;
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-md);
-  background: var(--card-bg);
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
 }
 .corr-pair {
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--font-body);
 }
 .corr-val {
-  font-weight: 800;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: var(--font-title);
   direction: ltr;
 }
 .corr-pos {
@@ -1144,45 +1125,18 @@ mark.search-hit {
   color: #f87171;
 }
 
-/* ===================== Data-quality stats (Phase 8) ==================== */
-.quality-stat {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-}
-.quality-stat-icon {
-  font-size: 28px;
-  color: var(--brand);
-}
-.quality-stat-value {
-  font-size: 20px;
-  font-weight: 800;
-}
-.quality-stat-label {
-  font-size: 12px;
-  color: #6b7280;
-}
-.dark .quality-stat-label {
-  color: #9ca3af;
-}
+/* The former `.quality-stat` bordered cards were removed: the data-quality overview
+   figures now render with the shared `.dash-group` / `.dash-cell--stat` metadata
+   language (see statistics.js `qualityStatGroup`) so there is ONE metric component
+   across the app rather than two. */
 
 /* ====================== Quality score gauge (Phase 7) =================== */
+/* Flat: the ring + big rating ARE the visual weight; no card frame around them. */
 .quality-score {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 18px 20px;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--card-radius);
-  background: #fff;
-}
-.dark .quality-score {
-  background: #16181b;
-  border-color: #26282c;
+  gap: var(--space-5);
+  padding: var(--space-1) 0 var(--space-2);
 }
 /* Conic-gradient ring driven by --pct (0..100). */
 .qs-ring {
@@ -1204,18 +1158,18 @@ mark.search-hit {
   width: 74px;
   height: 74px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--page); /* the gauge sits directly on the canvas now */
   display: flex;
   align-items: baseline;
   justify-content: center;
   gap: 1px;
 }
 .dark .qs-ring-inner {
-  background: #16181b;
+  background: var(--page);
 }
 .qs-num {
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
 }
 .qs-unit {
@@ -1225,14 +1179,14 @@ mark.search-hit {
 }
 .qs-title {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 .dark .qs-title {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 .qs-rating {
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 700;
   margin: 2px 0 8px;
 }
 .qs-breakdown {
@@ -1240,10 +1194,10 @@ mark.search-hit {
   flex-wrap: wrap;
   gap: 6px 16px;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 .dark .qs-breakdown {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 /* Tone → ring + rating colour. */
 .quality-score-green .qs-ring {
@@ -1283,51 +1237,60 @@ mark.search-hit {
   color: #f87171;
 }
 
-/* ====================== Auto-insights card (Phase 8) =================== */
-/* Uses the shared card tokens (see :root --card-*) like every other card. */
+/* ==================== Auto-insights — analysis card ==================== */
+/* A concise analytical panel matching the summary card: the same subtle
+   surface, hairline border and radius token. Three grouped sections, each
+   closed by whitespace and a single hairline (never weight or colour):
+   a quiet caption HEADER, then the findings as bare icon + text rows with
+   room to breathe (colour reserved for real signals), then the "view all"
+   text ACTION as a quiet footer. Reads as insights, not notifications. */
 .insight-card {
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--card-radius);
-  background: var(--card-bg);
-  padding: 16px 18px;
+  padding: var(--space-5);
 }
+/* Card header — a whisper-quiet caption label closed by a hairline, so the
+   findings below read as their own grouped band. */
 .insight-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 800;
-  font-size: 15px; /* card-title tier */
-  margin-bottom: 12px;
-  color: var(--brand-text);
+  gap: 6px;
+  font-weight: 700;
+  font-size: var(--font-caption);
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--divider);
+  color: var(--text-muted);
 }
-.dark .insight-head {
-  color: var(--brand-text);
+/* The label's own icon is decorative — the text is the label. */
+.insight-head .material-symbols-outlined {
+  display: none;
 }
 .insight-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
+/* Each finding is a bare feed row: icon + text. No rules between rows — the
+   6px row gap is the only separator (a timeline, not a table). Long findings
+   still wrap (never truncated) so no information is lost. */
 .insight-item {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 13px;
-  line-height: 1.7;
-  padding: 8px 10px;
-  border-radius: var(--radius-md);
-  background: #fafafa;
-}
-.dark .insight-item {
-  background: #111317;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: var(--font-body);
+  line-height: 1.5;
+  padding: var(--space-2) 0;
 }
 .insight-item .insight-icon {
-  font-size: 18px;
+  font-size: 16px;
   flex-shrink: 0;
-  margin-top: 2px;
+  transform: translateY(2px); /* optically align the glyph with the first line */
 }
+/* Informational rows are neutral — colour is reserved for real signals. */
 .insight-info .insight-icon {
-  color: #1e5fa8;
+  color: var(--text-subtle);
 }
 .insight-ok .insight-icon {
   color: var(--brand-text);
@@ -1335,34 +1298,52 @@ mark.search-hit {
 .insight-warn .insight-icon {
   color: #b45309;
 }
-.dark .insight-info .insight-icon {
-  color: #6cb6f5;
-}
-.dark .insight-ok .insight-icon {
-  color: var(--brand-text);
-}
 .dark .insight-warn .insight-icon {
   color: #fcd34d;
+}
+/* "View all" — a text action, not a button: caption-level, aligned with the
+   rows. A hairline lifts it into a quiet footer, grouping it as the card's
+   ACTION section below the findings. */
+.insight-more {
+  align-self: flex-start;
+  width: 100%;
+  text-align: start;
+  margin-top: var(--space-2);
+  padding: var(--space-3) 0 0;
+  border-top: 1px solid var(--divider);
+  font-size: var(--font-meta);
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+.insight-more:hover {
+  color: var(--brand-text);
+}
+.insight-more:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
 }
 
 /* ============================ Toasts (UI/UX) =========================== */
 .toast-container {
   position: fixed;
-  bottom: 20px;
-  left: 20px;
+  bottom: var(--space-5);
+  left: var(--space-5);
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-2);
   max-width: min(360px, calc(100vw - 40px));
 }
 .toast {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
-  font-size: 13px;
+  font-size: var(--font-body);
   font-weight: 600;
   color: #fff;
   background: var(--success);
@@ -1471,36 +1452,80 @@ button.is-busy {
 /* Shared card tokens — a single source of truth so every dashboard card
    (header, KPI, insights, info, quality) shares radius / shadow / border. */
 :root {
-  /* Brand palette — the green identity (values unchanged, now centralised). */
-  --brand: #217346; /* primary green (fills, accents) */
+  /* Brand palette — the green identity (values unchanged). Reserved for a small
+     set of intents ONLY: primary action, active nav, focus ring, links,
+     selected controls, success. Everything else is neutral (see below). */
+  --brand: #217346; /* primary green (primary fills, active accent) */
   --brand-hover: #1a5c38; /* hover/pressed fill */
-  --brand-text: #185c37; /* green for text + icon accents */
-  --brand-tint: #e6f4ea; /* soft green surface */
+  --brand-text: #185c37; /* green for active/link text */
+  --brand-tint: #e6f4ea; /* soft green surface — active/selected states only */
   --success: #185c37; /* solid success fill (toasts) — theme-stable */
 
-  /* Radius scale — one rhythm for every rounded element. */
-  --radius-sm: 8px; /* chips, small controls, inputs */
-  --radius-md: 10px; /* buttons, toolbar, panels */
-  --radius-lg: 12px; /* toolbar, popovers */
-  --card-radius: 14px; /* cards, dashboard surfaces */
+  /* Neutral grayscale hierarchy — carries ~95% of the interface. Typography and
+     these grays (not colour or decoration) create the visual hierarchy. */
+  --text: #1d1f20; /* primary text */
+  --text-muted: #6b7280; /* secondary text, labels, meta */
+  --text-subtle: #9ca3af; /* tertiary hints, quiet captions */
+  --icon: #6b7280; /* DEFAULT icon colour — neutral, not brand green */
+  --surface: #ffffff; /* base surface (header, strips, panels) */
+  --surface-muted: #f6f7f8; /* subtle fill: table head, hover, inset panels */
+  --page: #f4f5f6; /* the app canvas behind the content (matches body bg) */
+  --divider: #e5e7eb; /* hairline separators between flat sections */
+
+  /* Application-shell dimensions — the single source of truth for the header
+     height and desktop sidebar width. Referenced by the header box and the
+     rail's dock position + width (sidebar.css), so changing one value here
+     keeps the whole layout in sync. 56px: a compact app bar (Linear/Stripe
+     height) — the chrome cedes vertical space to the workspace. */
+  --header-height: 56px;
+  --sidebar-width: 68px; /* slim desktop icon-first rail */
+  --header-border-width: 1px; /* the header's hairline divider; the sidebar docks
+                                 exactly below it (height + this) so the one real
+                                 border runs unbroken across the full width */
+  --content-gap: 2rem; /* breathing room between the main content and the rail —
+                          the extra gutter added on top of the rail width so text
+                          clears the rail instead of butting against it */
+
+  /* Radius scale — small corners (6–8px) for a mature, flat SaaS feel. */
+  --radius-sm: 6px; /* chips, small controls, inputs */
+  --radius-md: 6px; /* buttons, toolbar, panels */
+  --radius-lg: 8px; /* toolbar, popovers */
+  --card-radius: 8px; /* framed surfaces (table, analysis containers) */
   --radius-pill: 999px; /* pills, badges */
 
-  /* Elevation scale. */
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
-  --card-shadow:
-    0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px rgba(16, 24, 40, 0.05);
+  /* Spacing scale — the ONE grid every gap on the page aligns to. No arbitrary
+     margins at call sites; every rhythm below is one of these six steps. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Type ramp — typography IS the hierarchy (not borders, not colour).
+     Top to bottom: dataset title → key figures → hero section title →
+     section titles → body → metadata → captions. Numbers dominate their
+     labels (20 over 11); titles dominate descriptions; every step exists
+     for a reason. */
+  --font-hero: 24px; /* the dataset name — the largest type on the page */
+  --font-num: 20px; /* key figures — visibly dominant over their 11px labels */
+  --font-lg: 15px; /* the hero section title (Data Preview) */
+  --font-title: 14px; /* section titles */
+  --font-body: 13px; /* body text, controls */
+  --font-meta: 12px; /* metadata, labels, table captions */
+  --font-caption: 11px; /* quiet captions, badges, feed label */
+
+  /* Elevation — near-flat: thin borders do the separating, not shadows. Only
+     genuinely floating layers (menus, drawer, toasts, overlay) use --shadow-pop. */
+  --shadow-sm: none;
+  --card-shadow: none;
   --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.16);
 
   /* Surfaces & borders. */
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
   --control-border: #d1d5db; /* form controls, outlined buttons */
-  --header-bg: rgba(
-    255,
-    255,
-    255,
-    0.84
-  ); /* translucent sticky header (glass) */
+  --header-bg: #ffffff; /* solid, flat header (no glass/blur) */
 
   /* Motion & focus — one easing, one timing (<=200ms), one focus ring. */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -1511,171 +1536,322 @@ button.is-busy {
 .dark {
   --brand-text: #33c481; /* brighter green for contrast on dark */
   --brand-tint: #103021;
+  --text: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-subtle: #6b7280;
+  --icon: #9ca3af;
+  --surface: #16181b;
+  --surface-muted: #1d1f23;
+  --page: #0e0f11; /* the app canvas behind the content (matches body bg) */
+  --divider: #26282c;
   --card-bg: #16181b;
   --card-border: #26282c;
   --control-border: #33363b;
-  --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.26);
+  --card-shadow: none;
   --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.5);
-  --header-bg: rgba(22, 24, 27, 0.84); /* translucent sticky header (glass) */
+  --header-bg: #16181b; /* solid, flat header (no glass/blur) */
 }
 
-/* Unify the top-level cards onto the shared tokens (softer, consistent). */
-.kpi-card,
-.insight-card,
-.quality-score {
-  border-radius: var(--card-radius);
-  border-color: var(--card-border);
-  box-shadow: var(--card-shadow);
-}
+/* The quality-score gauge and the insight feed are both flat now — no framed
+   container survives above the data table except the summary panel itself. */
 
-/* --- KPI cards: equal heights, stronger numbers, softer shadow --- */
-.kpi-grid {
-  gap: 16px;
-}
-.kpi-card {
-  min-height: 86px;
-  padding: 18px;
-}
-.kpi-value {
-  font-size: 24px;
-  letter-spacing: -0.01em;
-}
-.kpi-label {
-  font-size: 12px;
-}
+/* ===================== Canonical typography ramp ======================= */
+/* The ENTIRE app types from these four roles — no ad-hoc font-size/weight at the
+   call site. Hierarchy comes from this ramp + neutral grays + whitespace, never
+   colour or decoration. Every builder emits one of:
+     .section-title     — the header of a region/analysis section (with rail icon)
+     .subsection-title  — a block inside a section (e.g. "column details")
+     .section-desc      — the one muted caption under a section title
+     (body text)        — 13px, inherits --text
+   Keeping all four here means headers and the space around them are pixel-identical
+   across every section, so the app reads as one design system. */
 
-/* Mobile only: let labels like "ستون‌ دسته‌ای" / "مقادیر گمشده" wrap to two
-   lines instead of truncating, and trim the icon chip ~14% so the row breathes.
-   Desktop (≥481px) keeps the single-line ellipsis look untouched. */
-@media (max-width: 480px) {
-  .kpi-card {
-    /* a little tighter internally to buy the label horizontal room */
-    gap: 8px;
-    padding: 12px;
-  }
-  .kpi-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-  }
-  .kpi-icon .material-symbols-outlined {
-    font-size: 20px;
-  }
-  .kpi-label {
-    white-space: normal; /* was nowrap+ellipsis — allow up to two lines */
-    overflow: visible;
-    text-overflow: clip;
-    line-height: 1.25;
-  }
-}
-
-/* --- Section title (e.g. "پیش‌نمایش داده") --- */
+/* --- Primary section header — one per region/analysis section. Text only:
+   the little leading icons every section used to carry were decoration, not
+   meaning, so CSS retires them (builders' markup untouched).
+   The full ramp (top to bottom): dataset name 24 → key figures 16 → hero
+   section title 16 → section title 14 → body 13 → metadata 12 → captions 11. */
 .section-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  font-weight: 800;
+  gap: var(--space-2);
+  font-size: var(--font-title);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--text);
+  margin: 0 0 var(--space-2); /* section title → content: one 8px step */
 }
-.section-title .material-symbols-outlined {
-  font-size: 22px;
-  color: var(--brand);
+.section-title > .material-symbols-outlined {
+  display: none;
 }
-.dark .section-title .material-symbols-outlined {
-  color: var(--brand-text);
+/* When a one-line caption follows the title, the title owns only 4px below and the
+   caption owns the gap — so title+desc read as one header unit, not two gaps. */
+.section-title:has(+ .section-desc) {
+  margin-bottom: var(--space-1);
 }
 
-/* --- Dashboard header strip (above the KPI cards) --- */
-.dash-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px;
+/* --- The Data Preview title is the page hero — visibly heavier than every other
+   header so the eye lands on the primary content first. --- */
+.section-title--primary {
+  font-size: var(--font-lg);
+}
+.section-title--primary .material-symbols-outlined {
+  display: none;
+}
+
+/* --- Secondary header — a block inside a section (e.g. "column details",
+   "outliers"). One rhythm: 24px above to clear the previous block, 8px below to
+   its own content; no top gap when it opens a container. --- */
+.subsection-title {
+  font-size: var(--font-body);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  margin: var(--space-5) 0 var(--space-2);
+}
+.subsection-title:first-child {
+  margin-top: 0;
+}
+
+/* --- The one muted caption under a section title. Replaces the repeated
+   `mb-4 text-gray-500 dark:text-gray-400` literal that every section used to
+   hand-write, so every explanatory line is the same size, colour and rhythm. --- */
+.section-desc {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-3);
+  max-width: 70ch; /* keep explanatory prose comfortably readable */
+}
+
+/* ==================== Analysis section cards =========================== */
+/* Every analysis section (missing values, correlation, chart builder, value
+   counts, group-by, data quality — any div dashboard.js stamps with
+   role="tabpanel") renders inside a proper section card: the card, not the
+   page canvas, defines the section. Same surface language as every other
+   framed dashboard surface (summary panel, insight card, data table): card
+   surface, hairline border, the shared --card-radius, no shadow. Title/desc/
+   controls/results all live inside it, so nothing floats on the gray
+   background. Pure CSS — the builders and their markup are untouched. */
+#content [role="tabpanel"] {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius); /* one radius across every framed card */
+  padding: var(--space-5);
+  /* 16px (summary panel's mb-4) + 8px = a 24px step from the dataset header
+     to the section card — the between-blocks rhythm of the spec. */
+  margin-top: var(--space-2);
+}
+@media (max-width: 640px) {
+  #content [role="tabpanel"] {
+    padding: var(--space-4);
+  }
+}
+/* Inside a card the section title reads at the hero step of the ramp
+   (15px — the same size as the Data Preview title on the home view), so the
+   card's own header clearly outranks subsection titles and body text. */
+#content [role="tabpanel"] > .section-title {
+  font-size: var(--font-lg);
+}
+/* Inside a card the header block breathes more: title+caption stay one tight
+   unit (4/8px), then a full 24px step opens the controls/results below —
+   the title → desc → controls → output cadence of the spec. */
+#content [role="tabpanel"] .section-desc {
+  margin-bottom: var(--space-5);
+}
+/* A section whose title has no caption gets the same 24px step to content. */
+#content [role="tabpanel"] > .section-title:not(:has(+ .section-desc)) {
+  margin-bottom: var(--space-5);
+}
+
+/* ============= Dataset summary — a calm dashboard panel ============= */
+/* The overview of the loaded dataset, composed as a lightweight information
+   card (Cloudflare zone-overview idiom): a subtle surface lifted off the page
+   by one hairline border and the shared radius token — no shadow, no fill, no
+   colour. Inside, three ranked sections separated by whitespace and a single
+   hairline, never by weight or colour:
+   1. IDENTITY — the name (24px hero type), the largest type on the page.
+   2. METADATA — the provenance facts (12px muted, dot-joined), hanging 4px
+      off the name, closed by a hairline that groups it with the identity.
+   3. STATISTICS — one quiet band of stacked metrics: the 20px figure OVER
+      its 11px caption label, so numbers visibly dominate their labels.
+   The card separates itself from the canvas without dominating it; the type
+   ramp still carries the whole hierarchy, tone marking a signal only. */
+.dash-panel {
+  --surface-pad: 20px; /* referenced by the hero surface for its shared grid */
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--card-radius);
-  background: var(--card-bg);
-  box-shadow: var(--card-shadow);
+  padding: var(--space-5);
 }
-.dash-header-main {
+/* When a summary panel appears INSIDE an analysis section card (e.g. the
+   data-quality overview in the statistics tab), the tabpanel card is already
+   the frame — so the panel reverts to a flat metric band and never reads as a
+   card-in-card. One framing decision per region. */
+#content [role="tabpanel"] .dash-panel {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+.dash-panel__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: var(--space-6); /* generous air between figures — on the scale */
+  row-gap: var(--space-3);
+}
+
+/* Identity — the dataset name, the largest type on the page. */
+.dash-panel__head {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--space-3);
   min-width: 0;
 }
-.dash-header-icon {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: 13px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--brand-tint);
-  color: var(--brand-text);
-}
-.dark .dash-header-icon {
-  background: var(--brand-tint);
-  color: var(--brand-text);
-}
-.dash-header-icon .material-symbols-outlined {
-  font-size: 28px;
-}
-.dash-header-titles {
+.dash-panel__id {
   min-width: 0;
 }
-.dash-header-title {
-  font-size: 20px;
-  font-weight: 800;
+.dash-panel__title {
+  font-size: var(--font-hero);
+  font-weight: 700;
   line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dash-header-sub {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 2px;
+.dash-panel__sub {
+  font-size: var(--font-meta);
+  color: var(--text-muted);
 }
-.dark .dash-header-sub {
-  color: #9ca3af;
-}
-.dash-header-meta {
+/* The provenance caption hangs directly off the name (4px — one identity
+   unit); a hairline closes the identity+metadata section, and the body's
+   own row-gap opens the metric band beneath. */
+.dash-group--meta {
+  flex: 1 1 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  column-gap: var(--space-2);
+  row-gap: 2px;
+  margin: var(--space-1) 0 0;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--divider);
 }
-.dash-chip {
+
+/* Metric band — the stat groups dissolve (display:contents) so all figures
+   flow on the body's own row with ONE uniform gap; counts and quality flags
+   read as a single band, tone colour the only thing marking a signal. */
+.dash-panel__body > .dash-group--stat {
+  display: contents;
+}
+.dash-cell {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  background: #f3f4f6;
-  color: #374151;
-  font-size: 12.5px;
-  font-weight: 600;
   white-space: nowrap;
 }
-.dark .dash-chip {
-  background: #1d1f23;
-  color: #cbd5e1;
+
+/* Metadata cell — quiet caption text joined by dot separators, no icons. */
+.dash-cell--meta {
+  align-items: center;
+  font-size: var(--font-meta);
+  color: var(--text-muted);
 }
-.dash-chip b {
-  font-weight: 800;
-  color: #1d1f20;
+.dash-cell--meta:not(:first-child)::before {
+  content: "•";
+  margin-inline-end: var(--space-2);
+  color: var(--text-subtle);
 }
-.dark .dash-chip b {
-  color: #f3f4f6;
+.dash-cell__meta bdi {
+  font-weight: 600;
+  color: var(--text);
 }
-.dash-chip .material-symbols-outlined {
-  font-size: 17px;
-  color: var(--brand);
+
+/* Statistic cell — the figure stacked OVER its caption label. The 20px
+   number against the 11px label is the ramp's clearest dominance step. */
+.dash-cell--stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
 }
-.dark .dash-chip .material-symbols-outlined {
+/* Standalone stat groups (e.g. the quality report's overview row, which has
+   no identity head) read as the same stacked-metric band. */
+.dash-panel > .dash-group--stat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-3) var(--space-6);
+}
+.dash-cell__num {
+  font-size: var(--font-num);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  direction: ltr;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.dash-cell__sub {
+  font-size: var(--font-caption);
+  font-weight: 600;
+  margin-inline-start: 3px;
+  opacity: 0.7;
+}
+.dash-cell__label {
+  font-size: var(--font-caption);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+/* Tone — colour the figure ONLY for flags that carry a real signal: missing →
+   amber, duplicates → red, a clean zero → green (success). Counts stay neutral. */
+.dash-cell.is-green .dash-cell__num {
   color: var(--brand-text);
+}
+.dash-cell.is-amber .dash-cell__num {
+  color: #92600a;
+}
+.dash-cell.is-red .dash-cell__num {
+  color: #b91c1c;
+}
+.dark .dash-cell.is-amber .dash-cell__num {
+  color: #fcd34d;
+}
+.dark .dash-cell.is-red .dash-cell__num {
+  color: #f87171;
+}
+
+/* Decorative chrome retired with the flat redesign — the builders still emit
+   these nodes (their markup is untouched), CSS simply doesn't show them:
+   the summary's icon mark + boilerplate subtitle, and the per-fact meta icons
+   (the "•" separators replace them). Icons now appear only where they carry
+   meaning (alerts, status line, navigation, empty state). */
+.dash-panel__mark,
+.dash-panel__sub,
+.dash-cell__icon.material-symbols-outlined {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  /* Tighter metric band on phones; the header is already a flat flow, so it
+     only needs smaller type and gaps. (The stat groups are display:contents,
+     so the body's own gap governs every figure.) */
+  .dash-panel,
+  .insight-card {
+    padding: var(--space-4);
+  }
+  .dash-panel__body {
+    column-gap: var(--space-5);
+    row-gap: var(--space-2);
+  }
+  .dash-panel__title {
+    font-size: 18px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1687,18 +1863,150 @@ button.is-busy {
   }
 }
 
+/* ---- Home-page rhythm — the spacing system, pinned in one place ----
+   The page reads as three ranked bands separated by pure whitespace (no
+   rules): identity (dataset header) → 24px → findings (the quiet activity
+   stream) → 32px → workspace (the one framed surface). Flat blocks align to
+   the page's right edge (RTL reading start); the workspace border sits on
+   that same edge — one invisible grid down the whole page. (These ID
+   selectors outrank the builders' mb-4 utilities without touching markup.) */
+#content > .dash-panel {
+  margin-bottom: var(--space-5);
+}
+#content > div:has(> .insight-card) {
+  margin-bottom: var(--space-6);
+}
+
+/* ================= Data Preview — the workspace instrument ================ */
+/* The page's dominant surface — where work happens. One framed panel composed
+   as a GitHub file-browser table: a single HEAD BAND holding the title, the
+   live row-count and the command bar on one row, then the table running
+   full-bleed to the surface edges. The toolbar is not four floating buttons;
+   it is the table's command bar, living in the table's own chrome.
+   CSS Grid recomposes the builder's stacked markup (title / desc / toolbar
+   host / table host) into this band without touching the DOM. */
+#content > div:has(> .section-title--primary) {
+  --surface-pad: 20px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  background: var(--card-bg);
+  padding: 0;
+  overflow: hidden; /* children run edge-to-edge; the frame clips the corners */
+  display: grid;
+  /* title · row-count (flexible) · command bar */
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+}
+/* This ID-weighted grid must not outrank the orchestrator's `.hidden` toggle
+   (Tailwind's display:none is only class-weighted) when the workspace is
+   swapped out for an analysis section. */
+#content > div.hidden:has(> .section-title--primary) {
+  display: none;
+}
+/* The toolbar host dissolves so the command bar, trays and status line place
+   directly on the surface grid. */
+#content > div:has(> .section-title--primary) > div:has(> .data-toolbar) {
+  display: contents;
+}
+/* Head band, item 1 — the instrument's name. */
+#content > div:has(> .section-title--primary) > .section-title--primary {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+  padding: var(--space-3) var(--surface-pad);
+}
+/* The one-line description under the title described the obvious (search,
+   filter, browse) — the controls themselves say it. Removed by subtraction. */
+#content > div:has(> .section-title--primary) > .section-desc {
+  display: none;
+}
+/* Head band, item 2 — the live row-count sits beside the title as quiet
+   metadata (GitHub's "N rows"), not as a separate status strip. */
+#content > div:has(> .section-title--primary) .toolbar-status {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  min-height: 0;
+  font-size: var(--font-meta);
+}
+/* Its leading icon is decorative — the text and the filter badge carry the
+   meaning. */
+#content > div:has(> .section-title--primary) .toolbar-status .status-icon {
+  display: none;
+}
+/* Head band, item 3 — the command bar, docked at the reading end. */
+#content > div:has(> .section-title--primary) .data-toolbar {
+  grid-column: 3;
+  grid-row: 1;
+  padding-inline: var(--space-3);
+}
+/* Search / filter trays open full-width directly under the head band. */
+#content > div:has(> .section-title--primary) .toolbar-panel {
+  grid-column: 1 / -1;
+}
+#content > div:has(> .section-title--primary) .toolbar-panel.open {
+  margin: 0 var(--space-3) var(--space-3);
+}
+/* The table block spans the surface, flush to its edges — the surface frame
+   IS the table frame. A single hairline closes the head band above it.
+   min-width:0 lets the grid track shrink below the table's intrinsic width so
+   the wrapper's own horizontal scroll works on narrow screens. */
+#content > div:has(> .section-title--primary) > div:last-child {
+  grid-column: 1 / -1;
+  margin: 0;
+  min-width: 0;
+}
+#content > div:has(> .section-title--primary) .df-wrapper,
+#content > div:has(> .section-title--primary) .empty-state {
+  border: none;
+  border-radius: 0;
+  border-top: 1px solid var(--card-border);
+}
+/* Hero height: the table claims the rest of the viewport instead of a fixed
+   box — on any modern display the data dominates the page. */
+#content > div:has(> .section-title--primary) .df-wrapper {
+  max-height: max(480px, calc(100dvh - 340px));
+  scroll-behavior: smooth;
+}
+#content > div:has(> .section-title--primary) .pager {
+  border-top: 1px solid var(--divider);
+  margin-top: 0;
+  padding-block: var(--space-2);
+}
+
+/* Narrow screens: the head band stacks — title+count on the first row, the
+   command bar full-width beneath it. */
+@media (max-width: 640px) {
+  #content > div:has(> .section-title--primary) {
+    grid-template-columns: auto 1fr;
+  }
+  #content > div:has(> .section-title--primary) > .section-title--primary {
+    padding-bottom: var(--space-1);
+  }
+  #content > div:has(> .section-title--primary) .toolbar-status {
+    grid-column: 2;
+    padding-inline-end: var(--space-3);
+    justify-self: end;
+  }
+  #content > div:has(> .section-title--primary) .data-toolbar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 0 var(--space-3) var(--space-2);
+  }
+}
+
 /* --- Localized (non-blocking) section loading indicator --- */
 .section-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 48px 20px;
-  color: #6b7280;
+  gap: var(--space-3);
+  padding: 48px var(--space-5);
+  color: var(--text-muted);
 }
 .dark .section-loading {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 .spinner-section {
   width: 34px;

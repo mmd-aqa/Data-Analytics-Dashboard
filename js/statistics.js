@@ -125,9 +125,9 @@ window.App = window.App || {};
 
   function renderMissing(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "text-base font-bold mb-1", "گزارش مقادیر گمشده"));
+    root.appendChild(el("h3", "section-title", `${iconHTML("missing")}<span>گزارش مقادیر گمشده</span>`));
     root.appendChild(
-      el("p", "mb-4 text-gray-500 dark:text-gray-400",
+      el("p", "section-desc",
         "تعداد و درصد مقادیر گمشده برای هر ستون. ستون‌های با بیش از ۳۰٪ داده گمشده برجسته شده‌اند. برای مرتب‌سازی روی سرستون‌ها کلیک کنید."),
     );
 
@@ -150,7 +150,7 @@ window.App = window.App || {};
     // Optional bar chart of missing percentage (only columns that have any).
     const withMissing = data.filter((r) => r._pct > 0).sort((a, b) => b._pct - a._pct);
     if (withMissing.length) {
-      root.appendChild(el("h4", "font-bold mt-5 mb-2", "نمودار درصد مقادیر گمشده"));
+      root.appendChild(el("h4", "subsection-title", "نمودار درصد مقادیر گمشده"));
       const div = el("div", "min-h-[360px]");
       root.appendChild(div);
       charts.plot(
@@ -258,9 +258,9 @@ window.App = window.App || {};
 
   function renderQuality(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "text-base font-bold mb-1", "گزارش کیفیت داده"));
+    root.appendChild(el("h3", "section-title", `${iconHTML("quality")}<span>گزارش کیفیت داده</span>`));
     root.appendChild(
-      el("p", "mb-4 text-gray-500 dark:text-gray-400",
+      el("p", "section-desc",
         "نمای کلی از سلامت داده‌ها: امتیاز کیفیت، مقادیر گمشده، ردیف‌های تکراری، ستون‌های ثابت/خالی، مقادیر یکتا و داده‌های پرت."),
     );
 
@@ -285,13 +285,16 @@ window.App = window.App || {};
       </div>`;
     root.appendChild(scoreCard);
 
-    // Overview stats.
-    const ov = el("div", "grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5");
-    ov.appendChild(qualityStat("ردیف‌های تکراری", fmtInt(summary.duplicates), "duplicate"));
-    ov.appendChild(qualityStat("کل مقادیر گمشده", fmtInt(summary.missing), "missing"));
-    ov.appendChild(qualityStat("ستون‌های ثابت", fmtInt(q.constantColumns.length), "grid"));
-    ov.appendChild(qualityStat("ستون‌های خالی", fmtInt(q.emptyColumns.length), "warn"));
-    root.appendChild(ov);
+    // Overview stats — the same borderless `.dash-group` of `.dash-cell--stat`
+    // figures used by the dataset-summary panel (one metric component app-wide):
+    // bold value + muted label, hairline-separated, tone applied only for signals
+    // (any duplicate/missing/empty/constant column reads amber; a clean zero green).
+    root.appendChild(qualityStatGroup([
+      { label: "ردیف‌های تکراری", value: fmtInt(summary.duplicates), tone: summary.duplicates ? "amber" : "green" },
+      { label: "کل مقادیر گمشده", value: fmtInt(summary.missing), tone: summary.missing ? "amber" : "green" },
+      { label: "ستون‌های ثابت", value: fmtInt(q.constantColumns.length), tone: q.constantColumns.length ? "amber" : "green" },
+      { label: "ستون‌های خالی", value: fmtInt(q.emptyColumns.length), tone: q.emptyColumns.length ? "amber" : "green" },
+    ]));
 
     if (q.constantColumns.length || q.emptyColumns.length) {
       const notes = [];
@@ -310,7 +313,7 @@ window.App = window.App || {};
       "داده پرت": c.isNumeric ? c.outliers : "—",
     }));
 
-    root.appendChild(el("h4", "font-bold mb-2 mt-2", "جزئیات ستون‌ها"));
+    root.appendChild(el("h4", "subsection-title", "جزئیات ستون‌ها"));
     root.appendChild(
       buildSortableTable(
         data,
@@ -325,7 +328,7 @@ window.App = window.App || {};
       .filter((r) => r.count > 0)
       .map((r) => ({ "ستون": r["ستون"], "تعداد داده پرت": r.count, "حد پایین": r.lower, "حد بالا": r.upper }));
 
-    root.appendChild(el("h4", "font-bold mt-5 mb-2", "داده‌های پرت (روش IQR)"));
+    root.appendChild(el("h4", "subsection-title", "داده‌های پرت (روش IQR)"));
     if (!outRows.length) {
       root.appendChild(alertBox("ok", "هیچ داده پرتی در ستون‌های عددی یافت نشد."));
     } else {
@@ -337,12 +340,22 @@ window.App = window.App || {};
     }
   }
 
-  function qualityStat(label, value, icon) {
-    const card = el("div", "quality-stat");
-    card.innerHTML = `${iconHTML(icon, "quality-stat-icon")}
-      <div><div class="quality-stat-value">${value}</div>
-      <div class="quality-stat-label">${label}</div></div>`;
-    return card;
+  // One `.dash-group` row of stat cells — identical markup to the dataset-summary
+  // panel's metric groups, so the quality overview and the summary read as one
+  // component. Wrapped in `.dash-panel` so it sits as the single framed surface at
+  // the top of the report (mirroring the summary panel), not four separate cards.
+  function qualityStatGroup(items) {
+    const panel = el("div", "dash-panel mb-5");
+    const group = el("div", "dash-group dash-group--stat");
+    items.forEach((c) => {
+      const cell = el("span", `dash-cell dash-cell--stat is-${c.tone}`);
+      cell.innerHTML =
+        `<span class="dash-cell__num">${c.value}</span>` +
+        `<span class="dash-cell__label">${c.label}</span>`;
+      group.appendChild(cell);
+    });
+    panel.appendChild(group);
+    return panel;
   }
 
   App.statistics = {

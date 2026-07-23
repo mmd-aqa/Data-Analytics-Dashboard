@@ -1,12 +1,13 @@
 /*
- * dashboard/header.js — The dataset identity strip above the KPI cards
- * (Power BI / Looker style): dataset name, then provenance chips.
+ * dashboard/header.js — The identity HEAD and file-metadata GROUP of the unified
+ * dataset-summary panel (Cloudflare information-panel style): the dataset name as
+ * the panel hero, then the provenance facts as their own hairline-divided row.
  *
  * Single source of truth (Req 1): this is the ONLY place file-level metadata
  * lives — file type, file size, memory footprint, load time. Row/column counts
- * and the numeric/categorical/missing/duplicate breakdown live only in the KPI
- * cards. No business logic — reads App.state / App.statistics. Exposed as
- * App.dashHeader.
+ * and the numeric/categorical/missing/duplicate breakdown live only in the metric
+ * groups (dashboard/summary.js). No business logic — reads
+ * App.state / App.statistics. Exposed as App.dashHeader.
  */
 window.App = window.App || {};
 
@@ -46,7 +47,11 @@ window.App = window.App || {};
     }
   }
 
-  // A clean identity strip: dataset name (or "sample dataset") + provenance chips.
+  // The identity HEAD of the summary panel (Cloudflare information-panel style):
+  // a small neutral mark, the dataset name as the panel's hero (bold, largest
+  // type), over a quiet subtitle. It carries no metadata itself — the file facts
+  // render as their own hairline-divided group via buildMeta(), so the panel reads
+  // as clearly grouped sections rather than one continuous line.
   function build() {
     const meta = S.meta() || {};
     const isSample = S.isExample();
@@ -54,27 +59,34 @@ window.App = window.App || {};
       ? "مجموعه داده نمونه"
       : (meta.name || S.fileName() || "مجموعه داده");
 
-    const chips = [
-      `${iconHTML("table")}<bdi>${escapeHTML(fileTypeLabel())}</bdi>`,
-      `${iconHTML("download")}حجم: <bdi>${isSample ? "—" : formatBytes(meta.size)}</bdi>`,
-      `${iconHTML("grid")}حافظه: <bdi>${formatBytes(meta.memoryBytes)}</bdi>`,
-      `${iconHTML("settings")}بارگذاری: <bdi>${formatTime(meta.uploadedAt)}</bdi>`,
-    ];
-
-    const card = el("div", "dash-header");
-    card.innerHTML = `
-      <div class="dash-header-main">
-        <span class="dash-header-icon">${iconHTML("analytics")}</span>
-        <div class="dash-header-titles">
-          <h2 class="dash-header-title" title="${escapeHTML(title)}"><bdi>${escapeHTML(title)}</bdi></h2>
-          <div class="dash-header-sub">نمای کلی داشبورد تحلیل داده</div>
-        </div>
-      </div>
-      <div class="dash-header-meta">
-        ${chips.map((c) => `<span class="dash-chip">${c}</span>`).join("")}
+    const head = el("div", "dash-panel__head");
+    head.innerHTML = `
+      <span class="dash-panel__mark">${iconHTML("analytics")}</span>
+      <div class="dash-panel__id">
+        <h2 class="dash-panel__title" title="${escapeHTML(title)}"><bdi>${escapeHTML(title)}</bdi></h2>
+        <div class="dash-panel__sub">نمای کلی داشبورد تحلیل داده</div>
       </div>`;
-    return card;
+    return head;
   }
 
-  App.dashHeader = { build, fileTypeLabel, formatBytes, formatTime };
+  // The four file-metadata facts (type · size · memory · load time) as one
+  // hairline-divided `.dash-group` of `.dash-cell` items, so dashboard.js can drop
+  // it straight into the panel body as its own scannable row. Single source of
+  // truth for file-level metadata — all four facts preserved; the value in each
+  // cell is emphasised (bold) while its label stays muted.
+  function buildMeta() {
+    const meta = S.meta() || {};
+    const isSample = S.isExample();
+    const items = [
+      `${iconHTML("table", "dash-cell__icon")}<span class="dash-cell__meta"><bdi>${escapeHTML(fileTypeLabel())}</bdi></span>`,
+      `${iconHTML("download", "dash-cell__icon")}<span class="dash-cell__meta">حجم <bdi>${isSample ? "—" : formatBytes(meta.size)}</bdi></span>`,
+      `${iconHTML("grid", "dash-cell__icon")}<span class="dash-cell__meta">حافظه <bdi>${formatBytes(meta.memoryBytes)}</bdi></span>`,
+      `${iconHTML("settings", "dash-cell__icon")}<span class="dash-cell__meta">بارگذاری <bdi>${formatTime(meta.uploadedAt)}</bdi></span>`,
+    ];
+    const group = el("div", "dash-group dash-group--meta");
+    items.forEach((html) => group.appendChild(el("span", "dash-cell dash-cell--meta", html)));
+    return group;
+  }
+
+  App.dashHeader = { build, buildMeta, fileTypeLabel, formatBytes, formatTime };
 })(window.App);

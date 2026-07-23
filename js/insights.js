@@ -73,6 +73,11 @@ window.App = window.App || {};
 
   const ICON_FOR = { info: "info", warn: "warn", ok: "ok" };
 
+  // The stream shows the first few findings; the rest collapse behind a quiet
+  // "view all" row (activity-stream pattern, not a dashboard). Signals (warn)
+  // are surfaced first so what matters is never hidden below the fold.
+  const VISIBLE_COUNT = 4;
+
   // Render insights into a host element (rebuilt on data/filter change).
   function render(host) {
     host.innerHTML = "";
@@ -80,12 +85,29 @@ window.App = window.App || {};
     const head = el("div", "insight-head", `${iconHTML("info")}<span>بینش‌های خودکار مجموعه‌داده</span>`);
     card.appendChild(head);
     const list = el("ul", "insight-list");
-    compute().forEach((ins) => {
+    // Presentation order only: warnings first, then info, then confirmations —
+    // the computed findings themselves are unchanged.
+    const RANK = { warn: 0, info: 1, ok: 2 };
+    const items = [...compute()].sort((a, b) => RANK[a.tone] - RANK[b.tone]);
+    const overflow = items.length - VISIBLE_COUNT;
+    items.forEach((ins, i) => {
       const li = el("li", `insight-item insight-${ins.tone}`);
       li.innerHTML = `${iconHTML(ICON_FOR[ins.tone], "insight-icon")}<span>${ins.text}</span>`;
+      if (overflow > 1 && i >= VISIBLE_COUNT) li.hidden = true;
       list.appendChild(li);
     });
     card.appendChild(list);
+    // "View all" only when it actually hides something (2+ rows) — collapsing
+    // a single row behind a control would cost more than it saves.
+    if (overflow > 1) {
+      const more = el("button", "insight-more", `نمایش همه (${fmtInt(items.length)})`);
+      more.type = "button";
+      more.onclick = () => {
+        list.querySelectorAll("[hidden]").forEach((li) => (li.hidden = false));
+        more.remove();
+      };
+      card.appendChild(more);
+    }
     host.appendChild(card);
   }
 
