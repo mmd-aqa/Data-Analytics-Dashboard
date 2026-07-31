@@ -13,6 +13,9 @@ window.App = window.App || {};
 
   const FONT = "Vazirmatn, Tahoma, sans-serif";
   const GREEN = "#217346";
+  // Multi-series palette: brand green first, then desaturated sage/slate neutrals
+  // (Cloudflare-style restraint - no saturated default Plotly hues).
+  const COLORWAY = ["#217346", "#86a894", "#414b52", "#b5c7bb", "#5f6b73", "#d0dbd3"];
 
   // Track live charts so we can recolour them when the theme flips.
   const registry = new Set();
@@ -23,15 +26,18 @@ window.App = window.App || {};
 
   function layout(title, extra = {}) {
     const dark = isDark();
+    const grid = dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+    const tick = dark ? "#9ca3af" : "#6b7280"; // axis labels = secondary text
     return Object.assign(
       {
         title: { text: title, font: { family: FONT } },
         paper_bgcolor: "rgba(0,0,0,0)",
         plot_bgcolor: "rgba(0,0,0,0)",
-        font: { color: dark ? "#e5e7eb" : "#111827", family: FONT },
+        font: { color: dark ? "#f5f5f5" : "#1d1f20", family: FONT },
+        colorway: COLORWAY,
         margin: { t: 50, r: 20, b: 70, l: 60 },
-        xaxis: { gridcolor: dark ? "#26282c" : "#e5e7eb", automargin: true },
-        yaxis: { gridcolor: dark ? "#26282c" : "#e5e7eb", automargin: true },
+        xaxis: { gridcolor: grid, tickfont: { color: tick }, automargin: true },
+        yaxis: { gridcolor: grid, tickfont: { color: tick }, automargin: true },
       },
       extra,
     );
@@ -59,10 +65,14 @@ window.App = window.App || {};
         return;
       }
       const dark = isDark();
+      const grid = dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+      const tick = dark ? "#9ca3af" : "#6b7280";
       Plotly.relayout(node, {
-        "font.color": dark ? "#e5e7eb" : "#111827",
-        "xaxis.gridcolor": dark ? "#26282c" : "#e5e7eb",
-        "yaxis.gridcolor": dark ? "#26282c" : "#e5e7eb",
+        "font.color": dark ? "#f5f5f5" : "#1d1f20",
+        "xaxis.gridcolor": grid,
+        "yaxis.gridcolor": grid,
+        "xaxis.tickfont.color": tick,
+        "yaxis.tickfont.color": tick,
       });
     });
   }

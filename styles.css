@@ -185,10 +185,7 @@ input[type="range"] {
   border-radius: var(--radius-pill);
 }
 .df-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #b9bdc3;
-}
-.dark .df-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #4a4e54;
+  background: var(--scrollbar-thumb-hover);
 }
 
 .alert {
@@ -474,7 +471,7 @@ mark.search-hit {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: var(--surface);
+  background: var(--page);
   border-bottom: var(--header-border-width) solid var(--card-border);
 }
 
@@ -874,10 +871,7 @@ mark.search-hit {
   color: var(--brand-text);
 }
 .dropdown-item:active {
-  background: #d7ecdf;
-}
-.dark .dropdown-item:active {
-  background: #16432c;
+  background: var(--brand-press);
 }
 /* Fixed-width icon box → labels align perfectly down the column. Icons follow
    the item's text colour: neutral at rest, brand accent when highlighted. */
@@ -1017,13 +1011,10 @@ mark.search-hit {
   height: 96px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: conic-gradient(var(--ring) calc(var(--pct) * 1%), #e5e7eb 0);
+  background: conic-gradient(var(--ring) calc(var(--pct) * 1%), var(--gauge-track) 0);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.dark .qs-ring {
-  background: conic-gradient(var(--ring) calc(var(--pct) * 1%), #2a2d31 0);
 }
 .qs-ring-inner {
   width: 74px;
@@ -1329,9 +1320,9 @@ button.is-busy {
   --text-muted: #6b7280; /* secondary text, labels, meta */
   --text-subtle: #9ca3af; /* tertiary hints, quiet captions */
   --icon: #6b7280; /* DEFAULT icon colour — neutral, not brand green */
-  --surface: #ffffff; /* base surface (header, strips, panels) */
+  --surface: #ffffff; /* base surface (sidebar, strips, panels) */
   --surface-muted: #f6f7f8; /* subtle fill: table head, hover, inset panels */
-  --page: #f4f5f6; /* the app canvas behind the content (matches body bg) */
+  --page: #fbfbfb; /* the app canvas behind the content (matches body bg) */
   --divider: #e5e7eb; /* hairline separators between flat sections */
 
   /* Application-shell dimensions — the single source of truth for the header
@@ -1381,7 +1372,7 @@ button.is-busy {
      genuinely floating layers (menus, drawer, toasts, overlay) use --shadow-pop.
      Cards carry a barely-there 1px shadow for Cloudflare-style depth. */
   --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.16);
+  --shadow-pop: 0 8px 30px rgba(0, 0, 0, 0.12);
 
   /* Surfaces & borders. */
   --card-bg: #ffffff;
@@ -1389,6 +1380,9 @@ button.is-busy {
   --control-border: #d1d5db; /* form controls, outlined buttons */
   --surface-hover: #f0f1f3; /* neutral hover fill for interactive elements */
   --scrollbar-thumb: #d3d6da; /* slim scrollbar thumb (table, insight feed) */
+  --scrollbar-thumb-hover: #b9bdc3; /* scrollbar thumb on hover-intent */
+  --brand-press: #d7ecdf; /* pressed fill for brand-tinted items (dropdown active) */
+  --gauge-track: var(--divider); /* unfilled arc of the quality ring */
 
   /* Toast — a dark floating card in BOTH themes (Linear/Vercel-style). In light
      mode it reads as a high-contrast notification; in dark mode it lifts off the
@@ -1407,26 +1401,36 @@ button.is-busy {
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --transition: 0.15s var(--ease);
   --transition-lift: 0.18s var(--ease); /* transform/elevation moves */
-  --focus-ring: 0 0 0 3px rgba(33, 115, 70, 0.2);
+  --focus-ring: 0 0 0 2px rgba(33, 115, 70, 0.3); /* crisp brand ring (light) */
 }
 .dark {
   --brand-text: #33c481; /* brighter green for contrast on dark */
   --brand-tint: #103021;
+  /* Cloudflare-style text ramp: near-white primary -> soft secondary -> muted.
+     Hierarchy comes from these three grays, not colour or decoration. */
   --text: #f5f5f5;
-  --text-muted: #9ca3af;
-  --text-subtle: #6b7280;
+  --text-muted: #c9c9c9;
+  --text-subtle: #9ca3af;
   --icon: #9ca3af;
-  --surface: #030303;
-  --surface-muted: #030303;
+  /* Layered dark surfaces (Cloudflare): a near-black canvas, then chrome, then
+     cards, then elevated/inset fills. The steps are deliberately subtle - depth
+     reads through hairline borders, not big jumps or shadows. */
+  --surface: #0d0d0d; /* header, sidebar, panels (chrome) */
+  --surface-muted: #161616; /* table heads, insets, elevated fills */
   --page: #030303; /* the app canvas behind the content (matches body bg) */
-  --divider: #26282c;
-  --card-bg: #0F0F0F;
-  --card-border: #26282c;
-  --control-border: #33363b;
-  --card-shadow: none; /* no shadow in dark — borders carry the separation */
-  --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.5);
-  --surface-hover: #222428; /* neutral hover fill for interactive elements */
+  --divider: rgba(255, 255, 255, 0.06);
+  --card-bg: #0f0f0f;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --control-border: rgba(255, 255, 255, 0.14);
+  --card-shadow: none; /* no shadow in dark - borders carry the separation */
+  --shadow-pop: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --surface-hover: #1c1c1c; /* neutral hover fill for interactive elements */
   --scrollbar-thumb: #3a3d42; /* slim scrollbar thumb (table, insight feed) */
+  --scrollbar-thumb-hover: #4a4e54; /* scrollbar thumb on hover-intent */
+  --brand-press: #16432c; /* pressed fill for brand-tinted items (dropdown active) */
+  --gauge-track: #2a2d31; /* unfilled arc of the quality ring (stronger than divider for legibility) */
+  /* Cloudflare focus: a crisp, subtle outline - no coloured glow. */
+  --focus-ring: 0 0 0 2px rgba(255, 255, 255, 0.22);
 }
 
 /* ===================== Canonical typography ramp ======================= */

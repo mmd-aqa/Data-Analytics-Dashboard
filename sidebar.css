@@ -87,8 +87,8 @@
   z-index: var(--sb-z-rail);
   display: flex;
   flex-direction: column;
-  background: var(--card-bg);
-  border-left: 1px solid var(--card-border);
+  background: var(--surface);
+  border-left: 1px solid var(--divider);
   /* Hidden until a dataset loads; sidebar.js toggles .is-visible. */
   opacity: 0;
   visibility: hidden;
@@ -225,16 +225,16 @@
   overflow: hidden;
 }
 
-/* Active item — the one green touchpoint in the rail: a soft brand tint, full
-   brand ink and a slim accent bar on the start (right) edge. Mirrors
+/* Active item — the Cloudflare pattern: no filled background, just full-ink
+   text and the slim brand-green accent bar on the start (right) edge. Mirrors
    .tab-btn.active so the two navigation systems read the same. */
 .sb-item.is-active {
-  background: var(--brand-tint);
-  color: var(--brand-text);
+  background: transparent;
+  color: var(--text);
   font-weight: 700;
 }
 .sb-item.is-active .sb-item__icon {
-  color: var(--brand-text);
+  color: var(--text);
 }
 .sb-item.is-active::before {
   content: "";
