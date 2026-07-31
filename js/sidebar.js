@@ -76,6 +76,14 @@ window.App = window.App || {};
     aside.setAttribute("aria-label", "ناوبری بخش‌های تحلیل");
 
     const head = el("div", "app-sidebar__head");
+    // Mobile drawer branding — logo + title + divider (visible only in the
+    // drawer; the desktop rail hides .app-sidebar__head entirely). Mirrors the
+    // branding removed from the mobile header so identity is preserved.
+    const brand = el("div", "app-sidebar__brand");
+    brand.innerHTML =
+      `<span class="material-symbols-outlined app-sidebar__brand-icon" aria-hidden="true">analytics</span>` +
+      `<span class="app-sidebar__brand-title">داشبورد تحلیل داده</span>`;
+    head.appendChild(brand);
     const close = el("button", "app-sidebar__close");
     close.type = "button";
     close.setAttribute("aria-label", "بستن منو");
@@ -105,11 +113,11 @@ window.App = window.App || {};
     window.addEventListener("resize", () => { if (!isMobile()) closeDrawer(); }, { passive: true });
   }
 
-  // Add the mobile drawer toggle into the existing header action group so it
-  // matches the upload/theme buttons exactly (same .header-btn system). The
-  // group is #headerActions (the primary-action cluster at the RTL start).
+  // Add the mobile drawer toggle into the header START group (#headerStart) so
+  // it sits at the reading-start edge (rightmost in RTL) — before the title —
+  // matching Cloudflare/Linear mobile nav patterns. Reuses .header-btn system.
   function injectToggle() {
-    const group = $("headerActions");
+    const group = $("headerStart") || $("headerActions");
     if (!group) return;
     toggleBtn = el("button", "header-btn header-btn--ghost header-btn--icon sb-toggle");
     toggleBtn.id = "sbToggle";
@@ -137,9 +145,19 @@ window.App = window.App || {};
   }
   function closeDrawer() {
     if (!aside) return;
+    // Return focus to the toggle when closing while focus is inside the drawer
+    // (WAI-ARIA disclosure pattern). Without this, Escape / close-button /
+    // backdrop close would strand focus on a now-hidden element and drop it to
+    // <body>. Guarded by a visibility check so the desktop resize path (where
+    // the toggle is display:none) never attempts to focus a hidden element.
+    const restoreFocus = aside.contains(document.activeElement);
     aside.classList.remove("is-open");
     backdrop.classList.remove("is-open");
-    if (toggleBtn) { toggleBtn.classList.remove("is-open"); toggleBtn.setAttribute("aria-expanded", "false"); }
+    if (toggleBtn) {
+      toggleBtn.classList.remove("is-open");
+      toggleBtn.setAttribute("aria-expanded", "false");
+      if (restoreFocus && getComputedStyle(toggleBtn).display !== "none") toggleBtn.focus();
+    }
   }
 
   /* --------------------------- Show / hide ------------------------------- */

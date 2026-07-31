@@ -114,6 +114,10 @@ window.App = window.App || {};
       const prev = el("button", "pager-btn", "‹");
       const next = el("button", "pager-btn", "›");
       const last = el("button", "pager-btn", "»");
+      first.setAttribute("aria-label", "صفحه نخست");
+      prev.setAttribute("aria-label", "صفحه قبل");
+      next.setAttribute("aria-label", "صفحه بعد");
+      last.setAttribute("aria-label", "صفحه آخر");
       const update = () => {
         const start = page * pageSize + 1;
         const end = Math.min(total, (page + 1) * pageSize);

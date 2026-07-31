@@ -12,7 +12,7 @@ window.App = window.App || {};
   "use strict";
   const { el, iconHTML } = App.dom;
   const { fmtInt, round, isBlank } = App.fmt;
-  const { quantile, mean, std, median } = App.stats;
+  const { quantile, mean, std, aggregateValues } = App.stats;
   const { alertBox, buildTable, buildSortableTable } = App.ui;
   const charts = App.charts;
   const S = App.state;
@@ -61,18 +61,7 @@ window.App = window.App || {};
       if (op !== "count") { v = Number(v); if (isNaN(v)) continue; }
       groups[key].vals.push(r[opCol]);
     }
-    const agg = (vals) => {
-      const nums = vals.map(Number).filter((v) => !isNaN(v));
-      switch (op) {
-        case "count": return vals.length;
-        case "sum": return Number(nums.reduce((s, v) => s + v, 0).toFixed(4));
-        case "max": return nums.length ? Math.max(...nums) : 0;
-        case "min": return nums.length ? Math.min(...nums) : 0;
-        case "mean": return nums.length ? Number((nums.reduce((s, v) => s + v, 0) / nums.length).toFixed(4)) : 0;
-        case "median": return nums.length ? round(median(nums), 4) : 0;
-        default: return vals.length;
-      }
-    };
+    const agg = (vals) => aggregateValues(vals, op);
     return Object.values(groups).map((g) => {
       const row = {};
       gbCols.forEach((c, i) => { row[c] = g.keyVals[i]; });

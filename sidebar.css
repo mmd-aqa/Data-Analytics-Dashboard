@@ -38,13 +38,38 @@
    overlays as a drawer. The main inset preserves its own gutter (+--content-gap)
    so content clears the rail with breathing room instead of butting against it. */
 @media (min-width: 1024px) {
+  /* Structural sidebar offset — the content column RIGHT-ANCHORS to the rail
+     instead of symmetrically centering in the full viewport.
+
+     Root cause this solves: main is both `flex-1` (vertical spacer) and
+     `max-w-[1400px] mx-auto` (horizontal centering). Symmetric centering
+     ignores the fixed sidebar, so on wide screens the content drifts away
+     from the rail proportionally to viewport width.
+
+     Architecture: `margin-right: var(--sb-w)` reserves the rail's column in
+     the flow; `margin-left: auto` absorbs all surplus on wide screens.
+     The padding-right (--content-gap) then produces a STRUCTURALLY CONSTANT
+     gutter between content and rail at every viewport width — no calc(),
+     no viewport expressions, no !important. RTL-native: the sidebar is the
+     reading-start edge; content anchors to it and extra air opens left. */
   .dash-has-sidebar > main {
-    padding-right: calc(var(--sb-w) + var(--content-gap));
+    width: auto !important; /* let margins reduce the box (w-full ignores them) */
+    margin-right: var(--sb-w) !important; /* reserve the fixed rail's column */
+    margin-left: auto !important; /* surplus space opens on the left */
+    padding-right: var(--content-gap); /* the constant gutter */
     transition: padding-right var(--transition-lift);
   }
+  /* Footer: the bar itself spans full width (like the header — its border-top
+     runs edge-to-edge). Only the INNER content div is offset to align with
+     main's content column. This mirrors the header pattern: full-bleed chrome,
+     aligned inner content. */
   .dash-has-sidebar > footer {
-    padding-right: var(--sb-w);
     transition: padding-right var(--transition-lift);
+  }
+  .dash-has-sidebar > footer > div {
+    margin-left: auto; /* right-anchor to match main's right-anchoring */
+    margin-right: 0;
+    padding-right: calc(var(--sb-w) + var(--content-gap)); /* sidebar + gutter */
   }
 }
 
@@ -79,16 +104,38 @@
   transform: translateX(0);
 }
 
-/* Rail head — mobile drawer only: it holds the drawer's close button. Hidden on
-   desktop, where the rail starts just below the full-width header (see the
-   desktop media query) so no head strip is needed. */
+/* Rail head — mobile drawer only: it holds the branding (logo + title) and
+   the close button. Hidden on desktop, where the rail starts just below the
+   full-width header (see the desktop media query) so no head strip is needed. */
 .app-sidebar__head {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   min-height: var(--header-height); /* match the app-header height (shared token) */
-  padding: 0 var(--space-3);
+  padding: var(--space-3) var(--space-3);
   border-bottom: 1px solid var(--card-border);
+}
+
+/* Drawer branding — centered logo + title, visible only in the mobile drawer.
+   Uses existing typography tokens; the divider is the head's border-bottom. */
+.app-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.app-sidebar__brand-icon {
+  font-size: 22px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.app-sidebar__brand-title {
+  font-size: var(--font-title);
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Close button — visible only in the mobile drawer (see media query). */
@@ -98,7 +145,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
   color: var(--text-muted);
   cursor: pointer;
   transition: background var(--transition), color var(--transition);
@@ -109,11 +156,8 @@
   line-height: 1;
 }
 .app-sidebar__close:hover {
-  background: var(--surface-muted);
+  background: var(--surface-hover);
   color: var(--text);
-}
-.dark .app-sidebar__close:hover {
-  background: var(--surface-muted);
 }
 .app-sidebar__close:focus-visible {
   outline: none;
@@ -145,7 +189,7 @@
   gap: var(--space-1);
   width: 100%;
   padding: var(--space-2) var(--space-1);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   font-size: 10px;
   font-weight: 500;
   color: var(--text-subtle);
@@ -156,7 +200,7 @@
     color var(--transition);
 }
 .sb-item:hover {
-  background: var(--surface-muted);
+  background: var(--surface-hover);
   color: var(--text-muted);
 }
 .sb-item:focus-visible {
@@ -302,7 +346,7 @@
     justify-content: flex-start;
     gap: var(--space-3);
     padding: var(--space-3);
-    font-size: 13.5px;
+    font-size: var(--font-body);
     font-weight: 600;
     color: var(--text-muted); /* the drawer is a full menu — readable, not whispered */
     text-align: start;

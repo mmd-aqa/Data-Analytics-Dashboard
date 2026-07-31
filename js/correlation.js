@@ -6,7 +6,7 @@ window.App = window.App || {};
 
 (function (App) {
   "use strict";
-  const { el, iconHTML } = App.dom;
+  const { el, iconHTML, escapeHTML } = App.dom;
   const { round } = App.fmt;
   const { alertBox, buildTable } = App.ui;
   const charts = App.charts;
@@ -118,15 +118,13 @@ window.App = window.App || {};
     items.forEach((p) => {
       const row = el("div", "corr-item");
       const arrow = kind === "pos" ? "↗" : "↘";
-      row.innerHTML = `<span class="corr-pair">${escape(p.a)} ↔ ${escape(p.b)}</span>
+      row.innerHTML = `<span class="corr-pair">${escapeHTML(p.a)} ↔ ${escapeHTML(p.b)}</span>
         <span class="corr-val corr-${kind}">${arrow} ${p.r}</span>`;
       list.appendChild(row);
     });
     box.appendChild(list);
     return box;
   }
-
-  const escape = (v) => App.dom.escapeHTML(v);
 
   App.correlation = { pearson, computeMatrix, renderCorrelation };
 })(window.App);

@@ -8,6 +8,7 @@ window.App = window.App || {};
   "use strict";
   const { el, iconHTML } = App.dom;
   const { alertBox } = App.ui;
+  const { aggregateValues } = App.stats;
   const S = App.state;
 
   const FONT = "Vazirmatn, Tahoma, sans-serif";
@@ -72,18 +73,7 @@ window.App = window.App || {};
 
   /* ----------------------- Aggregation for builder ----------------------- */
   function aggregate(groups, method) {
-    const agg = (vals) => {
-      const nums = vals.map(Number).filter((v) => !isNaN(v));
-      switch (method) {
-        case "count": return vals.length;
-        case "sum": return Number(nums.reduce((s, v) => s + v, 0).toFixed(4));
-        case "average": return nums.length ? Number((nums.reduce((s, v) => s + v, 0) / nums.length).toFixed(4)) : 0;
-        case "min": return nums.length ? Math.min(...nums) : 0;
-        case "max": return nums.length ? Math.max(...nums) : 0;
-        default: return vals.length;
-      }
-    };
-    return Object.entries(groups).map(([k, vals]) => ({ key: k, value: agg(vals) }));
+    return Object.entries(groups).map(([k, vals]) => ({ key: k, value: aggregateValues(vals, method) }));
   }
 
   /* ----------------------- Phase 5: Chart builder ------------------------ */

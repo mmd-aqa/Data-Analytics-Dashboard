@@ -47,33 +47,28 @@ body {
 
 .tab-btn {
   font-weight: 600;
-  font-size: 14px;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
+  font-size: var(--font-title);
+  padding: var(--space-1h) var(--space-3);
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--text-muted);
+  cursor: pointer;
   transition:
     background var(--transition),
     color var(--transition);
   white-space: nowrap;
 }
 .tab-btn:hover {
-  background: var(--surface-muted);
+  background: var(--surface-hover);
   color: var(--text);
 }
-.dark .tab-btn:hover {
-  background: var(--surface-muted);
-  color: var(--text);
-}
+
 .tab-btn.active {
   background: var(--brand-tint);
   color: var(--brand-text);
   font-weight: 700;
 }
-.dark .tab-btn.active {
-  background: var(--brand-tint);
-  color: var(--brand-text);
-}
+
 .tab-btn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
@@ -92,9 +87,6 @@ body {
   max-height: 520px;
   overflow-y: auto;
 }
-.dark .df-wrapper {
-  border-color: var(--card-border);
-}
 
 table.df {
   border-collapse: collapse;
@@ -105,15 +97,11 @@ table.df {
 table.df th,
 table.df td {
   border-bottom: 1px solid var(--divider);
-  padding: 9px var(--space-4); /* comfortable cells: dense but never cramped */
+  padding: var(--space-2) var(--space-4); /* comfortable cells: dense but never cramped */
   text-align: left;
   direction: ltr;
   white-space: nowrap;
   font-variant-numeric: tabular-nums; /* columns of figures align digit-for-digit */
-}
-.dark table.df th,
-.dark table.df td {
-  border-color: var(--divider);
 }
 /* Numbers/body read at full contrast; the index column steps back. */
 table.df td:first-child b {
@@ -139,18 +127,11 @@ table.df thead th {
   z-index: 1;
   box-shadow: inset 0 -1px 0 var(--card-border);
 }
-.dark table.df thead th {
-  background: var(--surface-muted);
-  box-shadow: inset 0 -1px 0 var(--card-border);
-}
 
 /* Row hover — barely-there (the pointer already tells you where you are);
    the only row treatment. */
 table.df tbody tr:hover td {
-  background: var(--surface-muted);
-}
-.dark table.df tbody tr:hover td {
-  background: #1a1c20;
+  background: var(--surface-hover);
 }
 
 .widget label {
@@ -164,8 +145,8 @@ table.df tbody tr:hover td {
 .widget input[type="number"] {
   width: 100%;
   border: 1px solid var(--control-border);
-  border-radius: var(--radius-sm);
-  padding: 7px 10px;
+  border-radius: var(--radius-control);
+  padding: var(--space-2) var(--space-3);
   background: var(--card-bg);
   color: var(--text);
   font-size: var(--font-body);
@@ -177,8 +158,12 @@ table.df tbody tr:hover td {
   color: var(--text);
   border-color: var(--control-border);
 }
+/* Shared focus state for every form control (widget / search / filter inputs). */
 .widget select:focus,
-.widget input[type="number"]:focus {
+.widget input[type="number"]:focus,
+.search-wrap input:focus,
+.filter-row select:focus,
+.filter-row input:focus {
   outline: none;
   border-color: var(--brand);
   box-shadow: var(--focus-ring);
@@ -187,26 +172,27 @@ input[type="range"] {
   accent-color: var(--brand);
 }
 /* Slim, quiet scrollbars — visible on hover-intent, never heavy chrome. */
+.df-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
 .df-wrapper::-webkit-scrollbar {
   height: 8px;
   width: 8px;
 }
 .df-wrapper::-webkit-scrollbar-thumb {
-  background: #d3d6da;
+  background: var(--scrollbar-thumb);
   border-radius: var(--radius-pill);
 }
 .df-wrapper::-webkit-scrollbar-thumb:hover {
   background: #b9bdc3;
-}
-.dark .df-wrapper::-webkit-scrollbar-thumb {
-  background: #3a3d42;
 }
 .dark .df-wrapper::-webkit-scrollbar-thumb:hover {
   background: #4a4e54;
 }
 
 .alert {
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   padding: var(--space-3) var(--space-4);
   font-size: var(--font-body);
   margin: var(--space-2) 0;
@@ -219,10 +205,6 @@ input[type="range"] {
   flex-shrink: 0;
 }
 .alert-info {
-  background: var(--surface-muted);
-  color: var(--text);
-}
-.dark .alert-info {
   background: var(--surface-muted);
   color: var(--text);
 }
@@ -251,15 +233,13 @@ details.expander {
   padding: 0;
   background: transparent;
 }
-.dark details.expander {
-  background: transparent;
-}
+
 details.expander > summary {
   cursor: pointer;
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--font-body);
   color: var(--text);
-  padding: 4px 0;
+  padding: var(--space-1) 0;
   list-style: none;
 }
 details.expander > summary::-webkit-details-marker {
@@ -276,12 +256,6 @@ html {
   overflow-y: scroll;
 }
 
-/* The dataset metric breakdown (rows · columns · numeric · categorical ·
-   missing · duplicates) no longer renders as six KPI cards — it is now a set of
-   compact `.dash-cell` figures inside the bordered `.dash-panel` information block
-   (see that block near the end of this file). The former .kpi-* rules were removed
-   with that redesign. */
-
 /* ===================== Sortable / highlighted tables ==================== */
 table.df th.th-sort {
   cursor: pointer;
@@ -294,10 +268,7 @@ table.df th.th-sort:hover {
   color: var(--text);
   background: var(--surface-muted);
 }
-.dark table.df th.th-sort:hover {
-  color: var(--text);
-  background: var(--surface-muted);
-}
+
 table.df tr.row-warn td {
   background: #fef3c7 !important;
   color: #7c4a03;
@@ -330,25 +301,23 @@ mark.search-hit {
   flex-wrap: wrap;
 }
 .pager-info {
-  font-size: 12px;
+  font-size: var(--font-meta);
   color: var(--text-muted);
-  margin: 0 10px;
-}
-.dark .pager-info {
-  color: var(--text-muted);
+  margin: 0 var(--space-2);
 }
 .pager-btn {
   min-width: 30px;
   height: 28px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-muted);
   font-weight: 700;
+  cursor: pointer;
   transition: all var(--transition);
 }
 .pager-btn:hover:not(:disabled) {
-  background: var(--surface-muted);
+  background: var(--surface-hover);
   color: var(--text);
 }
 .pager-btn:focus-visible {
@@ -359,15 +328,6 @@ mark.search-hit {
   opacity: 0.35;
   cursor: not-allowed;
 }
-.dark .pager-btn {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-muted);
-}
-.dark .pager-btn:hover:not(:disabled) {
-  background: var(--surface-muted);
-  color: var(--text);
-}
 
 /* ====================== Filters & search (Phase 6/7) ==================== */
 .search-wrap {
@@ -376,7 +336,7 @@ mark.search-hit {
 }
 .search-wrap .search-icon {
   position: absolute;
-  right: 12px;
+  right: var(--space-3);
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-subtle);
@@ -386,23 +346,14 @@ mark.search-hit {
 .search-wrap input {
   width: 100%;
   border: 1px solid var(--control-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   padding: var(--space-2) 40px var(--space-2) var(--space-3);
   background: var(--card-bg);
   color: var(--text);
   font-size: var(--font-body);
   transition: border-color var(--transition), box-shadow var(--transition);
 }
-.dark .search-wrap input {
-  background: var(--card-bg);
-  color: var(--text);
-  border-color: var(--control-border);
-}
-.search-wrap input:focus {
-  outline: none;
-  border-color: var(--brand);
-  box-shadow: var(--focus-ring);
-}
+
 .filter-row {
   display: flex;
   flex-wrap: wrap;
@@ -414,30 +365,15 @@ mark.search-hit {
   border-top: 1px solid var(--divider); /* hairline between stacked conditions */
   padding-top: var(--space-2);
 }
-.dark .filter-row {
-  background: transparent;
-}
 .filter-row select,
 .filter-row input {
   border: 1px solid var(--control-border);
-  border-radius: var(--radius-sm);
-  padding: 7px 10px;
+  border-radius: var(--radius-control);
+  padding: var(--space-2) var(--space-3);
   background: var(--card-bg);
   color: var(--text);
   font-size: var(--font-body);
   transition: border-color var(--transition), box-shadow var(--transition);
-}
-.dark .filter-row select,
-.dark .filter-row input {
-  background: var(--card-bg);
-  color: var(--text);
-  border-color: var(--control-border);
-}
-.filter-row select:focus,
-.filter-row input:focus {
-  outline: none;
-  border-color: var(--brand);
-  box-shadow: var(--focus-ring);
 }
 .filter-row .filter-col {
   min-width: 150px;
@@ -458,8 +394,9 @@ mark.search-hit {
   color: #b91c1c;
   display: inline-flex;
   align-items: center;
-  border-radius: var(--radius-sm);
-  padding: 4px;
+  border-radius: var(--radius-control);
+  padding: var(--space-1);
+  cursor: pointer;
 }
 .filter-remove:hover {
   background: #fde2e2;
@@ -472,21 +409,29 @@ mark.search-hit {
 /* One button family — every action in the app is one of these three, all sharing
    height (34px), radius and focus ring so the interface has a single button
    language. Primary = brand fill (the one place a solid action lives); secondary
-   = outlined; ghost = text-only. */
-.btn-primary {
+   = outlined; ghost = text-only.
+   Height hierarchy (intentional role ordering):
+   -- .header-btn  40px  (shell-level actions: upload, theme)
+   -- .btn-*       34px  (page-level actions: apply, clear, export)
+   -- .toolbar-btn 32px  (inline table commands: sort, filter, search)        */
+.btn-primary,
+.btn-secondary,
+.btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--space-1h);
   height: 34px;
   padding: 0 14px;
-  border: 1px solid transparent;
-  background: var(--brand);
-  color: #fff;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   font-weight: 600;
   font-size: var(--font-body);
   cursor: pointer;
+}
+.btn-primary {
+  border: 1px solid transparent;
+  background: var(--brand);
+  color: #fff;
   transition: background var(--transition);
 }
 .btn-primary:hover {
@@ -497,23 +442,14 @@ mark.search-hit {
   box-shadow: var(--focus-ring);
 }
 .btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 34px;
   border: 1px solid var(--control-border);
   background: var(--card-bg);
   color: var(--text);
-  border-radius: var(--radius-md);
-  padding: 0 14px;
-  font-weight: 600;
-  font-size: var(--font-body);
   transition: all var(--transition);
 }
 .btn-secondary:hover {
   border-color: var(--text-subtle);
-  background: var(--surface-muted);
+  background: var(--surface-hover);
   color: var(--text);
 }
 .dark .btn-secondary {
@@ -521,26 +457,13 @@ mark.search-hit {
   border-color: var(--control-border);
   color: var(--text);
 }
-.dark .btn-secondary:hover {
-  border-color: var(--text-subtle);
-  background: var(--surface-muted);
-  color: var(--text);
-}
 .btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 34px;
-  border-radius: var(--radius-md);
-  padding: 0 14px;
-  font-weight: 600;
-  font-size: var(--font-body);
   color: var(--text-muted);
   transition: all var(--transition);
 }
 .btn-ghost:hover {
-  color: #b91c1c;
+  color: var(--text);
+  background: var(--surface-hover);
 }
 
 /* ===================== App header — flat toolbar ====================== */
@@ -574,9 +497,9 @@ mark.search-hit {
   height: 40px;
   padding: 0 14px;
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-title);
   line-height: 1;
   cursor: pointer;
   transition: all var(--transition);
@@ -597,25 +520,25 @@ mark.search-hit {
   padding: 0;
 }
 
-/* Secondary — outlined ghost, matching the toolbar's default button exactly. */
+/* Secondary — borderless, lightweight header action (Cloudflare style).
+   Transparent at rest; a subtle hover highlight is the only affordance. */
 .header-btn--ghost {
-  background: var(--card-bg);
-  border-color: var(--control-border);
+  background: transparent;
+  border-color: transparent;
   color: var(--text);
+  box-shadow: none;
 }
 .header-btn--ghost:hover {
-  border-color: var(--text-subtle);
-  background: var(--surface-muted);
+  border-color: transparent;
+  background: var(--surface-hover);
   color: var(--text);
 }
 .dark .header-btn--ghost {
-  background: var(--surface-muted);
+  background: transparent;
   color: var(--text);
 }
 .dark .header-btn--ghost:hover {
-  border-color: var(--text-subtle);
-  background: var(--surface-muted);
-  color: var(--text);
+  background: var(--surface-hover);
 }
 
 /* A gentle press feedback shared by header/toolbar buttons — a barely-there
@@ -668,15 +591,62 @@ mark.search-hit {
   }
 }
 
-/* On touch-width viewports guarantee a ≥48px hit target, and prefer tighter
-   horizontal padding over wrapping so the header actions always stay on one
-   line. Applies to every header control (upload, export, theme, sidebar toggle). */
-@media (max-width: 640px) {
-  .app-header .header-btn {
-    min-height: 48px;
+/* ===================== Mobile header (≤ 768px) ======================= */
+/* Cloudflare-inspired: branding hidden, actions become icon-only buttons.
+   Layout order is identical to desktop — #headerStart (hamburger) on the
+   reading-start edge (right in RTL), #headerActions (upload + export + theme)
+   on the reading-end (left). No reordering or direction swap. */
+@media (max-width: 767px) {
+  .header-brand {
+    display: none; /* logo + title move into the mobile drawer */
   }
-  .header-btn:not(.header-btn--icon) {
-    padding: 0 12px;
+  .header-action-group:has(> :not([hidden])) {
+    display: inline-flex; /* ensure upload + export are visible */
+  }
+  /* Icon-only buttons: hide the export text label + caret on mobile. */
+  .header-action-group .header-btn span:not(.material-symbols-outlined) {
+    display: none;
+  }
+  .header-action-group .toolbar-caret {
+    display: none;
+  }
+  /* Compact 40×40 touch targets, borderless ghost style. */
+  .app-header .header-btn {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+  /* Data-toolbar: icon-only compact action bar on mobile.
+     Text labels are visually hidden (sr-only pattern) so screen readers
+     still announce them; icons stay centered in 40×40 touch targets. */
+  .data-toolbar {
+    gap: var(--space-2);
+  }
+  .toolbar-btn {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+  .toolbar-btn span:not(.material-symbols-outlined):not(.toolbar-badge) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* Smaller phones: bump to 44px for comfortable thumb reach. */
+@media (max-width: 380px) {
+  .app-header .header-btn {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 
@@ -699,12 +669,12 @@ mark.search-hit {
 .toolbar-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1h);
   height: 32px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-muted);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   padding: 0 10px;
   font-weight: 600;
   font-size: var(--font-body);
@@ -712,21 +682,13 @@ mark.search-hit {
   transition: all var(--transition);
 }
 .toolbar-btn:hover {
-  background: var(--surface-muted);
+  background: var(--surface-hover);
   color: var(--text);
 }
 .toolbar-btn:focus-visible {
   outline: none;
   border-color: var(--brand);
   box-shadow: var(--focus-ring);
-}
-.dark .toolbar-btn {
-  background: transparent;
-  color: var(--text-muted);
-}
-.dark .toolbar-btn:hover {
-  background: var(--surface-muted);
-  color: var(--text);
 }
 /* Highlight when the panel is open (active-toggle) or its query/filters are active. */
 .toolbar-btn.active,
@@ -735,12 +697,7 @@ mark.search-hit {
   border-color: var(--brand);
   color: var(--brand-text);
 }
-.dark .toolbar-btn.active,
-.dark .toolbar-btn.active-toggle {
-  background: var(--brand-tint);
-  border-color: var(--brand);
-  color: var(--brand-text);
-}
+
 .toolbar-btn .material-symbols-outlined {
   font-size: 18px;
 }
@@ -753,10 +710,10 @@ mark.search-hit {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--brand);
   color: #fff;
-  font-size: 11px;
+  font-size: var(--font-caption);
   font-weight: 700;
   direction: ltr;
 }
@@ -801,7 +758,7 @@ mark.search-hit {
 /* An inset tray, not a card: the muted fill alone marks the region (no border). */
 .toolbar-panel-inner {
   overflow: hidden;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-muted);
   padding: var(--space-3);
   transition: padding 0.2s var(--ease);
@@ -810,9 +767,6 @@ mark.search-hit {
    and this collapses the inner padding (otherwise a dead 24px strip remains). */
 .toolbar-panel:not(.open) .toolbar-panel-inner {
   padding-block: 0;
-}
-.dark .toolbar-panel-inner {
-  background: #111317;
 }
 
 /* Search panel layout: input grows, clear button trails. */
@@ -837,10 +791,6 @@ mark.search-hit {
   background: transparent;
   color: var(--text-muted);
 }
-.dark .toolbar-btn:disabled {
-  background: transparent;
-  color: var(--text-muted);
-}
 .toolbar-caret {
   font-size: 18px !important;
   opacity: 0.7;
@@ -856,11 +806,11 @@ mark.search-hit {
   position: fixed;
   top: 0;
   left: 0;
-  width: 240px;
+  width: 192px;
   max-width: calc(100vw - 16px);
   max-height: 320px; /* JS narrows this to the available space; scrolls if taller */
   z-index: 9990; /* above charts/table; below toasts (9999) and overlay (9998) */
-  padding: 6px;
+  padding: var(--space-1h);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
   background: var(--card-bg);
@@ -894,18 +844,18 @@ mark.search-hit {
   }
 }
 .dark .dropdown-menu {
-  background: #1d1f23;
+  background: var(--surface-muted);
   border-color: var(--control-border);
   box-shadow: var(--shadow-pop);
 }
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   width: 100%;
-  min-height: 44px;
+  min-height: 34px;
   padding: 0 var(--space-3);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   font-weight: 600;
   font-size: var(--font-body);
   color: var(--text);
@@ -926,14 +876,6 @@ mark.search-hit {
 .dropdown-item:active {
   background: #d7ecdf;
 }
-.dark .dropdown-item {
-  color: var(--text);
-}
-.dark .dropdown-item:hover,
-.dark .dropdown-item:focus {
-  background: var(--brand-tint);
-  color: var(--brand-text);
-}
 .dark .dropdown-item:active {
   background: #16432c;
 }
@@ -951,12 +893,9 @@ mark.search-hit {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 12.5px;
+  font-size: var(--font-meta);
   color: var(--text-muted);
   min-height: 20px;
-}
-.dark .toolbar-status {
-  color: var(--text-muted);
 }
 .toolbar-status:empty {
   display: none;
@@ -965,15 +904,12 @@ mark.search-hit {
   color: var(--text);
   font-weight: 700;
 }
-.dark .toolbar-status b {
-  color: var(--text);
-}
 .toolbar-status .status-icon {
   font-size: 18px;
   color: var(--icon);
 }
 .status-badge {
-  font-size: 11px;
+  font-size: var(--font-caption);
   font-weight: 700;
   padding: 2px 8px;
   border-radius: var(--radius-pill);
@@ -985,36 +921,6 @@ mark.search-hit {
   color: #fcd34d;
 }
 
-@media (max-width: 480px) {
-  /* Two-button rows instead of one-per-row. A 2-column grid forces equal widths
-     regardless of each label's intrinsic width. In DOM order the children are
-     search · filter · reset (Export moved to the header, chart creation lives
-     only in the rail), so auto-flow yields:
-       row 1  [ جستجو ] [ فیلتر ]
-       row 2  [ بازنشانی ]  (spans both columns → full width)
-     RTL: column 1 is the right-hand cell, so first-in-DOM sits right. */
-  .data-toolbar {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-2);
-  }
-  .data-toolbar > .toolbar-btn,
-  .data-toolbar > .toolbar-dropdown {
-    min-width: 0; /* let cells shrink to the 1fr track instead of overflowing */
-  }
-  .data-toolbar > .toolbar-btn:last-child {
-    grid-column: 1 / -1; /* Reset is alone on its row — keep it full width */
-  }
-  .toolbar-btn {
-    justify-content: center;
-    padding: 0 10px; /* a touch tighter so icon+label fit down to 320px */
-    white-space: nowrap; /* never let a label wrap to a 2nd line inside the 40px pill */
-  }
-  .dropdown-menu {
-    width: 100%;
-  }
-}
-
 /* =========================== Empty states ============================= */
 /* Flat and quiet — type and whitespace, no dashed box (the surrounding surface
    already frames the region). */
@@ -1024,7 +930,7 @@ mark.search-hit {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 48px var(--space-5);
+  padding: var(--space-6) var(--space-5);
 }
 .empty-state .empty-icon {
   font-size: 40px;
@@ -1036,36 +942,9 @@ mark.search-hit {
   margin-top: var(--space-3);
 }
 .empty-text {
-  font-size: 12.5px;
+  font-size: var(--font-meta);
   color: var(--text-muted);
   margin-top: var(--space-1);
-}
-
-/* ========================= Landing upload card ======================== */
-.upload-card {
-  box-shadow: none;
-}
-.dark .upload-card {
-  box-shadow: none;
-}
-/* "یا" separator with a rule on each side. */
-.upload-divider {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  color: var(--text-subtle);
-  font-size: var(--font-meta);
-}
-.upload-divider::before,
-.upload-divider::after {
-  content: "";
-  flex: 1 1 auto;
-  height: 1px;
-  background: var(--divider);
-}
-.dark .upload-divider::before,
-.dark .upload-divider::after {
-  background: var(--divider);
 }
 
 /* Subtle fade/scale used for the landing card and the dashboard reveal. */
@@ -1118,17 +997,9 @@ mark.search-hit {
 .corr-neg {
   color: #b91c1c;
 }
-.dark .corr-pos {
-  color: var(--brand-text);
-}
 .dark .corr-neg {
   color: #f87171;
 }
-
-/* The former `.quality-stat` bordered cards were removed: the data-quality overview
-   figures now render with the shared `.dash-group` / `.dash-cell--stat` metadata
-   language (see statistics.js `qualityStatGroup`) so there is ONE metric component
-   across the app rather than two. */
 
 /* ====================== Quality score gauge (Phase 7) =================== */
 /* Flat: the ring + big rating ARE the visual weight; no card frame around them. */
@@ -1164,39 +1035,30 @@ mark.search-hit {
   justify-content: center;
   gap: 1px;
 }
-.dark .qs-ring-inner {
-  background: var(--page);
-}
 .qs-num {
   font-size: 28px;
   font-weight: 700;
   line-height: 1;
 }
 .qs-unit {
-  font-size: 13px;
+  font-size: var(--font-body);
   font-weight: 700;
   opacity: 0.7;
 }
 .qs-title {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-.dark .qs-title {
+  font-size: var(--font-body);
   color: var(--text-muted);
 }
 .qs-rating {
   font-size: 22px;
   font-weight: 700;
-  margin: 2px 0 8px;
+  margin: var(--space-1) 0 var(--space-2);
 }
 .qs-breakdown {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 16px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.dark .qs-breakdown {
+  gap: var(--space-1h) var(--space-4);
+  font-size: var(--font-meta);
   color: var(--text-muted);
 }
 /* Tone → ring + rating colour. */
@@ -1224,9 +1086,7 @@ mark.search-hit {
 .quality-score-red .qs-rating {
   color: #b91c1c;
 }
-.dark .quality-score-green .qs-rating {
-  color: var(--brand-text);
-}
+
 .dark .quality-score-blue .qs-rating {
   color: #6cb6f5;
 }
@@ -1249,13 +1109,17 @@ mark.search-hit {
   border: 1px solid var(--card-border);
   border-radius: var(--card-radius);
   padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* contain the scrollable list within the card frame */
+  min-height: 0; /* allow the card to shrink below its content height */
 }
 /* Card header — a whisper-quiet caption label closed by a hairline, so the
    findings below read as their own grouped band. */
 .insight-head {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1h);
   font-weight: 700;
   font-size: var(--font-caption);
   letter-spacing: 0.04em;
@@ -1263,6 +1127,7 @@ mark.search-hit {
   padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--divider);
   color: var(--text-muted);
+  flex-shrink: 0; /* fixed header — never scrolls */
 }
 /* The label's own icon is decorative — the text is the label. */
 .insight-head .material-symbols-outlined {
@@ -1271,6 +1136,19 @@ mark.search-hit {
 .insight-list {
   display: flex;
   flex-direction: column;
+  flex: 1; /* fill available height between header and card bottom */
+  overflow-y: auto; /* scroll when findings exceed the available space */
+  min-height: 0; /* allow shrinking below content height for overflow to work */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+/* All insights are visible inside the scrollable area — the JS [hidden]
+   attribute (set for the retired "View all" pattern) is overridden. */
+.insight-list [hidden] {
+  display: flex !important;
 }
 /* Each finding is a bare feed row: icon + text. No rules between rows — the
    6px row gap is the only separator (a timeline, not a table). Long findings
@@ -1301,29 +1179,9 @@ mark.search-hit {
 .dark .insight-warn .insight-icon {
   color: #fcd34d;
 }
-/* "View all" — a text action, not a button: caption-level, aligned with the
-   rows. A hairline lifts it into a quiet footer, grouping it as the card's
-   ACTION section below the findings. */
+/* "View all" retired — the insight list scrolls internally instead. */
 .insight-more {
-  align-self: flex-start;
-  width: 100%;
-  text-align: start;
-  margin-top: var(--space-2);
-  padding: var(--space-3) 0 0;
-  border-top: 1px solid var(--divider);
-  font-size: var(--font-meta);
-  font-weight: 600;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: color var(--transition);
-}
-.insight-more:hover {
-  color: var(--brand-text);
-}
-.insight-more:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-  border-radius: var(--radius-sm);
+  display: none;
 }
 
 /* ============================ Toasts (UI/UX) =========================== */
@@ -1343,11 +1201,13 @@ mark.search-hit {
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
+  border: 1px solid var(--toast-border);
+  border-inline-start: 2px solid var(--toast-accent, var(--toast-border));
   font-size: var(--font-body);
   font-weight: 600;
-  color: #fff;
-  background: var(--success);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  color: var(--toast-text);
+  background: var(--toast-bg);
+  box-shadow: var(--shadow-pop);
   cursor: pointer;
   opacity: 0;
   transform: translateY(12px);
@@ -1362,21 +1222,21 @@ mark.search-hit {
 .toast .material-symbols-outlined {
   font-size: 20px;
   flex-shrink: 0;
+  color: var(--toast-accent, var(--toast-text));
 }
+/* Each type declares only its accent colour; the base card turns it into a
+   coloured icon + a thin inline-start bar (no saturated blocks, low noise). */
 .toast-ok {
-  background: var(--success);
+  --toast-accent: var(--toast-ok);
 }
 .toast-info {
-  background: #1e5fa8;
+  --toast-accent: var(--toast-info);
 }
 .toast-warn {
-  background: #b45309;
+  --toast-accent: var(--toast-warn);
 }
 .toast-error {
-  background: #b91c1c;
-}
-.dark .toast {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --toast-accent: var(--toast-error);
 }
 
 /* ====================== Spinner + loading overlay ===================== */
@@ -1424,7 +1284,7 @@ button.is-busy {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: var(--space-4);
   background: rgba(15, 16, 18, 0.55);
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
@@ -1441,7 +1301,7 @@ button.is-busy {
 }
 .loading-text {
   color: #fff;
-  font-size: 14px;
+  font-size: var(--font-title);
   font-weight: 700;
 }
 
@@ -1459,7 +1319,9 @@ button.is-busy {
   --brand-hover: #1a5c38; /* hover/pressed fill */
   --brand-text: #185c37; /* green for active/link text */
   --brand-tint: #e6f4ea; /* soft green surface — active/selected states only */
-  --success: #185c37; /* solid success fill (toasts) — theme-stable */
+  --success: #33c481; /* success accent — refined from the old saturated solid fill
+                         (#185c37) so it stays legible on the dark toast surface;
+                         matches the on-dark brand green */
 
   /* Neutral grayscale hierarchy — carries ~95% of the interface. Typography and
      these grays (not colour or decoration) create the visual hierarchy. */
@@ -1487,14 +1349,14 @@ button.is-busy {
                           clears the rail instead of butting against it */
 
   /* Radius scale — small corners (6–8px) for a mature, flat SaaS feel. */
-  --radius-sm: 6px; /* chips, small controls, inputs */
-  --radius-md: 6px; /* buttons, toolbar, panels */
-  --radius-lg: 8px; /* toolbar, popovers */
+  --radius-control: 6px; /* buttons, inputs, chips, toolbar, panels */
+  --radius-lg: 8px; /* popovers, dropdowns, toasts */
   --card-radius: 8px; /* framed surfaces (table, analysis containers) */
   --radius-pill: 999px; /* pills, badges */
 
   /* Spacing scale — the ONE grid every gap on the page aligns to. No arbitrary
-     margins at call sites; every rhythm below is one of these six steps. */
+     margins at call sites; every rhythm below is one of these steps. */
+  --space-1h: 6px; /* micro gap: icon–text pairs, inline badges */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -1513,19 +1375,33 @@ button.is-busy {
   --font-title: 14px; /* section titles */
   --font-body: 13px; /* body text, controls */
   --font-meta: 12px; /* metadata, labels, table captions */
-  --font-caption: 11px; /* quiet captions, badges, feed label */
+  --font-caption: 14px; /* quiet captions, badges, feed label */
 
   /* Elevation — near-flat: thin borders do the separating, not shadows. Only
-     genuinely floating layers (menus, drawer, toasts, overlay) use --shadow-pop. */
-  --shadow-sm: none;
-  --card-shadow: none;
+     genuinely floating layers (menus, drawer, toasts, overlay) use --shadow-pop.
+     Cards carry a barely-there 1px shadow for Cloudflare-style depth. */
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.16);
 
   /* Surfaces & borders. */
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
   --control-border: #d1d5db; /* form controls, outlined buttons */
-  --header-bg: #ffffff; /* solid, flat header (no glass/blur) */
+  --surface-hover: #f0f1f3; /* neutral hover fill for interactive elements */
+  --scrollbar-thumb: #d3d6da; /* slim scrollbar thumb (table, insight feed) */
+
+  /* Toast — a dark floating card in BOTH themes (Linear/Vercel-style). In light
+     mode it reads as a high-contrast notification; in dark mode it lifts off the
+     page via its border + shadow. Type is signalled by a coloured icon + a thin
+     inline-start accent bar — never a saturated block — so a toast feels like a
+     natural part of the dashboard rather than a standalone widget. */
+  --toast-bg: #1b1d21;
+  --toast-border: rgba(255, 255, 255, 0.08);
+  --toast-text: #f3f4f6;
+  --toast-ok: var(--success);
+  --toast-info: #60a5fa;
+  --toast-warn: #fbbf24;
+  --toast-error: #f87171;
 
   /* Motion & focus — one easing, one timing (<=200ms), one focus ring. */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -1536,24 +1412,22 @@ button.is-busy {
 .dark {
   --brand-text: #33c481; /* brighter green for contrast on dark */
   --brand-tint: #103021;
-  --text: #e5e7eb;
+  --text: #f5f5f5;
   --text-muted: #9ca3af;
   --text-subtle: #6b7280;
   --icon: #9ca3af;
-  --surface: #16181b;
-  --surface-muted: #1d1f23;
-  --page: #0e0f11; /* the app canvas behind the content (matches body bg) */
+  --surface: #030303;
+  --surface-muted: #030303;
+  --page: #030303; /* the app canvas behind the content (matches body bg) */
   --divider: #26282c;
-  --card-bg: #16181b;
+  --card-bg: #0F0F0F;
   --card-border: #26282c;
   --control-border: #33363b;
-  --card-shadow: none;
+  --card-shadow: none; /* no shadow in dark — borders carry the separation */
   --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.5);
-  --header-bg: #16181b; /* solid, flat header (no glass/blur) */
+  --surface-hover: #222428; /* neutral hover fill for interactive elements */
+  --scrollbar-thumb: #3a3d42; /* slim scrollbar thumb (table, insight feed) */
 }
-
-/* The quality-score gauge and the insight feed are both flat now — no framed
-   container survives above the data table except the summary panel itself. */
 
 /* ===================== Canonical typography ramp ======================= */
 /* The ENTIRE app types from these four roles — no ad-hoc font-size/weight at the
@@ -1618,7 +1492,7 @@ button.is-busy {
    `mb-4 text-gray-500 dark:text-gray-400` literal that every section used to
    hand-write, so every explanatory line is the same size, colour and rhythm. --- */
 .section-desc {
-  font-size: 12.5px;
+  font-size: var(--font-meta);
   line-height: 1.5;
   color: var(--text-muted);
   margin: 0 0 var(--space-3);
@@ -1639,9 +1513,8 @@ button.is-busy {
   border: 1px solid var(--card-border);
   border-radius: var(--card-radius); /* one radius across every framed card */
   padding: var(--space-5);
-  /* 16px (summary panel's mb-4) + 8px = a 24px step from the dataset header
-     to the section card — the between-blocks rhythm of the spec. */
-  margin-top: var(--space-2);
+  /* The grid row-gap (24px) owns the between-blocks rhythm — no extra margin. */
+  margin-top: 0;
 }
 @media (max-width: 640px) {
   #content [role="tabpanel"] {
@@ -1665,6 +1538,16 @@ button.is-busy {
   margin-bottom: var(--space-5);
 }
 
+/* Subtle depth — a barely-perceptible 1px shadow lifts framed surfaces off
+   the --page canvas (Cloudflare-style). Dark mode keeps none (border alone
+   provides the boundary on dark surfaces). */
+.dash-panel,
+.insight-card,
+#content [role="tabpanel"],
+#content > div:has(> .section-title--primary) {
+  box-shadow: var(--card-shadow);
+}
+
 /* ============= Dataset summary — a calm dashboard panel ============= */
 /* The overview of the loaded dataset, composed as a lightweight information
    card (Cloudflare zone-overview idiom): a subtle surface lifted off the page
@@ -1684,6 +1567,8 @@ button.is-busy {
   border: 1px solid var(--card-border);
   border-radius: var(--card-radius);
   padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
 }
 /* When a summary panel appears INSIDE an analysis section card (e.g. the
    data-quality overview in the statistics tab), the tabpanel card is already
@@ -1694,12 +1579,13 @@ button.is-busy {
   border-radius: 0;
   padding: 0;
   background: transparent;
+  box-shadow: none; /* flat inside a card — no card-in-card depth */
 }
 .dash-panel__body {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  column-gap: var(--space-6); /* generous air between figures — on the scale */
+  column-gap: var(--space-5); /* tighter in the two-column layout — stats wrap naturally */
   row-gap: var(--space-3);
 }
 
@@ -1733,13 +1619,24 @@ button.is-busy {
 .dash-group--meta {
   flex: 1 1 100%;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* metadata stays on a single line */
   align-items: center;
   column-gap: var(--space-2);
-  row-gap: 2px;
   margin: var(--space-1) 0 0;
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--divider);
+}
+/* Sub-360px phones (320px class): the file-type + date-time line no longer
+   fits on one row — let it wrap instead of forcing page-wide overflow. */
+@media (max-width: 359px) {
+  .dash-group--meta {
+    flex-wrap: wrap;
+    row-gap: var(--space-1);
+  }
+}
+/* Memory metric removed from the metadata row — not needed in the compact panel. */
+.dash-group--meta .dash-cell:nth-child(3) {
+  display: none;
 }
 
 /* Metric band — the stat groups dissolve (display:contents) so all figures
@@ -1748,10 +1645,20 @@ button.is-busy {
 .dash-panel__body > .dash-group--stat {
   display: contents;
 }
+/* Numeric/Categorical column counts removed — only Rows, Columns, Missing and
+   Duplicates remain. Each remaining stat distributes evenly across the row.
+   Note: :nth-of-type(2) because .dash-group--meta is the first div child. */
+.dash-panel__body > .dash-group--stat:nth-of-type(2) .dash-cell:nth-child(3),
+.dash-panel__body > .dash-group--stat:nth-of-type(2) .dash-cell:nth-child(4) {
+  display: none;
+}
+.dash-panel__body .dash-cell--stat {
+  flex: 1; /* distribute the four remaining stats evenly */
+}
 .dash-cell {
   display: inline-flex;
   align-items: baseline;
-  gap: 6px;
+  gap: var(--space-1h);
   white-space: nowrap;
 }
 
@@ -1854,27 +1761,85 @@ button.is-busy {
   }
 }
 
-@media (max-width: 480px) {
-  /* On phones the sticky bar would eat too much viewport — let it scroll. */
-  .data-toolbar {
-    position: static;
-    box-shadow: none;
-    padding: 0;
-  }
+/* ---- Overview two-column grid — the layout system, pinned in one place ----
+   Auto-insights (.insight-card) is the primary card (wider, ≈63%, LEFT in RTL);
+   dataset summary (.dash-panel) is the compact secondary (≈37%, RIGHT in RTL).
+   The dash-panel's content defines the row height; the insight-card fills that
+   height via absolute positioning and scrolls internally when its findings
+   overflow. Data Preview spans the full width below. On narrow viewports the
+   columns stack. */
+#content {
+  display: grid;
+  grid-template-columns: 3fr 5fr;
+  column-gap: var(--space-5);
+  row-gap: var(--space-5);
+  align-items: stretch; /* equal-height cards — row height follows the dash-panel */
+}
+/* Row 1 — insights wrapper (left in RTL, the narrower column).
+   The insight-card is absolutely positioned inside so its content NEVER
+   influences the grid row height — the dash-panel alone drives it. */
+#content > div:has(> .insight-card) {
+  grid-column: 2;
+  grid-row: 1;
+  margin-bottom: 0;
+  position: relative; /* containing block for the absolutely-positioned card */
+  min-height: 0;
+}
+#content > div:has(> .insight-card) > .insight-card {
+  position: absolute; /* removed from grid sizing — fills the wrapper frame */
+  inset: 0;
+}
+/* Row 1 — summary panel (right in RTL, the wider primary column). */
+#content > .dash-panel {
+  grid-column: 1;
+  grid-row: 1;
+  margin-bottom: 0; /* grid row-gap owns the vertical rhythm now */
+}
+/* Row 2+ — Data Preview and everything after spans both columns.
+   min-width:0 lets the grid track shrink below the content's intrinsic width
+   (e.g. a 6-column nowrap table) so internal .df-wrapper overflow-x:auto
+   handles horizontal scrolling instead of blowing out the layout. */
+#content > div:has(> .section-title--primary),
+#content > [role="tablist"],
+#content > div:has(> [role="tabpanel"]) {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+/* When no analysis panel is visible (overview/home), the panels wrapper is an
+   empty grid row that adds a phantom row-gap below the preview. Hide it so
+   the grid ends cleanly at the last visible row. */
+#content > div:has(> [role="tabpanel"]):not(:has(> [role="tabpanel"]:not(.hidden))) {
+  display: none;
 }
 
-/* ---- Home-page rhythm — the spacing system, pinned in one place ----
-   The page reads as three ranked bands separated by pure whitespace (no
-   rules): identity (dataset header) → 24px → findings (the quiet activity
-   stream) → 32px → workspace (the one framed surface). Flat blocks align to
-   the page's right edge (RTL reading start); the workspace border sits on
-   that same edge — one invisible grid down the whole page. (These ID
-   selectors outrank the builders' mb-4 utilities without touching markup.) */
-#content > .dash-panel {
-  margin-bottom: var(--space-5);
-}
-#content > div:has(> .insight-card) {
-  margin-bottom: var(--space-6);
+/* Tablet / mobile: stack the overview cards into a single column.
+   Equal height and internal scrolling are disabled — cards use natural height. */
+@media (max-width: 768px) {
+  #content {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  #content > .dash-panel,
+  #content > div:has(> .insight-card) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  #content > div:has(> .insight-card) {
+    min-height: auto;
+    position: static; /* natural flow on mobile */
+  }
+  #content > div:has(> .insight-card) > .insight-card {
+    position: static; /* natural height, no absolute fill */
+  }
+  .insight-card {
+    overflow: visible;
+    min-height: auto;
+  }
+  .insight-list {
+    overflow-y: visible;
+    flex: none;
+    min-height: auto;
+  }
 }
 
 /* ================= Data Preview — the workspace instrument ================ */
@@ -1974,24 +1939,31 @@ button.is-busy {
   padding-block: var(--space-2);
 }
 
-/* Narrow screens: the head band stacks — title+count on the first row, the
-   command bar full-width beneath it. */
-@media (max-width: 640px) {
+/* Mobile: the head band becomes a compact two-row header —
+   Row 1: title (reading-start) + icon-only command bar (reading-end)
+   Row 2: live row-count beneath the title as quiet secondary text. */
+@media (max-width: 767px) {
   #content > div:has(> .section-title--primary) {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr auto;
   }
   #content > div:has(> .section-title--primary) > .section-title--primary {
+    grid-column: 1;
+    grid-row: 1;
     padding-bottom: var(--space-1);
   }
-  #content > div:has(> .section-title--primary) .toolbar-status {
-    grid-column: 2;
-    padding-inline-end: var(--space-3);
-    justify-self: end;
-  }
   #content > div:has(> .section-title--primary) .data-toolbar {
-    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: nowrap;
+    grid-column: 2;
+    grid-row: 1;
+    padding-inline: var(--space-3);
+    align-self: center;
+  }
+  #content > div:has(> .section-title--primary) .toolbar-status {
+    grid-column: 1;
     grid-row: 2;
-    padding: 0 var(--space-3) var(--space-2);
+    padding: 0 var(--surface-pad) var(--space-2);
+    justify-self: start;
   }
 }
 
@@ -2002,10 +1974,7 @@ button.is-busy {
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  padding: 48px var(--space-5);
-  color: var(--text-muted);
-}
-.dark .section-loading {
+  padding: var(--space-6) var(--space-5);
   color: var(--text-muted);
 }
 .spinner-section {
@@ -2018,7 +1987,7 @@ button.is-busy {
   color: var(--brand-text);
 }
 .section-loading-text {
-  font-size: 13px;
+  font-size: var(--font-body);
   font-weight: 600;
 }
 

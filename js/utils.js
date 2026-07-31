@@ -101,6 +101,24 @@ window.App = window.App || {};
     return quantile(a, 0.5);
   }
 
+  // Shared numeric aggregation for the chart builder and the group-by section.
+  // Non-numeric values are filtered out before reducing; sum/mean/median round
+  // to 4 decimals. `method` is one of count/sum/mean/average/min/max/median
+  // ("average" is the chart builder's spelling of "mean").
+  function aggregateValues(vals, method) {
+    const nums = vals.map(Number).filter((v) => !isNaN(v));
+    switch (method) {
+      case "count": return vals.length;
+      case "sum": return Number(nums.reduce((s, v) => s + v, 0).toFixed(4));
+      case "mean":
+      case "average": return nums.length ? Number((nums.reduce((s, v) => s + v, 0) / nums.length).toFixed(4)) : 0;
+      case "min": return nums.length ? Math.min(...nums) : 0;
+      case "max": return nums.length ? Math.max(...nums) : 0;
+      case "median": return nums.length ? round(median(nums), 4) : 0;
+      default: return vals.length;
+    }
+  }
+
   /* ------------------------------ Utilities ------------------------------ */
   // Trailing-edge debounce — used for live search / filter inputs.
   function debounce(fn, wait = 200) {
@@ -127,6 +145,6 @@ window.App = window.App || {};
 
   App.dom = { $, el, ICONS, iconHTML, escapeHTML };
   App.fmt = { fmtInt, round, isBlank };
-  App.stats = { quantile, mean, std, median };
+  App.stats = { quantile, mean, std, median, aggregateValues };
   App.util = { debounce, downloadBlob };
 })(window.App);

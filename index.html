@@ -19,41 +19,39 @@
     <link rel="stylesheet" href="sidebar.css" />
   </head>
   <body
-    class="min-h-dvh text-sm antialiased bg-[#f4f5f6] dark:bg-[#0e0f11] text-[#1d1f20] dark:text-gray-100"
+    class="min-h-dvh text-sm antialiased bg-[#fbfbfb] dark:bg-[#030303] text-[#363636] dark:text-[#f5f5f5]"
   >
     <div class="flex flex-col min-h-dvh">
       <header class="app-header w-full">
-        <!-- RTL-native header: exactly TWO groups with flexible empty space
-             between them (justify-between). Branding is anchored to the RIGHT
-             edge (reading start), the action toolbar to the LEFT edge (reading
-             end). The groups are explicit — layout does not rely on RTL
-             auto-ordering, the logo never sits in the toolbar, and the action
-             buttons never sit near the branding. -->
+        <!-- Two-group header. Desktop: branding (right) + actions (left).
+             Mobile (≤768px): branding hidden, actions become icon-only buttons.
+             Same visual order as desktop — no reordering or direction swap.
+             Branding moves into the mobile drawer (sidebar.js). -->
         <div
-          class="w-full px-5 sm:px-8 min-h-[var(--header-height)] flex items-center justify-between gap-4"
+          class="header-inner w-full px-4 sm:px-8 min-h-[var(--header-height)] flex items-center justify-between gap-3"
         >
-          <!-- Branding group — pinned to the right edge. A small neutral mark
-               immediately before the wordmark; no coloured icon container. -->
-          <div class="flex items-center gap-2 min-w-0">
+          <!-- Start group — branding (desktop) + hamburger (injected by
+               sidebar.js). On mobile the branding is hidden and only the
+               hamburger remains, in the same reading-start position. -->
+          <div id="headerStart" class="flex items-center gap-2 min-w-0">
             <span
-              class="material-symbols-outlined shrink-0 text-[26px] text-gray-700 dark:text-gray-300"
+              class="header-brand material-symbols-outlined shrink-0 text-[22px] sm:text-[26px] text-gray-700 dark:text-gray-300"
               aria-hidden="true"
               >analytics</span
             >
             <h1
-              class="text-base sm:text-[17px] font-semibold leading-tight truncate"
+              class="header-brand text-[15px] sm:text-[17px] font-semibold leading-tight truncate"
             >
               داشبورد تحلیل داده
             </h1>
           </div>
 
-          <!-- Toolbar group — pinned to the left edge. Two independent, equal-
-               weight buttons (Load New File + Export) sit side by side with a
-               small gap; the theme toggle follows with a larger gap as a
-               separate control. IDs preserved: dashboard.js reveals the actions
-               + mounts Export into #headerActionGroup; sidebar.js injects the
-               mobile toggle into #headerActions. -->
-          <div id="headerActions" class="flex items-center gap-4 shrink-0">
+          <!-- End group — actions. Desktop: upload + export + theme with labels.
+               Mobile: icon-only upload + export + theme (40×40 touch targets). -->
+          <div
+            id="headerActions"
+            class="flex items-center gap-2 sm:gap-4 shrink-0"
+          >
             <div id="headerActionGroup" class="header-action-group">
               <button
                 id="headerUploadBtn"
@@ -90,7 +88,7 @@
       <!-- Vertical rhythm: 24px from the app header to the dataset header
            (the flat page title needs air), generous side/bottom padding. -->
       <main
-        class="flex-1 w-full max-w-[1400px] mx-auto px-5 sm:px-8 pt-6 pb-5 sm:pb-8"
+        class="flex-1 w-full max-w-[1400px] mx-auto px-5 sm:px-8 pt-6 pb-4 sm:pb-5"
       >
         <!-- Landing (empty state) — a desktop-application empty state, not a
              marketing page: quiet title → one-line hint → the dropzone as the
@@ -108,8 +106,11 @@
           >
             <!-- Quiet page title: states what the application does, at app
                  scale (not hero scale). No letter-spacing tweaks — Persian
-                 script is connected; tracking hurts more than it helps. -->
-            <h1 class="text-xl font-semibold">تحلیل داده‌های Excel و CSV</h1>
+                 script is connected; tracking hurts more than it helps.
+                 h2 (not h1): the persistent app header already carries the
+                 page's single h1, so this sits one level below it for a
+                 logical a11y outline. -->
+            <h2 class="text-xl font-semibold">تحلیل داده‌های Excel و CSV</h2>
             <p class="text-[13px] text-gray-500 dark:text-gray-400 mt-2">
               تمام پردازش‌ها به‌صورت محلی در مرورگر شما انجام می‌شوند.
             </p>
@@ -184,7 +185,7 @@
              (Cloudflare-style): the summary, insights and data-preview render as
              independent flat sections separated by spacing/dividers, and only the
              data table carries its own thin frame. -->
-        <section id="resultsSection" class="hidden mb-6">
+        <section id="resultsSection" class="hidden">
           <div id="content"></div>
         </section>
       </main>
@@ -193,7 +194,7 @@
            low-contrast micro-type. Pure chrome — it must never compete with
            the page content above it. -->
       <footer
-        class="w-full bg-white dark:bg-[#16181b] border-t border-gray-200 dark:border-[#26282c] mt-6"
+        class="w-full bg-white dark:bg-[#16181b] border-t border-gray-200 dark:border-[#26282c] mt-4"
       >
         <div
           class="w-full max-w-[1400px] mx-auto px-5 sm:px-8 h-8 flex items-center justify-center"

@@ -99,6 +99,13 @@ class FakeNode {
   querySelector(sel) { return this.querySelectorAll(sel)[0] || null; }
   closest(sel) { let n = this; while (n) { if (matchesGroups(n, sel)) return n; n = n.parentNode; } return null; }
   matches(sel) { return matchesGroups(this, sel); }
+  // Standard DOM APIs used by sidebar.js focus management (closeDrawer).
+  contains(node) {
+    if (node === this) return true;
+    return this.children.some((c) => c.contains(node));
+  }
+  focus() { document.activeElement = this; }
+  blur() { if (document.activeElement === this) document.activeElement = document.body; }
 }
 
 function makeEvent(type, target) {
@@ -164,6 +171,8 @@ const document = {
   readyState: "complete",
 };
 document.body = new FakeNode("body");
+// Focus starts on the body (nothing focused inside the rail), matching a fresh page.
+document.activeElement = document.body;
 
 const store = {};
 const window = {
@@ -181,7 +190,8 @@ const window = {
 // body > shell > (header[with #themeToggle], main > #resultsSection > #content)
 const shell = new FakeNode("div"); document.body.appendChild(shell);
 const header = new FakeNode("header"); shell.appendChild(header);
-const hgroup = new FakeNode("div"); hgroup.id = "headerActions"; header.appendChild(hgroup); // sidebar.js injects #sbToggle here
+const hstart = new FakeNode("div"); hstart.id = "headerStart"; header.appendChild(hstart); // sidebar.js injects #sbToggle here
+const hgroup = new FakeNode("div"); hgroup.id = "headerActions"; header.appendChild(hgroup);
 const themeToggle = new FakeNode("button"); themeToggle.id = "themeToggle"; hgroup.appendChild(themeToggle);
 
 const results = new FakeNode("section"); results.id = "resultsSection";
@@ -225,6 +235,9 @@ const sandbox = {
   requestAnimationFrame: window.requestAnimationFrame,
   localStorage: window.localStorage,
   MutationObserver: window.MutationObserver,
+  // Minimal computed style: the fake DOM has no CSS, so report display from the
+  // element's `hidden` flag (the only visibility signal sidebar.js toggles here).
+  getComputedStyle: (el) => ({ display: el && el.hidden ? "none" : "" }),
 };
 window.App = {};
 sandbox.window.App = window.App;
@@ -306,6 +319,23 @@ results.classList.add("hidden");
 window.App.sidebar.refresh();
 assert("panel hidden when results hidden", !aside.classList.contains("is-visible"));
 assert("shell offset removed", !shell.classList.contains("dash-has-sidebar"));
+
+console.log("\n[drawer] focus restoration on close (a11y)");
+// Re-reveal the dashboard so the toggle is usable, then open the drawer via the
+// toggle: focus must move into the rail, and closing must return it to the
+// toggle (WAI-ARIA disclosure) instead of stranding it on a hidden element.
+results.classList.remove("hidden");
+window.App.sidebar.refresh();
+const toggle = document.getElementById("sbToggle");
+toggle.dispatch("click", makeEvent("click", toggle)); // open
+const firstItem = aside.querySelector(".sb-item");
+assert("opening drawer focuses first nav item", document.activeElement === firstItem);
+assert("drawer marked open", aside.classList.contains("is-open"));
+assert("toggle aria-expanded=true", toggle.getAttribute("aria-expanded") === "true");
+toggle.dispatch("click", makeEvent("click", toggle)); // close
+assert("drawer closed", !aside.classList.contains("is-open"));
+assert("toggle aria-expanded=false", toggle.getAttribute("aria-expanded") === "false");
+assert("focus restored to toggle (not dropped to body)", document.activeElement === toggle);
 
 console.log(`\nRESULT: ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);

@@ -85,6 +85,7 @@ window.App = window.App || {};
     const head = el("div", "insight-head", `${iconHTML("info")}<span>بینش‌های خودکار مجموعه‌داده</span>`);
     card.appendChild(head);
     const list = el("ul", "insight-list");
+    list.setAttribute("role", "list");
     // Presentation order only: warnings first, then info, then confirmations —
     // the computed findings themselves are unchanged.
     const RANK = { warn: 0, info: 1, ok: 2 };

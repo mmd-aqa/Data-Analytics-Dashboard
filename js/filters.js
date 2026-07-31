@@ -70,10 +70,6 @@ window.App = window.App || {};
     draft = S.filters().map((f) => ({ ...f }));
 
     root.appendChild(el("h3", "section-title", `${iconHTML("filter")}<span>فیلتر داده‌ها</span>`));
-    // root.appendChild(
-    //   el("p", "section-desc",
-    //     "چند فیلتر را هم‌زمان اعمال کنید. جدول‌ها، نمودارها و شاخص‌ها به‌صورت زنده به‌روزرسانی می‌شوند."),
-    // );
 
     /* --------------------------- Filter rows ----------------------------- */
     const rowsBox = el("div", "flex flex-col gap-3 mb-3");
@@ -86,14 +82,6 @@ window.App = window.App || {};
     controls.appendChild(clearBtn);
     root.appendChild(controls);
 
-    const status = el("div", "mt-4 text-sm text-gray-500 dark:text-gray-400");
-    root.appendChild(status);
-
-    function updateStatus() {
-      const total = S.raw().length;
-      const shown = S.getView().length;
-    }
-
     function apply() {
       // Keep only complete filter rows.
       const valid = draft.filter((f) => {
@@ -102,7 +90,6 @@ window.App = window.App || {};
       });
       S.setFilters(valid);
       S.refresh();
-      updateStatus();
     }
 
     function drawRows() {
@@ -130,7 +117,6 @@ window.App = window.App || {};
     };
 
     drawRows();
-    updateStatus();
   }
 
   // Build one filter row: [column] [operator] [value(s)] [remove]
@@ -195,7 +181,9 @@ window.App = window.App || {};
     }
 
     const rm = el("button", "filter-remove", iconHTML("error", "text-base"));
+    rm.type = "button";
     rm.title = "حذف فیلتر";
+    rm.setAttribute("aria-label", "حذف فیلتر");
     rm.onclick = () => {
       draft.splice(idx, 1);
       redraw();

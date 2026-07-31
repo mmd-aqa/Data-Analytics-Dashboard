@@ -234,9 +234,11 @@ window.App = window.App || {};
     c.appendChild(panels);
 
     // ---- View controllers (the sidebar rail's two navigation outcomes) -------
-    // Show/hide the home region (Auto-insights + Data Preview) as a unit.
+    // The Auto-insights card persists across ALL sections (overview + analysis)
+    // so it never disappears when the user navigates the sidebar rail. Only the
+    // Data Preview block is toggled: visible on the home/landing view, hidden
+    // when an analysis section is open.
     const setHomeVisible = (on) => {
-      if (insightsHost) insightsHost.classList.toggle("hidden", !on);
       if (previewSection) previewSection.classList.toggle("hidden", !on);
     };
     // Reflect the active section on the (hidden) tab buttons so the sidebar's
@@ -251,19 +253,20 @@ window.App = window.App || {};
 
     // Home = the landing screen: Dataset Information + Auto-insights + Data
     // Preview, every analysis panel hidden. The overview panel itself is never
-    // rendered — "Overview" simply IS the home region.
+    // rendered — "Overview" simply IS the home region. The insight-card is
+    // always visible (persists across sections), so no fade is needed for it.
     showHomeView = () => {
       activeTabId = "overview";
       Object.values(panelMap).forEach((x) => x.panel.classList.add("hidden"));
       selectOnly("overview");
       setHomeVisible(true);
-      fadeIn(insightsHost);
       fadeIn(previewSection);
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
-    // Analysis = exactly one section visible; insights + preview hidden. Reuses
-    // the tab's own onclick (lazy render on first open, show panel, hide others,
-    // set aria-selected) — no render logic duplicated, state preserved on reopen.
+    // Analysis = exactly one section visible; Data Preview hidden, insight-card
+    // stays. Reuses the tab's own onclick (lazy render on first open, show
+    // panel, hide others, set aria-selected) — no render logic duplicated,
+    // state preserved on reopen.
     showAnalysisView = (id) => {
       if (!tabBtns[id]) return;
       setHomeVisible(false);
@@ -339,7 +342,7 @@ window.App = window.App || {};
 
     root.appendChild(el("h4", "subsection-title", "سطرهای ابتدایی"));
     const topW = el("div", "widget mb-2");
-    topW.innerHTML = `<label>تعداد سطرهای ابتدایی موردنظر: <span id="topVal">5</span></label>
+    topW.innerHTML = `<label for="topSlider">تعداد سطرهای ابتدایی موردنظر: <span id="topVal">5</span></label>
       <input type="range" min="1" max="${Math.min(max, 100)}" value="5" id="topSlider" class="w-full">`;
     root.appendChild(topW);
     const topTbl = el("div"); root.appendChild(topTbl);
@@ -349,7 +352,7 @@ window.App = window.App || {};
 
     root.appendChild(el("h4", "subsection-title", "سطرهای انتهایی"));
     const botW = el("div", "widget mb-2");
-    botW.innerHTML = `<label>تعداد سطرهای انتهایی موردنظر: <span id="botVal">5</span></label>
+    botW.innerHTML = `<label for="botSlider">تعداد سطرهای انتهایی موردنظر: <span id="botVal">5</span></label>
       <input type="range" min="1" max="${Math.min(max, 100)}" value="5" id="botSlider" class="w-full">`;
     root.appendChild(botW);
     const botTbl = el("div"); root.appendChild(botTbl);
@@ -580,7 +583,6 @@ window.App = window.App || {};
       if (id === "overview") { if (showHomeView) showHomeView(); }
       else if (id) { if (showAnalysisView) showAnalysisView(id); }
     },
-    buildKpiCards: (...a) => App.dashSummary.buildKpiCards(...a),
     setupThemeToggle,
     setupHeaderScroll,
   };
