@@ -8,7 +8,6 @@ window.App = window.App || {};
 (function (App) {
   "use strict";
 
-  /* ----------------------------- DOM helpers ----------------------------- */
   const $ = (id) => document.getElementById(id);
 
   const el = (tag, cls, html) => {
@@ -63,7 +62,6 @@ window.App = window.App || {};
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
 
-  /* --------------------------- Value formatting -------------------------- */
   // Thousands separator for counts (kept in latin digits for data fidelity).
   const fmtInt = (n) =>
     typeof n === "number" && isFinite(n) ? n.toLocaleString("en-US") : n;
@@ -73,7 +71,6 @@ window.App = window.App || {};
 
   const isBlank = (v) => v === null || v === undefined || v === "";
 
-  /* --------------------------- Statistics core --------------------------- */
   // Sorted-array quantile (linear interpolation, pandas-style).
   function quantile(sortedAsc, p) {
     const n = sortedAsc.length;
@@ -119,7 +116,6 @@ window.App = window.App || {};
     }
   }
 
-  /* ------------------------------ Utilities ------------------------------ */
   // Trailing-edge debounce — used for live search / filter inputs.
   function debounce(fn, wait = 200) {
     let t;

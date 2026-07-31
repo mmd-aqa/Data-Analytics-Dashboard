@@ -27,9 +27,8 @@ window.App = window.App || {};
   let draft = [];
 
   /*
-   * Global search panel — only the search input + a clear action. Search logic is
-   * unchanged: it still drives S.setSearch() + S.refresh() (debounced on input,
-   * immediate on Enter). Relocated out of the old combined panel into the toolbar.
+   * Global search panel — only the search input + a clear action. It drives
+   * S.setSearch() + S.refresh() (debounced on input, immediate on Enter).
    */
   function renderSearch(root) {
     root.innerHTML = "";
@@ -71,7 +70,6 @@ window.App = window.App || {};
 
     root.appendChild(el("h3", "section-title", `${iconHTML("filter")}<span>فیلتر داده‌ها</span>`));
 
-    /* --------------------------- Filter rows ----------------------------- */
     const rowsBox = el("div", "flex flex-col gap-3 mb-3");
     root.appendChild(rowsBox);
 

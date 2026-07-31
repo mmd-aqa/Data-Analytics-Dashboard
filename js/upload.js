@@ -1,7 +1,7 @@
 /*
  * upload.js — Phase 1 feature: CSV/Excel upload, drag-and-drop and the sample
- * dataset. Parsing is preserved from the original app; on success it hands rows
- * to App.state and asks the dashboard to render.
+ * dataset. On success it hands parsed rows to App.state and asks the dashboard
+ * to render.
  */
 window.App = window.App || {};
 

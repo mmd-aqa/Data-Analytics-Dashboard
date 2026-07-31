@@ -3,7 +3,7 @@
  * groups of the unified summary panel: the structural counts (rows · columns ·
  * numeric · categorical) and, separated by a divider, the data-quality flags
  * (missing · duplicates). This is the Cloudflare information-panel treatment of
- * the six figures that were once large KPI cards — each figure is a compact cell
+ * the six figures — each a compact cell
  * with a bold value and a muted label, grouped so the panel scans top-to-bottom.
  *
  * No business logic / no calculation change — reads App.statistics. The public

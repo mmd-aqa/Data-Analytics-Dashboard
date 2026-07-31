@@ -17,7 +17,6 @@ window.App = window.App || {};
 
   const baseName = () => (S.fileName() || "dataset").replace(/\.[^.]+$/, "").replace(/[^\w\-]+/g, "_") || "dataset";
 
-  /* ----------------------------- Excel / CSV ----------------------------- */
   function rowsToAOA(rows, columns) {
     const aoa = [columns.slice()];
     rows.forEach((r) => aoa.push(columns.map((c) => (isBlank(r[c]) ? "" : r[c]))));
@@ -49,7 +48,6 @@ window.App = window.App || {};
     exportCSV(S.getView(), S.columns(), `${baseName()}_data.csv`);
   }
 
-  /* ------------------------------ Chart images --------------------------- */
   // Export every live Plotly chart currently on the page.
   async function exportCharts(format) {
     const nodes = Array.from(document.querySelectorAll(".js-plotly-plot"));
@@ -72,7 +70,6 @@ window.App = window.App || {};
     return true;
   }
 
-  /* -------------------------------- PDF report --------------------------- */
   // Builds a standalone, print-styled HTML document and triggers print.
   // The browser's "Save as PDF" produces the report — fully offline, no deps.
   async function exportPDF() {
@@ -168,7 +165,6 @@ window.App = window.App || {};
     return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
   }
 
-  /* ------------------------- UX wrapper (run) ---------------------------- */
   // Single entry point for every export action — adds a loading overlay for the
   // slow async jobs, success/empty/error toasts, and prevents duplicate clicks
   // while running. The raw export functions above stay UI-agnostic.

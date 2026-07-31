@@ -18,7 +18,6 @@ window.App = window.App || {};
   const stats = App.statistics;
   const charts = App.charts;
 
-  /* ------------------------------ Main render ---------------------------- */
   // Tab registry — order defines the tab bar. `render(panel)` fills the panel.
   function tabDefs() {
     return [
@@ -101,7 +100,7 @@ window.App = window.App || {};
       headerUpload.hidden = false;
       headerUpload.onclick = showUpload;
     }
-    // Export now lives beside "Load New File" in the header, joined into the
+    // Export lives beside "Load New File" in the header, joined into the
     // segmented action group (#headerActionGroup). Build the popover once and
     // reveal it whenever a dataset is on screen; it reuses
     // App.toolbar.buildExportMenu / App.exporter unchanged.
@@ -233,7 +232,7 @@ window.App = window.App || {};
     c.appendChild(tabBar);
     c.appendChild(panels);
 
-    // ---- View controllers (the sidebar rail's two navigation outcomes) -------
+    // View controllers (the sidebar rail's two navigation outcomes)
     // The Auto-insights card persists across ALL sections (overview + analysis)
     // so it never disappears when the user navigates the sidebar rail. Only the
     // Data Preview block is toggled: visible on the home/landing view, hidden
@@ -299,7 +298,6 @@ window.App = window.App || {};
     });
   }
 
-  /* --------------------------- Overview section -------------------------- */
   function renderOverview(root) {
     root.innerHTML = "";
     root.appendChild(el("h3", "section-title", `${iconHTML("analytics")}<span>نمای کلی مجموعه‌داده</span>`));
@@ -361,7 +359,6 @@ window.App = window.App || {};
     drawBot(5);
   }
 
-  /* ------------------------- Value-counts section ------------------------ */
   function renderValueCounts(root) {
     root.innerHTML = "";
     root.appendChild(el("h3", "section-title", `${iconHTML("rows")}<span>شمارش مقادیر ستون‌ها</span>`));
@@ -409,7 +406,6 @@ window.App = window.App || {};
     root.appendChild(det);
   }
 
-  /* --------------------------- Group-by section -------------------------- */
   function renderGroupby(root) {
     root.innerHTML = "";
     root.appendChild(el("h3", "section-title", `${iconHTML("category")}<span>گروه‌بندی</span>`));
@@ -493,7 +489,6 @@ window.App = window.App || {};
     root.appendChild(det);
   }
 
-  /* ------------------------------- Clear --------------------------------- */
   function clear() {
     S.setData([], []);
     const c = $("content");
@@ -510,9 +505,9 @@ window.App = window.App || {};
     charts.clearRegistry();
   }
 
-  // Reveal the upload card again (via the toolbar "بارگذاری فایل جدید" button)
-  // without a page reload. Existing state is untouched until a new file replaces
-  // it. Returning to the dashboard happens automatically once a file loads.
+  // Reveal the upload card again without a page reload. Existing state is
+  // untouched until a new file replaces it. Returning to the dashboard happens
+  // automatically once a file loads.
   function showUpload() {
     const results = $("resultsSection");
     if (results) results.classList.add("hidden");
@@ -535,7 +530,6 @@ window.App = window.App || {};
     if (label) label.focus();
   }
 
-  /* ---------------------------- Theme toggle ----------------------------- */
   function applyThemeButton() {
     const dark = document.documentElement.classList.contains("dark");
     const icon = $("themeIcon"), btn = $("themeToggle");
@@ -556,7 +550,6 @@ window.App = window.App || {};
     });
   }
 
-  /* --------------------------- Sticky header ----------------------------- */
   // Toggle `.is-scrolled` on the header past a small threshold so it gains its
   // soft shadow only once the page has moved. Presentation only — no state.
   function setupHeaderScroll() {

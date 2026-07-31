@@ -27,7 +27,6 @@ window.App = window.App || {};
   "use strict";
   const { $, el, iconHTML } = App.dom;
 
-  /* --------------------------- Navigation model -------------------------- */
   // `id` is the section's STABLE identifier — it matches dashboard.js tabDefs
   // ids, so navigation binds by identity (App.dashboard.showSection(id)) rather
   // than by tab order or DOM position. One rail item ↔ one dashboard section.
@@ -43,14 +42,12 @@ window.App = window.App || {};
 
   const NAV_IDS = new Set(NAV.map((n) => n.id));
 
-  /* ------------------------------ Elements ------------------------------- */
   let aside = null;
   let backdrop = null;
   let toggleBtn = null;
   let shell = null; // the app's top-level flex wrapper (gains right padding)
   let nav = null;
 
-  /* ------------------------------- Build --------------------------------- */
   function buildNav() {
     const frag = document.createDocumentFragment();
     NAV.forEach((item) => {
@@ -78,7 +75,7 @@ window.App = window.App || {};
     const head = el("div", "app-sidebar__head");
     // Mobile drawer branding — logo + title + divider (visible only in the
     // drawer; the desktop rail hides .app-sidebar__head entirely). Mirrors the
-    // branding removed from the mobile header so identity is preserved.
+    // header branding (hidden on mobile) so identity is preserved.
     const brand = el("div", "app-sidebar__brand");
     brand.innerHTML =
       `<span class="material-symbols-outlined app-sidebar__brand-icon" aria-hidden="true">analytics</span>` +
@@ -132,7 +129,6 @@ window.App = window.App || {};
     group.insertBefore(toggleBtn, group.firstChild);
   }
 
-  /* ------------------------------ Drawer --------------------------------- */
   const isMobile = () => window.matchMedia("(max-width: 1023px)").matches;
 
   function openDrawer() {
@@ -160,7 +156,6 @@ window.App = window.App || {};
     }
   }
 
-  /* --------------------------- Show / hide ------------------------------- */
   function isDashboardVisible() {
     const results = $("resultsSection");
     return !!results && !results.classList.contains("hidden");
@@ -182,7 +177,6 @@ window.App = window.App || {};
     if (isDashboardVisible()) show(); else hide();
   }
 
-  /* --------------------------- Navigation -------------------------------- */
   function onNavClick(e) {
     const item = e.target.closest(".sb-item");
     if (!item) return;
@@ -200,7 +194,6 @@ window.App = window.App || {};
     }
   }
 
-  /* --------------------------- Active state ------------------------------ */
   function setActive(id) {
     nav.querySelectorAll(".sb-item.is-active").forEach((n) => {
       n.classList.remove("is-active");
@@ -221,7 +214,6 @@ window.App = window.App || {};
     setActive(NAV_IDS.has(id) ? id : null);
   }
 
-  /* --------------------------- Keyboard nav ------------------------------ */
   // Roving focus with Up/Down across the rail items; Home/End jump to the ends.
   // Enter/Space are handled natively by the buttons.
   function onNavKeydown(e) {
@@ -238,7 +230,6 @@ window.App = window.App || {};
     items[next].focus();
   }
 
-  /* --------------------------- Observation ------------------------------- */
   function observe() {
     const results = $("resultsSection");
     if (results) {
@@ -258,7 +249,6 @@ window.App = window.App || {};
     }
   }
 
-  /* ------------------------------- Init ---------------------------------- */
   function init() {
     build();
     observe();

@@ -28,7 +28,6 @@ window.App = window.App || {};
     _subscribers: [],
   };
 
-  /* ----------------------------- Loading data ---------------------------- */
   function setData(rows, columns, opts = {}) {
     state.raw = rows;
     state.columns = columns;
@@ -69,9 +68,8 @@ window.App = window.App || {};
     return Math.round((sampleBytes / sampleN) * rows.length);
   }
 
-  /* --------------------------- Type detection ---------------------------- */
-  // Sample-based numeric detection (first 50 non-blank values), matching the
-  // original behaviour but computed once and cached.
+  // Sample-based numeric detection (first 50 non-blank values), computed once
+  // and cached.
   function detectType(col) {
     let seen = 0;
     for (const r of state.raw) {
@@ -95,7 +93,6 @@ window.App = window.App || {};
   const numericColumns = () => state.columns.filter(isNumericCol);
   const categoricalColumns = () => state.columns.filter((c) => !isNumericCol(c));
 
-  /* ------------------------------ The view ------------------------------- */
   // Raw data after applying active filters and the global search query.
   function getView() {
     if (state._viewCache) return state._viewCache;
@@ -145,7 +142,6 @@ window.App = window.App || {};
     return set.includes(sv);
   }
 
-  /* --------------------------- Column extraction ------------------------- */
   // Pull a column's values; optionally numeric-coerced and/or from the view.
   function colValues(col, { numeric = false, fromView = true } = {}) {
     const src = fromView ? getView() : state.raw;
@@ -162,7 +158,6 @@ window.App = window.App || {};
     return out;
   }
 
-  /* ----------------------- Mutators + subscriptions ---------------------- */
   function setFilters(filters) {
     state.filters = filters || [];
     invalidate();

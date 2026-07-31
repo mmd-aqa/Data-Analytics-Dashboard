@@ -52,7 +52,6 @@ sandbox.window.App.charts = { plot: noop, layout: () => ({}), GREEN: "#217346" }
 
 const App = sandbox.window.App;
 
-/* ------------------------------- Test data ----------------------------- */
 const sampleSrc = fs.readFileSync(path.join(ROOT, "assets/sample-data.js"), "utf8");
 vm.runInContext(sampleSrc, sandbox);
 const csv = sandbox.window.SAMPLE_CSV;
@@ -88,7 +87,6 @@ const rows = parseCSV(csv);
 const columns = Object.keys(rows[0]);
 App.state.setData(rows, columns, { isExample: true, fileName: "titanic.csv" });
 
-/* ------------------------------- Assertions ---------------------------- */
 let pass = 0, fail = 0;
 function assert(name, cond, detail) {
   if (cond) { pass++; console.log("  ✓ " + name); }
@@ -154,7 +152,6 @@ const searchView = App.state.getView();
 assert("global search finds match", searchView.length >= 1 && searchView.length < rows.length, `${searchView.length}`);
 App.state.setSearch("");
 
-/* ---------------------- Audit fixes & new features --------------------- */
 console.log("\n[audit] subscriber leak fix");
 let fireCount = 0;
 App.state.subscribe(() => fireCount++);

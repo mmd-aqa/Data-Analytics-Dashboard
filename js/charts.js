@@ -81,12 +81,10 @@ window.App = window.App || {};
     registry.clear();
   }
 
-  /* ----------------------- Aggregation for builder ----------------------- */
   function aggregate(groups, method) {
     return Object.entries(groups).map(([k, vals]) => ({ key: k, value: aggregateValues(vals, method) }));
   }
 
-  /* ----------------------- Phase 5: Chart builder ------------------------ */
   const CHART_TYPES = [
     { id: "bar", fa: "میله‌ای" },
     { id: "line", fa: "خطی" },

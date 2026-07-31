@@ -5,14 +5,14 @@
  *
  * It only relocates/wraps existing behaviour — search/filter/reset logic is
  * reused from App.filters / App.state. The Export popover menu is also built
- * here (buildExportMenu) but now lives in the app header, not this bar; see
+ * here (buildExportMenu) but rendered in the app header, not this bar; see
  * index.html #headerActions and dashboard.js. Chart creation is NOT offered
  * here — the نمودارساز rail section is its single home. Exposed as App.toolbar.
  *
  * build(host, handlers) returns:
  *   { refs, statusHost, updateBadges }
  * where handlers = { onUpload, onNewChart, onReset } (onNewChart is accepted
- * for API stability but no longer bound to any toolbar button) and refs
+ * for API stability) and refs
  * carries the elements the orchestrator needs for live refresh and reset.
  */
 window.App = window.App || {};
@@ -95,10 +95,6 @@ window.App = window.App || {};
     popover.closeAll(); // re-home any menu portalled to <body> before we rebuild
     host.innerHTML = "";
     const toolbar = el("div", "data-toolbar");
-
-    // Note: "بارگذاری فایل جدید" is no longer a toolbar button — it is now the
-    // app's header primary action (see #headerUploadBtn in index.html,
-    // wired in dashboard.js). Same trigger, same behaviour.
 
     // Search toggle.
     const searchBtn = el("button", "toolbar-btn",

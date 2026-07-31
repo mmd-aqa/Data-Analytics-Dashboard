@@ -253,7 +253,6 @@ html {
   overflow-y: scroll;
 }
 
-/* ===================== Sortable / highlighted tables ==================== */
 table.df th.th-sort {
   cursor: pointer;
   -webkit-user-select: none;
@@ -285,7 +284,6 @@ mark.search-hit {
   color: #fff;
 }
 
-/* ============================== Pagination ============================== */
 /* Quiet ghost controls (GitHub-style): no boxes at rest — the chevrons and the
    page info read as one caption-level line; a soft fill appears on hover. */
 .pager {
@@ -326,7 +324,6 @@ mark.search-hit {
   cursor: not-allowed;
 }
 
-/* ====================== Filters & search (Phase 6/7) ==================== */
 .search-wrap {
   position: relative;
   max-width: 520px;
@@ -402,7 +399,6 @@ mark.search-hit {
   background: #3a1414;
 }
 
-/* ============================ Shared buttons =========================== */
 /* One button family — every action in the app is one of these three, all sharing
    height (34px), radius and focus ring so the interface has a single button
    language. Primary = brand fill (the one place a solid action lives); secondary
@@ -463,7 +459,6 @@ mark.search-hit {
   background: var(--surface-hover);
 }
 
-/* ===================== App header — flat toolbar ====================== */
 /* Sticky, solid, flat SaaS style. No glass/blur and no scroll elevation — a
    single hairline bottom border is the only separation, forming the boundary the
    sidebar rail docks beneath so header + rail read as one connected surface. */
@@ -482,7 +477,6 @@ mark.search-hit {
   box-shadow: none;
 }
 
-/* ===================== Header action group (UI/UX) ===================== */
 /* Upload (primary) + theme toggle (secondary) read as one toolbar: identical
    height, radius, motion and focus ring — only fill and weight differ. Built on
    the same tokens as .toolbar-btn so every control in the app stays consistent. */
@@ -544,7 +538,6 @@ mark.search-hit {
   transform: translateY(0.5px);
 }
 
-/* --- Header actions: two independent, equal-weight buttons --- */
 /* "Load New File" + "Export" sit side by side as separate buttons with a small
    gap — NOT a segmented control. Each keeps its own .header-btn shape, height,
    padding, radius and (ghost) weight, so the two read as identical peers. The
@@ -559,7 +552,6 @@ mark.search-hit {
   display: inline-flex;
 }
 
-/* --- View entrance fade (Home ↔ Analysis switch) --- */
 @keyframes view-fade {
   from {
     opacity: 0;
@@ -588,7 +580,6 @@ mark.search-hit {
   }
 }
 
-/* ===================== Mobile header (≤ 768px) ======================= */
 /* Cloudflare-inspired: branding hidden, actions become icon-only buttons.
    Layout order is identical to desktop — #headerStart (hamburger) on the
    reading-start edge (right in RTL), #headerActions (upload + export + theme)
@@ -647,7 +638,6 @@ mark.search-hit {
   }
 }
 
-/* ===================== Search / Filter toolbar (UI/UX) ================== */
 /* The table's command bar — not a floating strip of independent controls. It
    lives inside the Data Preview surface's header band (see the hero rules near
    the end of this file), so it carries no chrome of its own: the quiet ghost
@@ -915,7 +905,6 @@ mark.search-hit {
   color: #fcd34d;
 }
 
-/* =========================== Empty states ============================= */
 /* Flat and quiet — type and whitespace, no dashed box (the surrounding surface
    already frames the region). */
 .empty-state {
@@ -961,7 +950,6 @@ mark.search-hit {
   }
 }
 
-/* ===================== Correlation lists (Phase 4) ===================== */
 /* A flat, borderless divided list — the SAME idiom as the auto-insights feed:
    bare rows separated by spacing alone, no per-row chrome. One list component
    language across the app. */
@@ -995,7 +983,6 @@ mark.search-hit {
   color: #f87171;
 }
 
-/* ====================== Quality score gauge (Phase 7) =================== */
 /* Flat: the ring + big rating ARE the visual weight; no card frame around them. */
 .quality-score {
   display: flex;
@@ -1088,7 +1075,6 @@ mark.search-hit {
   color: #f87171;
 }
 
-/* ==================== Auto-insights — analysis card ==================== */
 /* A concise analytical panel matching the summary card: the same subtle
    surface, hairline border and radius token. Three grouped sections, each
    closed by whitespace and a single hairline (never weight or colour):
@@ -1175,7 +1161,6 @@ mark.search-hit {
   display: none;
 }
 
-/* ============================ Toasts (UI/UX) =========================== */
 .toast-container {
   position: fixed;
   bottom: var(--space-5);
@@ -1230,7 +1215,6 @@ mark.search-hit {
   --toast-accent: var(--toast-error);
 }
 
-/* ====================== Spinner + loading overlay ===================== */
 .spinner {
   display: inline-block;
   width: 18px;
@@ -1295,10 +1279,6 @@ button.is-busy {
   font-size: var(--font-title);
   font-weight: 700;
 }
-
-/* ====================================================================== */
-/* ======================= Final UI polish pass ========================= */
-/* ====================================================================== */
 
 /* Shared card tokens — a single source of truth so every dashboard card
    (header, KPI, insights, info, quality) shares radius / shadow / border. */
@@ -1433,7 +1413,6 @@ button.is-busy {
   --focus-ring: 0 0 0 2px rgba(255, 255, 255, 0.22);
 }
 
-/* ===================== Canonical typography ramp ======================= */
 /* The ENTIRE app types from these four roles — no ad-hoc font-size/weight at the
    call site. Hierarchy comes from this ramp + neutral grays + whitespace, never
    colour or decoration. Every builder emits one of:
@@ -1444,7 +1423,7 @@ button.is-busy {
    Keeping all four here means headers and the space around them are pixel-identical
    across every section, so the app reads as one design system. */
 
-/* --- Primary section header — one per region/analysis section. Text only:
+/* Primary section header — one per region/analysis section. Text only:
    the little leading icons every section used to carry were decoration, not
    meaning, so CSS retires them (builders' markup untouched).
    The full ramp (top to bottom): dataset name 24 → key figures 16 → hero
@@ -1469,8 +1448,8 @@ button.is-busy {
   margin-bottom: var(--space-1);
 }
 
-/* --- The Data Preview title is the page hero — visibly heavier than every other
-   header so the eye lands on the primary content first. --- */
+/* The Data Preview title is the page hero — visibly heavier than every other
+   header so the eye lands on the primary content first. */
 .section-title--primary {
   font-size: var(--font-lg);
 }
@@ -1478,9 +1457,9 @@ button.is-busy {
   display: none;
 }
 
-/* --- Secondary header — a block inside a section (e.g. "column details",
+/* Secondary header — a block inside a section (e.g. "column details",
    "outliers"). One rhythm: 24px above to clear the previous block, 8px below to
-   its own content; no top gap when it opens a container. --- */
+   its own content; no top gap when it opens a container. */
 .subsection-title {
   font-size: var(--font-body);
   font-weight: 700;
@@ -1492,9 +1471,9 @@ button.is-busy {
   margin-top: 0;
 }
 
-/* --- The one muted caption under a section title. Replaces the repeated
+/* The one muted caption under a section title. Replaces the repeated
    `mb-4 text-gray-500 dark:text-gray-400` literal that every section used to
-   hand-write, so every explanatory line is the same size, colour and rhythm. --- */
+   hand-write, so every explanatory line is the same size, colour and rhythm. */
 .section-desc {
   font-size: var(--font-meta);
   line-height: 1.5;
@@ -1503,7 +1482,6 @@ button.is-busy {
   max-width: 70ch; /* keep explanatory prose comfortably readable */
 }
 
-/* ==================== Analysis section cards =========================== */
 /* Every analysis section (missing values, correlation, chart builder, value
    counts, group-by, data quality — any div dashboard.js stamps with
    role="tabpanel") renders inside a proper section card: the card, not the
@@ -1552,7 +1530,6 @@ button.is-busy {
   box-shadow: var(--card-shadow);
 }
 
-/* ============= Dataset summary — a calm dashboard panel ============= */
 /* The overview of the loaded dataset, composed as a lightweight information
    card (Cloudflare zone-overview idiom): a subtle surface lifted off the page
    by one hairline border and the shared radius token — no shadow, no fill, no
@@ -1765,7 +1742,7 @@ button.is-busy {
   }
 }
 
-/* ---- Overview two-column grid — the layout system, pinned in one place ----
+/* Overview two-column grid — the layout system, pinned in one place.
    Auto-insights (.insight-card) is the primary card (wider, ≈63%, LEFT in RTL);
    dataset summary (.dash-panel) is the compact secondary (≈37%, RIGHT in RTL).
    The dash-panel's content defines the row height; the insight-card fills that
@@ -1846,7 +1823,6 @@ button.is-busy {
   }
 }
 
-/* ================= Data Preview — the workspace instrument ================ */
 /* The page's dominant surface — where work happens. One framed panel composed
    as a GitHub file-browser table: a single HEAD BAND holding the title, the
    live row-count and the command bar on one row, then the table running
@@ -1971,7 +1947,6 @@ button.is-busy {
   }
 }
 
-/* --- Localized (non-blocking) section loading indicator --- */
 .section-loading {
   display: flex;
   flex-direction: column;
@@ -1995,7 +1970,6 @@ button.is-busy {
   font-weight: 600;
 }
 
-/* --- Subtle entrance for dashboard sections (respects reduced-motion) --- */
 @keyframes section-rise {
   from {
     opacity: 0;

@@ -14,7 +14,6 @@ const path = require("path");
 const vm = require("vm");
 const ROOT = path.join(__dirname, "..");
 
-/* --------------------------- Tiny fake DOM ----------------------------- */
 let ID = 0;
 class FakeNode {
   constructor(tag) {
@@ -93,7 +92,6 @@ class FakeNode {
   getBoundingClientRect() { return { top: this._top, left: 0, bottom: this._top + 20, right: 0, width: 100, height: 20 }; }
   get offsetParent() { return this.parentNode; }
   get offsetHeight() { return 20; }
-  // --- selection ---
   _all() { const out = []; const walk = (n) => n.children.forEach((c) => { out.push(c); walk(c); }); walk(this); return out; }
   querySelectorAll(sel) { return this._all().filter((n) => matchesGroups(n, sel)); }
   querySelector(sel) { return this.querySelectorAll(sel)[0] || null; }
@@ -159,7 +157,6 @@ function matchesGroups(node, sel) {
   });
 }
 
-/* ------------------------- Document + globals -------------------------- */
 const document = {
   createElement: (t) => new FakeNode(t),
   createDocumentFragment: () => { const f = new FakeNode("#fragment"); f._isFragment = true; return f; },
@@ -186,7 +183,6 @@ const window = {
   MutationObserver: class { observe() {} disconnect() {} },
 };
 
-/* ---------------------- Build a dashboard-shaped DOM -------------------- */
 // body > shell > (header[with #themeToggle], main > #resultsSection > #content)
 const shell = new FakeNode("div"); document.body.appendChild(shell);
 const header = new FakeNode("header"); shell.appendChild(header);
@@ -228,7 +224,6 @@ function populateContent() {
 }
 let tabBtns = populateContent();
 
-/* ----------------------------- Load code ------------------------------- */
 const sandbox = {
   window, document, console,
   setTimeout: (fn) => fn(), clearTimeout() {},
@@ -259,7 +254,6 @@ window.App.dashboard = {
   },
 };
 
-/* ------------------------------ Assertions ----------------------------- */
 let pass = 0, fail = 0;
 function assert(name, cond, detail) {
   if (cond) { pass++; console.log("  ✓ " + name); }

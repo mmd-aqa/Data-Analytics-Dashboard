@@ -17,7 +17,6 @@ window.App = window.App || {};
   const charts = App.charts;
   const S = App.state;
 
-  /* --------------------------- describe() table -------------------------- */
   function computeStat(arr, stat) {
     if (!arr.length) return "";
     const a = [...arr].sort((x, y) => x - y);
@@ -51,7 +50,6 @@ window.App = window.App || {};
     return buildTable(rows, ["آماره", ...S.numericColumns()]);
   }
 
-  /* ------------------------------ group-by ------------------------------- */
   function groupby(gbCols, opCol, op) {
     const groups = {};
     for (const r of S.getView()) {
@@ -70,7 +68,6 @@ window.App = window.App || {};
     });
   }
 
-  /* ----------------------- Phase 2: dataset summary ---------------------- */
   // Counts that feed the KPI cards. Computed over the current view.
   function computeSummary() {
     const rows = S.getView();
@@ -101,7 +98,6 @@ window.App = window.App || {};
     };
   }
 
-  /* --------------------- Phase 3: missing-values report ------------------ */
   function missingByColumn() {
     const rows = S.getView();
     const n = rows.length || 1;
@@ -157,7 +153,6 @@ window.App = window.App || {};
     }
   }
 
-  /* ------------------- Phase 8: data-quality + outliers ------------------ */
   // IQR outliers: values outside [Q1 - 1.5*IQR, Q3 + 1.5*IQR].
   function outlierCount(col) {
     const a = S.colValues(col, { numeric: true }).sort((x, y) => x - y);
@@ -169,7 +164,6 @@ window.App = window.App || {};
     return { count, lower: round(lower), upper: round(upper) };
   }
 
-  /* ------------------ Phase 7: per-column quality + score ---------------- */
   // One pass over the view producing per-column metrics used by the quality
   // report and the overall score.
   function computeColumnQuality() {
@@ -256,7 +250,6 @@ window.App = window.App || {};
     const summary = computeSummary();
     const q = computeQualityScore();
 
-    // ---- Quality score gauge card ----
     const scoreCard = el("div", `quality-score quality-score-${q.tone} mb-5`);
     scoreCard.innerHTML = `
       <div class="qs-ring" style="--pct:${q.score}">
@@ -292,7 +285,7 @@ window.App = window.App || {};
       root.appendChild(alertBox("warn", notes.join(" — ")));
     }
 
-    // Per-column quality table (now includes % valid).
+    // Per-column quality table (includes % valid).
     const data = q.colq.map((c) => ({
       "ستون": c.col,
       "نوع داده": c.dtype,

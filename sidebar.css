@@ -28,7 +28,6 @@
   --sb-z-drawer: 9995;
 }
 
-/* ----------------------------- Shell offset ---------------------------- */
 /* On desktop the rail is a fixed column that starts BELOW the header. The header
    itself spans the full viewport width (one continuous bar), so ONLY the main
    content and footer are inset left of the rail — the header is never offset and
@@ -73,7 +72,6 @@
   }
 }
 
-/* -------------------------------- Rail --------------------------------- */
 /* Base geometry = the desktop docked rail: starts at the header's bottom
    border (shared shell tokens — no magic numbers) and runs to the viewport
    bottom. The mobile media query overrides top/height/z-index for the
@@ -87,7 +85,7 @@
   z-index: var(--sb-z-rail);
   display: flex;
   flex-direction: column;
-  background: var(--surface);
+  background: var(--page);
   border-left: 1px solid var(--divider);
   /* Hidden until a dataset loads; sidebar.js toggles .is-visible. */
   opacity: 0;
@@ -164,7 +162,6 @@
   box-shadow: var(--focus-ring);
 }
 
-/* ------------------------------- Nav list ------------------------------ */
 /* A flat list of the seven analysis sections — a quiet rail, not a menu. */
 .app-sidebar__nav {
   flex: 1;
@@ -248,7 +245,6 @@
   background: var(--brand);
 }
 
-/* ------------------------- Mobile drawer toggle ------------------------ */
 /* Injected into the existing header action group; reuses .header-btn so it
    matches the upload/theme controls. Hidden on desktop and until data loads. */
 .sb-toggle {
@@ -302,7 +298,6 @@
   visibility: visible;
 }
 
-/* ============================ Responsive =============================== */
 /* Below the desktop breakpoint the rail becomes an off-canvas drawer that
    slides in from the right; the shell keeps its full width. */
 @media (max-width: 1023px) {
@@ -373,7 +368,8 @@
 }
 
 /* Desktop: the rail is an integrated part of the application shell — a proper
-   docked column with its own quiet surface (card background) and a single
+   docked column that shares the header/footer's canvas (--page) so the three
+   read as one continuous chrome, separated from the content only by a single
    hairline on its content edge, exactly like the header's divider. Its
    geometry (top below the header's full-width bottom border, height to the
    viewport bottom) comes from the base .app-sidebar rules; here we only drop
