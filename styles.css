@@ -1208,6 +1208,14 @@ mark.search-hit {
    coloured icon + a thin inline-start bar (no saturated blocks, low noise). */
 .toast-ok {
   --toast-accent: var(--toast-ok);
+  /* Success is a routine confirmation, not an alarm: it borrows the exact
+     surface language of cards and popovers (--card-bg / --card-border / --text)
+     so it blends into the dashboard, with the brand green reserved for the icon
+     and inline-start accent only. The darker floating-card look is kept for the
+     rarer info/warn/error alerts that deserve to stand out. */
+  --toast-bg: var(--card-bg);
+  --toast-border: var(--card-border);
+  --toast-text: var(--text);
 }
 .toast-info {
   --toast-accent: var(--toast-info);
@@ -1217,6 +1225,13 @@ mark.search-hit {
 }
 .toast-error {
   --toast-accent: var(--toast-error);
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast-ok {
+    /* Appear/disappear without the slide; removal still happens via the JS
+       fallback timeout even when transitionend never fires. */
+    transition: none;
+  }
 }
 
 .spinner {
@@ -1294,9 +1309,6 @@ button.is-busy {
   --brand-hover: #1a5c38; /* hover/pressed fill */
   --brand-text: #185c37; /* green for active/link text */
   --brand-tint: #e6f4ea; /* soft green surface — active/selected states only */
-  --success: #33c481; /* success accent — refined from the old saturated solid fill
-                         (#185c37) so it stays legible on the dark toast surface;
-                         matches the on-dark brand green */
 
   /* Neutral grayscale hierarchy — carries ~95% of the interface. Typography and
      these grays (not colour or decoration) create the visual hierarchy. */
@@ -1368,15 +1380,16 @@ button.is-busy {
   --brand-press: #d7ecdf; /* pressed fill for brand-tinted items (dropdown active) */
   --gauge-track: var(--divider); /* unfilled arc of the quality ring */
 
-  /* Toast — a dark floating card in BOTH themes (Linear/Vercel-style). In light
-     mode it reads as a high-contrast notification; in dark mode it lifts off the
-     page via its border + shadow. Type is signalled by a coloured icon + a thin
-     inline-start accent bar — never a saturated block — so a toast feels like a
-     natural part of the dashboard rather than a standalone widget. */
+  /* Toast base — a dark floating card (Linear/Vercel-style) for the alert types
+     (info/warn/error) that should stand out from the page. The success type
+     overrides these tokens with the neutral card surface (see .toast-ok) so a
+     routine "done" confirmation blends into the dashboard instead of shouting.
+     Type is always signalled by a coloured icon + a thin inline-start accent
+     bar — never a saturated block. */
   --toast-bg: #1b1d21;
   --toast-border: rgba(255, 255, 255, 0.08);
   --toast-text: #f3f4f6;
-  --toast-ok: var(--success);
+  --toast-ok: var(--brand-text);
   --toast-info: #60a5fa;
   --toast-warn: #fbbf24;
   --toast-error: #f87171;
