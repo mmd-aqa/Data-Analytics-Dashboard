@@ -484,8 +484,8 @@ mark.search-hit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  height: 40px;
+  gap: var(--space-1h);
+  height: 32px;
   padding: 0 14px;
   border: 1px solid transparent;
   border-radius: var(--radius-control);
@@ -507,7 +507,7 @@ mark.search-hit {
 }
 /* Icon-only controls sit in a clean square so the glyph is optically centred. */
 .header-btn--icon {
-  width: 40px;
+  width: 32px;
   padding: 0;
 }
 
