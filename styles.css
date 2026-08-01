@@ -580,13 +580,17 @@ mark.search-hit {
   }
 }
 
-/* Cloudflare-inspired: branding hidden, actions become icon-only buttons.
-   Layout order is identical to desktop — #headerStart (hamburger) on the
-   reading-start edge (right in RTL), #headerActions (upload + export + theme)
-   on the reading-end (left). No reordering or direction swap. */
+/* Cloudflare-inspired: actions become icon-only buttons. Branding (logo +
+   title) stays visible on the landing page — where no drawer exists yet — and
+   hides only once the dashboard rail is active (.dash-has-sidebar), because the
+   logo + title then live in the mobile drawer instead. Without this scoping the
+   landing header would lose its identity on mobile. Layout order is identical
+   to desktop — #headerStart (hamburger) on the reading-start edge (right in
+   RTL), #headerActions (upload + export + theme) on the reading-end (left). No
+   reordering or direction swap. */
 @media (max-width: 767px) {
-  .header-brand {
-    display: none; /* logo + title move into the mobile drawer */
+  .dash-has-sidebar .header-brand {
+    display: none; /* logo + title move into the drawer once the rail exists */
   }
   .header-action-group:has(> :not([hidden])) {
     display: inline-flex; /* ensure upload + export are visible */
