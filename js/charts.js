@@ -14,7 +14,7 @@ window.App = window.App || {};
   const FONT = "Vazirmatn, Tahoma, sans-serif";
   const GREEN = "#217346";
   // Multi-series palette: brand green first, then desaturated sage/slate neutrals
-  // (Cloudflare-style restraint - no saturated default Plotly hues).
+  // (No saturated default Plotly hues).
   const COLORWAY = ["#217346", "#86a894", "#414b52", "#b5c7bb", "#5f6b73", "#d0dbd3"];
 
   // Track live charts so we can recolour them when the theme flips.

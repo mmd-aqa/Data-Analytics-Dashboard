@@ -222,7 +222,7 @@
   overflow: hidden;
 }
 
-/* Active item — the Cloudflare pattern: no filled background, just full-ink
+/* Active item — no filled background, just full-ink
    text and the slim brand-green accent bar on the start (right) edge. Mirrors
    .tab-btn.active so the two navigation systems read the same. */
 .sb-item.is-active {

@@ -1,6 +1,6 @@
 /*
  * dashboard/header.js — The identity HEAD and file-metadata GROUP of the unified
- * dataset-summary panel (Cloudflare information-panel style): the dataset name as
+ * dataset-summary panel: the dataset name as
  * the panel hero, then the provenance facts as their own hairline-divided row.
  *
  * Single source of truth (Req 1): this is the ONLY place file-level metadata
@@ -47,7 +47,7 @@ window.App = window.App || {};
     }
   }
 
-  // The identity HEAD of the summary panel (Cloudflare information-panel style):
+  // The identity HEAD of the summary panel:
   // a small neutral mark, the dataset name as the panel's hero (bold, largest
   // type), over a quiet subtitle. It carries no metadata itself — the file facts
   // render as their own hairline-divided group via buildMeta(), so the panel reads

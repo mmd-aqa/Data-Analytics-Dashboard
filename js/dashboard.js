@@ -121,7 +121,7 @@ window.App = window.App || {};
     // Drop subscribers from any previous render so they don't pile up.
     S.clearSubscribers();
 
-    // Dataset summary — a single compact information PANEL (Cloudflare style): a
+    // Dataset summary — a single compact information PANEL: a
     // bordered block with the dataset name as its hero head, then hairline-divided
     // groups for the file-metadata facts, the structural counts and the quality
     // flags. Bold values, muted labels — scannable top-to-bottom (16px gap below).

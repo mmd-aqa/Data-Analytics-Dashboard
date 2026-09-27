@@ -112,7 +112,7 @@ window.App = window.App || {};
 
   // Add the mobile drawer toggle into the header START group (#headerStart) so
   // it sits at the reading-start edge (rightmost in RTL) — before the title —
-  // matching Cloudflare/Linear mobile nav patterns. Reuses .header-btn system.
+  // matching Linear mobile nav patterns. Reuses .header-btn system.
   function injectToggle() {
     const group = $("headerStart") || $("headerActions");
     if (!group) return;

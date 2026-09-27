@@ -2,7 +2,7 @@
  * dashboard/summary.js — The dataset metric breakdown as two hairline-divided
  * groups of the unified summary panel: the structural counts (rows · columns ·
  * numeric · categorical) and, separated by a divider, the data-quality flags
- * (missing · duplicates). This is the Cloudflare information-panel treatment of
+ * (missing · duplicates). This is information-panel treatment of
  * the six figures — each a compact cell
  * with a bold value and a muted label, grouped so the panel scans top-to-bottom.
  *
