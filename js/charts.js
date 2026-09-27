@@ -6,7 +6,7 @@ window.App = window.App || {};
 
 (function (App) {
   "use strict";
-  const { el, iconHTML } = App.dom;
+  const { el, iconHTML, cardHead } = App.dom;
   const { alertBox } = App.ui;
   const { aggregateValues } = App.stats;
   const S = App.state;
@@ -103,7 +103,7 @@ window.App = window.App || {};
 
   function renderBuilder(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "section-title", `${iconHTML("chart")}<span>نمودارساز پیشرفته</span>`));
+    root.appendChild(cardHead("نمودارساز پیشرفته"));
     root.appendChild(
       el("p", "section-desc",
         "نوع نمودار، محورها و روش تجمیع را انتخاب کنید تا نمودار به‌صورت زنده ساخته شود."),

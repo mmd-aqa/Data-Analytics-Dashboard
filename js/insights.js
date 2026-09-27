@@ -7,7 +7,7 @@ window.App = window.App || {};
 
 (function (App) {
   "use strict";
-  const { el, iconHTML } = App.dom;
+  const { el, iconHTML, cardHead } = App.dom;
   const { fmtInt } = App.fmt;
   const S = App.state;
   const stats = App.statistics;
@@ -82,8 +82,7 @@ window.App = window.App || {};
   function render(host) {
     host.innerHTML = "";
     const card = el("div", "insight-card");
-    const head = el("div", "insight-head", `${iconHTML("info")}<span>بینش‌های خودکار مجموعه‌داده</span>`);
-    card.appendChild(head);
+    card.appendChild(cardHead("بینش‌های خودکار مجموعه‌داده"));
     const list = el("ul", "insight-list");
     list.setAttribute("role", "list");
     // Presentation order only: warnings first, then info, then confirmations —

@@ -11,7 +11,7 @@ window.App = window.App || {};
 
 (function (App) {
   "use strict";
-  const { $, el, iconHTML, ICONS } = App.dom;
+  const { $, el, iconHTML, ICONS, cardHead } = App.dom;
   const { fmtInt } = App.fmt;
   const { alertBox, buildTable } = App.ui;
   const S = App.state;
@@ -300,7 +300,7 @@ window.App = window.App || {};
 
   function renderOverview(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "section-title", `${iconHTML("analytics")}<span>نمای کلی مجموعه‌داده</span>`));
+    root.appendChild(cardHead("نمای کلی مجموعه‌داده"));
 
     const subNames = ["خلاصه", "ستون‌ها", "انواع داده", "سطرهای ابتدایی و انتهایی"];
     const bar = el("div", "flex gap-2 flex-wrap mb-4");
@@ -361,7 +361,7 @@ window.App = window.App || {};
 
   function renderValueCounts(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "section-title", `${iconHTML("rows")}<span>شمارش مقادیر ستون‌ها</span>`));
+    root.appendChild(cardHead("شمارش مقادیر ستون‌ها"));
 
     const det = el("details", "expander");
     det.open = true;
@@ -408,7 +408,7 @@ window.App = window.App || {};
 
   function renderGroupby(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "section-title", `${iconHTML("category")}<span>گروه‌بندی</span>`));
+    root.appendChild(cardHead("گروه‌بندی"));
     root.appendChild(el("p", "section-desc", "گروه‌بندی به شما امکان می‌دهد داده‌های خود را بر اساس دسته‌ها و گروه‌های خاص خلاصه کنید"));
 
     const det = el("details", "expander");

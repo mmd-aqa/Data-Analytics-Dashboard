@@ -139,7 +139,16 @@ window.App = window.App || {};
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  App.dom = { $, el, ICONS, iconHTML, escapeHTML };
+  // Reusable card header — builds the .card-head band shared by every dashboard
+  // card: a title at the reading start, styled by the single .card-head__title
+  // rule. `level` keeps the heading hierarchy intact (h3 for analysis cards).
+  const cardHead = (title, level = "h3") => {
+    const head = el("div", "card-head");
+    head.appendChild(el(level, "card-head__title", title));
+    return head;
+  };
+
+  App.dom = { $, el, ICONS, iconHTML, escapeHTML, cardHead };
   App.fmt = { fmtInt, round, isBlank };
   App.stats = { quantile, mean, std, median, aggregateValues };
   App.util = { debounce, downloadBlob };

@@ -1089,30 +1089,11 @@ mark.search-hit {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--card-radius);
-  padding: var(--space-5);
+  padding: var(--card-pad); /* shared with .card-head's bleed — see --card-pad */
   display: flex;
   flex-direction: column;
   overflow: hidden; /* contain the scrollable list within the card frame */
   min-height: 0; /* allow the card to shrink below its content height */
-}
-/* Card header — a whisper-quiet caption label closed by a hairline, so the
-   findings below read as their own grouped band. */
-.insight-head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1h);
-  font-weight: 700;
-  font-size: var(--font-caption);
-  letter-spacing: 0.04em;
-  margin-bottom: var(--space-3);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--divider);
-  color: var(--text-muted);
-  flex-shrink: 0; /* fixed header — never scrolls */
-}
-/* The label's own icon is decorative — the text is the label. */
-.insight-head .material-symbols-outlined {
-  display: none;
 }
 .insight-list {
   display: flex;
@@ -1351,14 +1332,20 @@ button.is-busy {
   --space-5: 24px;
   --space-6: 32px;
 
+  /* Card inner padding — the single value shared by each card's `padding` and
+     its .card-head's full-bleed negative margin, so the header always spans the
+     card edge-to-edge and the two can never desync. Cards shrink it at their
+     mobile breakpoints. */
+  --card-pad: var(--space-5);
+
   /* Type ramp — typography IS the hierarchy (not borders, not colour).
-     Top to bottom: dataset title → key figures → hero section title →
+     Top to bottom: dataset title → key figures → card title →
      section titles → body → metadata → captions. Numbers dominate their
      labels (20 over 11); titles dominate descriptions; every step exists
      for a reason. */
   --font-hero: 24px; /* the dataset name — the largest type on the page */
   --font-num: 20px; /* key figures — visibly dominant over their 11px labels */
-  --font-lg: 15px; /* the hero section title (Data Preview) */
+  --font-card-title: 16px; /* card header titles — the unified .card-head step */
   --font-title: 14px; /* section titles */
   --font-body: 13px; /* body text, controls */
   --font-meta: 12px; /* metadata, labels, table captions */
@@ -1459,16 +1446,11 @@ button.is-busy {
 .section-title > .material-symbols-outlined {
   display: none;
 }
-/* When a one-line caption follows the title, the title owns only 4px below and the
-   caption owns the gap — so title+desc read as one header unit, not two gaps. */
-.section-title:has(+ .section-desc) {
-  margin-bottom: var(--space-1);
-}
-
-/* The Data Preview title is the page hero — visibly heavier than every other
-   header so the eye lands on the primary content first. */
+/* The Data Preview title — a card header like every other, reading at the same
+   unified card-title step (the command bar beside it acts as its actions). */
 .section-title--primary {
-  font-size: var(--font-lg);
+  font-size: var(--font-card-title);
+  font-weight: 600;
 }
 .section-title--primary .material-symbols-outlined {
   display: none;
@@ -1499,6 +1481,46 @@ button.is-busy {
   max-width: 70ch; /* keep explanatory prose comfortably readable */
 }
 
+/* Reusable card header — the Cloudflare idiom every dashboard card shares: a
+   single-row title band fixed at 52px, closed by one hairline divider. The card
+   owns the framing (surface, border, radius); the header is transparent and
+   full-bleed, so the two read as one continuous surface — no second rounded
+   rectangle. It bleeds to the card's edges via negative margins that reference
+   the SAME --card-pad the card pads with, so header and padding can never
+   desync (and both shrink together at the mobile breakpoints). Title sits at
+   the reading start; an optional subtitle/badge beside it; optional actions are
+   pushed to the reading end. */
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: var(--space-3) var(--card-pad);
+  border-bottom: 1px solid var(--divider);
+  margin: calc(-1 * var(--card-pad)) calc(-1 * var(--card-pad)) var(--space-4);
+  flex-shrink: 0; /* fixed band — never scrolls or shrinks (insight-card) */
+}
+.card-head__title {
+  font-size: var(--font-card-title);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+  margin: 0;
+}
+/* Optional inline subtitle / badge beside the title. */
+.card-head__sub {
+  font-size: var(--font-body);
+  color: var(--text-muted);
+}
+/* Optional actions docked at the reading end (left in RTL). Reuses the existing
+   32px control buttons — no new button style is introduced. */
+.card-head__actions {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1h);
+}
+
 /* Every analysis section (missing values, correlation, chart builder, value
    counts, group-by, data quality — any div dashboard.js stamps with
    role="tabpanel") renders inside a proper section card: the card, not the
@@ -1511,29 +1533,18 @@ button.is-busy {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--card-radius); /* one radius across every framed card */
-  padding: var(--space-5);
+  padding: var(--card-pad); /* shared with .card-head's bleed — see --card-pad */
   /* The grid row-gap (24px) owns the between-blocks rhythm — no extra margin. */
   margin-top: 0;
 }
 @media (max-width: 640px) {
   #content [role="tabpanel"] {
-    padding: var(--space-4);
+    --card-pad: var(--space-4); /* padding + header bleed shrink together */
   }
 }
-/* Inside a card the section title reads at the hero step of the ramp
-   (15px — the same size as the Data Preview title on the home view), so the
-   card's own header clearly outranks subsection titles and body text. */
-#content [role="tabpanel"] > .section-title {
-  font-size: var(--font-lg);
-}
-/* Inside a card the header block breathes more: title+caption stay one tight
-   unit (4/8px), then a full 24px step opens the controls/results below —
-   the title → desc → controls → output cadence of the spec. */
+/* Inside a card the description sits below the header divider and opens the
+   controls/results beneath it with a full 24px step. */
 #content [role="tabpanel"] .section-desc {
-  margin-bottom: var(--space-5);
-}
-/* A section whose title has no caption gets the same 24px step to content. */
-#content [role="tabpanel"] > .section-title:not(:has(+ .section-desc)) {
   margin-bottom: var(--space-5);
 }
 
@@ -1746,9 +1757,11 @@ button.is-busy {
   /* Tighter metric band on phones; the header is already a flat flow, so it
      only needs smaller type and gaps. (The stat groups are display:contents,
      so the body's own gap governs every figure.) */
-  .dash-panel,
-  .insight-card {
+  .dash-panel {
     padding: var(--space-4);
+  }
+  .insight-card {
+    --card-pad: var(--space-4); /* padding + header bleed shrink together */
   }
   .dash-panel__body {
     column-gap: var(--space-5);

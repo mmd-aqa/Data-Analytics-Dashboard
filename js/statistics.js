@@ -10,7 +10,7 @@ window.App = window.App || {};
 
 (function (App) {
   "use strict";
-  const { el, iconHTML } = App.dom;
+  const { el, iconHTML, cardHead } = App.dom;
   const { fmtInt, round, isBlank } = App.fmt;
   const { quantile, mean, std, aggregateValues } = App.stats;
   const { alertBox, buildTable, buildSortableTable } = App.ui;
@@ -110,7 +110,7 @@ window.App = window.App || {};
 
   function renderMissing(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "section-title", `${iconHTML("missing")}<span>گزارش مقادیر گمشده</span>`));
+    root.appendChild(cardHead("گزارش مقادیر گمشده"));
     root.appendChild(
       el("p", "section-desc",
         "تعداد و درصد مقادیر گمشده برای هر ستون. ستون‌های با بیش از ۳۰٪ داده گمشده برجسته شده‌اند. برای مرتب‌سازی روی سرستون‌ها کلیک کنید."),
@@ -241,7 +241,7 @@ window.App = window.App || {};
 
   function renderQuality(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "section-title", `${iconHTML("quality")}<span>گزارش کیفیت داده</span>`));
+    root.appendChild(cardHead("گزارش کیفیت داده"));
     root.appendChild(
       el("p", "section-desc",
         "نمای کلی از سلامت داده‌ها: امتیاز کیفیت، مقادیر گمشده، ردیف‌های تکراری، ستون‌های ثابت/خالی، مقادیر یکتا و داده‌های پرت."),

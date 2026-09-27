@@ -6,7 +6,7 @@ window.App = window.App || {};
 
 (function (App) {
   "use strict";
-  const { el, iconHTML, escapeHTML } = App.dom;
+  const { el, iconHTML, escapeHTML, cardHead } = App.dom;
   const { round } = App.fmt;
   const { alertBox, buildTable } = App.ui;
   const charts = App.charts;
@@ -57,7 +57,7 @@ window.App = window.App || {};
 
   function renderCorrelation(root) {
     root.innerHTML = "";
-    root.appendChild(el("h3", "section-title", `${iconHTML("grid")}<span>ماتریس همبستگی</span>`));
+    root.appendChild(cardHead("ماتریس همبستگی"));
     root.appendChild(
       el("p", "section-desc",
         "همبستگی پیرسون بین ستون‌های عددی. مقیاس رنگ از ۱- (همبستگی منفی) تا ۱+ (همبستگی مثبت) است."),
