@@ -48,7 +48,7 @@ window.App = window.App || {};
     // duplicates → red); a clean zero reads green (success).
     const flags = [
       { label: "مقادیر گمشده", value: fmtInt(s.missing), tone: s.missing ? "amber" : "green",
-        sub: s.missing ? `${s.missingPct.toFixed(1)}%` : "" },
+        sub: s.missing ? `(${s.missingPct.toFixed(1)}%)` : "" },
       { label: "ردیف تکراری", value: fmtInt(s.duplicates), tone: s.duplicates ? "red" : "green" },
     ];
     // Two divided rows, returned together so dashboard.js drops them into the
