@@ -23,7 +23,6 @@ window.App = window.App || {};
     return [
       { id: "overview", name: "نمای کلی", render: renderOverview },
       { id: "missing", name: "مقادیر گمشده", render: (p) => stats.renderMissing(p) },
-      { id: "correlation", name: "همبستگی", render: (p) => App.correlation.renderCorrelation(p) },
       { id: "charts", name: "نمودارساز", render: (p) => charts.renderBuilder(p) },
       { id: "valuecounts", name: "شمارش مقادیر", render: renderValueCounts },
       { id: "groupby", name: "گروه‌بندی", render: renderGroupby },
@@ -168,9 +167,9 @@ window.App = window.App || {};
     const panelMap = {};
     const tabBtns = {};
     const rendered = {}; // lazy render per tab
-    // Tabs whose first render is heavy enough (chart drawing, correlation matrix,
-    // outlier scan) to deserve a localized spinner instead of a brief freeze.
-    const HEAVY = { charts: 1, correlation: 1, quality: 1 };
+    // Tabs whose first render is heavy enough (chart drawing, outlier scan)
+    // to deserve a localized spinner instead of a brief freeze.
+    const HEAVY = { charts: 1, quality: 1 };
 
     defs.forEach((def) => {
       const isActive = def.id === activeTabId;
@@ -282,7 +281,7 @@ window.App = window.App || {};
     // that should react to the view. Tabs that hold their own control state
     // (chart builder, value counts, group-by) are NOT auto-re-rendered, so the
     // user's in-tab selections survive a filter change.
-    const LIVE_TABS = { overview: 1, missing: 1, correlation: 1, quality: 1 };
+    const LIVE_TABS = { overview: 1, missing: 1, quality: 1 };
     S.subscribe(() => {
       if (summaryHost) fillSummaryBar(summaryHost);
       if (insightsHost) App.insights.render(insightsHost);

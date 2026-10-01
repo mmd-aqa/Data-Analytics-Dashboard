@@ -960,39 +960,6 @@ mark.search-hit {
   }
 }
 
-/* A flat, borderless divided list — the SAME idiom as the auto-insights feed:
-   bare rows separated by spacing alone, no per-row chrome. One list component
-   language across the app. */
-.corr-list {
-  display: flex;
-  flex-direction: column;
-}
-.corr-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) 0;
-}
-.corr-pair {
-  font-weight: 600;
-  font-size: var(--font-body);
-}
-.corr-val {
-  font-weight: 700;
-  font-size: var(--font-title);
-  direction: ltr;
-}
-.corr-pos {
-  color: var(--brand-text);
-}
-.corr-neg {
-  color: #b91c1c;
-}
-.dark .corr-neg {
-  color: #f87171;
-}
-
 /* Flat: the ring + big rating ARE the visual weight; no card frame around them. */
 .quality-score {
   display: flex;
@@ -1534,7 +1501,7 @@ button.is-busy {
   gap: var(--space-1h);
 }
 
-/* Every analysis section (missing values, correlation, chart builder, value
+/* Every analysis section (missing values, chart builder, value
    counts, group-by, data quality — any div dashboard.js stamps with
    role="tabpanel") renders inside a proper section card: the card, not the
    page canvas, defines the section. Same surface language as every other

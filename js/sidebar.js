@@ -3,9 +3,9 @@
  *
  * A compact, right-side vertical nav layered over the EXISTING dashboard without
  * changing its architecture, data flow or render logic. The dashboard is
- * tab-based: dashboard.js renders seven tabs (overview, missing, correlation,
+ * tab-based: dashboard.js renders six tabs (overview, missing,
  * charts, valuecounts, groupby, quality) in a fixed order. The rail lists those
- * seven sections as flat icon+label items — no trees, no sub-items — and a click
+ * six sections as flat icon+label items — no trees, no sub-items — and a click
  * simply activates the matching tab button that already exists, reusing its own
  * onclick (lazy render + active-state handling). Nothing here re-renders the
  * dashboard or duplicates any analysis code.
@@ -33,7 +33,6 @@ window.App = window.App || {};
   const NAV = [
     { id: "overview",    name: "نمای کلی",     icon: "home" },
     { id: "missing",     name: "مقادیر گمشده", icon: "missing" },
-    { id: "correlation", name: "همبستگی",      icon: "grid" },
     { id: "charts",      name: "نمودارساز",    icon: "chart" },
     { id: "valuecounts", name: "شمارش مقادیر", icon: "rows" },
     { id: "groupby",     name: "گروه‌بندی",    icon: "category" },

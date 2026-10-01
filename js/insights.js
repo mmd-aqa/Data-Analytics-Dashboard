@@ -11,7 +11,6 @@ window.App = window.App || {};
   const { fmtInt } = App.fmt;
   const S = App.state;
   const stats = App.statistics;
-  const correlation = App.correlation;
 
   // Build a list of insight strings (+ a tone for icon colour).
   function compute() {
@@ -35,22 +34,6 @@ window.App = window.App || {};
       });
     } else {
       out.push({ tone: "ok", text: "هیچ مقدار گمشده‌ای در مجموعه‌داده وجود ندارد." });
-    }
-
-    // Correlations — strongest + and − pair (needs ≥2 numeric columns).
-    if (S.numericColumns().length >= 2) {
-      const { pairs } = correlation.computeMatrix();
-      if (pairs.length) {
-        const sortedDesc = [...pairs].sort((a, b) => b.r - a.r);
-        const pos = sortedDesc[0];
-        const neg = sortedDesc[sortedDesc.length - 1];
-        if (pos && pos.r > 0) {
-          out.push({ tone: "info", text: `قوی‌ترین همبستگی مثبت: «<b>${pos.a}</b> ↔ <b>${pos.b}</b>» با ضریب <b>${pos.r}</b>.` });
-        }
-        if (neg && neg.r < 0) {
-          out.push({ tone: "info", text: `قوی‌ترین همبستگی منفی: «<b>${neg.a}</b> ↔ <b>${neg.b}</b>» با ضریب <b>${neg.r}</b>.` });
-        }
-      }
     }
 
     // Outliers — total across numeric columns.

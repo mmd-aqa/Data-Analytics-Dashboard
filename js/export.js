@@ -12,7 +12,6 @@ window.App = window.App || {};
   const { fmtInt, isBlank } = App.fmt;
   const { downloadBlob } = App.util;
   const stats = App.statistics;
-  const correlation = App.correlation;
   const S = App.state;
 
   const baseName = () => (S.fileName() || "dataset").replace(/\.[^.]+$/, "").replace(/[^\w\-]+/g, "_") || "dataset";
@@ -103,18 +102,7 @@ window.App = window.App || {};
       ? htmlTable(miss, ["ستون", "تعداد گمشده", "درصد گمشده"])
       : "<p>مقدار گمشده‌ای وجود ندارد.</p>";
 
-    // 4) Correlation summary (top pairs)
-    let corrHTML = "<p>برای همبستگی حداقل دو ستون عددی لازم است.</p>";
-    if (S.numericColumns().length >= 2) {
-      const { pairs } = correlation.computeMatrix();
-      const sorted = [...pairs].sort((a, b) => Math.abs(b.r) - Math.abs(a.r)).slice(0, 10);
-      corrHTML = htmlTable(
-        sorted.map((p) => ({ "جفت ستون": `${p.a} ↔ ${p.b}`, "همبستگی": p.r })),
-        ["جفت ستون", "همبستگی"],
-      );
-    }
-
-    // 5) Charts → embed as PNG snapshots
+    // 4) Charts → embed as PNG snapshots
     const chartNodes = Array.from(document.querySelectorAll(".js-plotly-plot"));
     const chartImgs = [];
     for (const node of chartNodes) {
@@ -148,7 +136,6 @@ window.App = window.App || {};
       <h2>شاخص‌های کلیدی</h2><div class="kpis">${kpiHTML}</div>
       <h2>خلاصه آماری</h2>${statHTML}
       <h2>مقادیر گمشده</h2>${missHTML}
-      <h2>خلاصه همبستگی</h2>${corrHTML}
       <h2>نمودارها</h2>${chartsHTML}
       </body></html>`);
     win.document.close();

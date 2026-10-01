@@ -1,7 +1,7 @@
 /*
  * smoke-test.js — Node smoke test for the pure-logic modules.
  * Stubs the few browser globals the logic touches, loads the App.* modules,
- * feeds the Titanic sample, and asserts KPI / missing / correlation / filter
+ * feeds the Titanic sample, and asserts KPI / missing / filter
  * computations. Not shipped — dev verification only. Run: node test/smoke-test.js
  */
 const fs = require("fs");
@@ -44,11 +44,11 @@ function load(file) {
 
 // Load only the modules whose logic we test (skip UI-heavy ones).
 ["js/utils.js", "js/state.js"].forEach(load);
-// statistics.js & correlation.js reference App.ui/App.charts at module load via
+// statistics.js references App.ui/App.charts at module load via
 // destructuring; provide harmless stubs first.
 sandbox.window.App.ui = { alertBox: () => fakeEl(), buildTable: () => fakeEl(), buildSortableTable: () => fakeEl() };
 sandbox.window.App.charts = { plot: noop, layout: () => ({}), GREEN: "#217346" };
-["js/statistics.js", "js/correlation.js", "js/insights.js"].forEach(load);
+["js/statistics.js", "js/insights.js"].forEach(load);
 
 const App = sandbox.window.App;
 
@@ -94,7 +94,7 @@ function assert(name, cond, detail) {
 }
 
 console.log("\n[Phase 11] modules loaded");
-assert("App namespace populated", App.state && App.statistics && App.correlation);
+assert("App namespace populated", App.state && App.statistics);
 
 console.log("\n[load] dataset");
 assert("rows parsed", rows.length > 50, `got ${rows.length}`);
@@ -118,14 +118,6 @@ const miss = App.statistics.missingByColumn();
 const ageMiss = miss.find((m) => m["ستون"] === "Age");
 assert("Age has missing values", ageMiss && ageMiss["تعداد گمشده"] > 0, JSON.stringify(ageMiss));
 assert("missing pct within 0..100", miss.every((m) => m._pct >= 0 && m._pct <= 100));
-
-console.log("\n[Phase 4] correlation");
-const r = App.correlation.pearson("Age", "Age");
-assert("self-correlation = 1", Math.abs(r - 1) < 1e-9, `${r}`);
-const { cols, matrix, pairs } = App.correlation.computeMatrix();
-assert("matrix is square", matrix.length === cols.length && matrix.every((row) => row.length === cols.length));
-assert("diagonal = 1", cols.every((_, i) => Math.abs(matrix[i][i] - 1) < 1e-9));
-assert("all r within [-1,1]", pairs.every((p) => p.r >= -1.0001 && p.r <= 1.0001));
 
 console.log("\n[Phase 8] outliers (IQR)");
 const fareOut = App.statistics.outlierCount("Fare");
@@ -162,18 +154,6 @@ App.state.setData(rows, columns, { isExample: true, fileName: "titanic.csv" });
 fireCount = 0;
 App.state.refresh();
 assert("setData clears old subscribers", fireCount === 0, `${fireCount}`);
-
-console.log("\n[audit] correlation ignores blanks (not coerced to 0)");
-// Build a tiny dataset where one column has nulls; null must be skipped, not 0.
-const tiny = [
-  { x: 1, y: 2 }, { x: 2, y: 4 }, { x: 3, y: 6 },
-  { x: 4, y: null }, { x: 5, y: "" },
-];
-App.state.setData(tiny, ["x", "y"], { fileName: "tiny" });
-const rxy = App.correlation.pearson("x", "y");
-assert("perfect linear corr on present pairs = 1", Math.abs(rxy - 1) < 1e-9, `${rxy}`);
-// restore sample
-App.state.setData(rows, columns, { isExample: true, fileName: "titanic.csv" });
 
 console.log("\n[Phase 9] dataset meta");
 const meta = App.state.meta();
