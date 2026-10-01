@@ -56,8 +56,8 @@ window.App = window.App || {};
     const meta = S.meta() || {};
     const isSample = S.isExample();
     const title = isSample
-      ? "مجموعه داده نمونه"
-      : (meta.name || S.fileName() || "مجموعه داده");
+      ? "مجموعه‌داده نمونه"
+      : (meta.name || S.fileName() || "مجموعه‌داده");
 
     const head = el("div", "dash-panel__head");
     head.innerHTML = `
