@@ -65,7 +65,7 @@ window.App = window.App || {};
   function render(host) {
     host.innerHTML = "";
     const card = el("div", "insight-card");
-    card.appendChild(cardHead("بینش‌های خودکار مجموعه‌داده"));
+    card.appendChild(cardHead("تحلیل خودکار داده‌ها"));
     const list = el("ul", "insight-list");
     list.setAttribute("role", "list");
     // Presentation order only: warnings first, then info, then confirmations —
