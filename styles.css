@@ -76,7 +76,7 @@ body {
 
 /* The data table is the ONE framed surface on the page — everything above it is
    flat, so the frame itself marks "this is the content". Inside, rows are
-   separated by horizontal hairlines only (GitHub/Linear style): no vertical
+   separated by horizontal hairlines only: no vertical
    grid, no zebra striping — padding and the row rule carry the structure. */
 .df-wrapper {
   direction: ltr;
@@ -113,7 +113,7 @@ table.df tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* Header — a quiet muted band (GitHub file-browser style): the tinted strip
+/* Header — a quiet muted band: the tinted strip
    marks "this is the instrument's head", caption type keeps it subordinate to
    the data; a single inset hairline keeps the boundary while it sticks. */
 table.df thead th {
@@ -286,7 +286,7 @@ mark.search-hit {
   color: #fff;
 }
 
-/* Quiet ghost controls (GitHub-style): no boxes at rest — the chevrons and the
+/* Quiet ghost controls: no boxes at rest — the chevrons and the
    page info read as one caption-level line; a soft fill appears on hover. */
 .pager {
   display: flex;
@@ -659,7 +659,7 @@ mark.search-hit {
   gap: var(--space-1);
 }
 /* Every command shares the same height, radius and spacing so the bar reads as
-   one cohesive unit. Commands are QUIET ghosts (GitHub-style): no box at rest —
+   one cohesive unit. Commands are QUIET ghosts: no box at rest —
    a soft fill on hover, and chrome only when a command carries active state.
    Four equal outlined boxes read as four competing controls; four quiet labels
    read as one toolbar. */
@@ -1839,7 +1839,7 @@ button.is-busy {
 }
 
 /* The page's dominant surface — where work happens. One framed panel composed
-   as a GitHub file-browser table: a single HEAD BAND holding the title, the
+   as a file-browser table: a single HEAD BAND holding the title, the
    live row-count and the command bar on one row, then the table running
    full-bleed to the surface edges. The toolbar is not four floating buttons;
    it is the table's command bar, living in the table's own chrome.
@@ -1881,7 +1881,7 @@ button.is-busy {
   display: none;
 }
 /* Head band, item 2 — the live row-count sits beside the title as quiet
-   metadata (GitHub's "N rows"), not as a separate status strip. */
+   metadata, not as a separate status strip. */
 #content > div:has(> .section-title--primary) .toolbar-status {
   grid-column: 2;
   grid-row: 1;
