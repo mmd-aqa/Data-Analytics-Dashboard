@@ -52,9 +52,22 @@ window.App = window.App || {};
     host.appendChild(body);
   }
 
+  // Fill the descriptive-statistics host with the EXISTING describe table
+  // (count / mean / std / min / quartiles / max per numeric column) so the
+  // average and the statistical summary are visible in the dashboard itself,
+  // not only in the PDF report. Re-runs on refresh so it always reflects the
+  // current dataset/view; render() rebuilds it on every new upload.
+  function drawStats() {
+    if (!statsHost) return;
+    statsHost.innerHTML = "";
+    statsHost.appendChild(stats.buildDescribe());
+  }
+
   // Shared layout state, owned here so the extracted modules can stay stateless.
   let summaryHost = null; // the unified dataset-summary card (identity + stats)
   let insightsHost = null;
+  let statsSection = null; // the "خلاصه آماری" block — part of the home/overview region
+  let statsHost = null; // the descriptive-statistics table (existing describe)
   let previewHost = null;
   let previewSection = null; // wrapper around the whole Data Preview block (toggled as one)
   let toolbarApi = null; // { refs, statusHost, updateBadges } from App.toolbar.build
@@ -133,6 +146,18 @@ window.App = window.App || {};
     insightsHost = el("div", "mb-4");
     c.appendChild(insightsHost);
     App.insights.render(insightsHost);
+
+    // Descriptive statistics — the existing describe table, shown ONLY on the
+    // home/overview region (toggled together with Data Preview by
+    // setHomeVisible), so the mean and the statistical summary are directly
+    // visible after upload and hidden while any analysis section is open.
+    statsSection = el("div", "mb-4");
+    statsSection.appendChild(el("h2", "section-title section-title--primary", `${iconHTML("analytics")}<span>خلاصه آماری</span>`));
+    statsSection.appendChild(el("p", "section-desc", "میانگین و سایر آماره‌های توصیفی (تعداد، انحراف معیار، کمینه، چارک‌ها، بیشینه) برای ستون‌های عددی مجموعه‌داده"));
+    statsHost = el("div");
+    statsSection.appendChild(statsHost);
+    drawStats();
+    c.appendChild(statsSection);
 
     // Data preview: section title, the sticky search/filter toolbar (with its
     // live status line), then the paginated table — no repeated summary chips.
@@ -238,6 +263,7 @@ window.App = window.App || {};
     // when an analysis section is open.
     const setHomeVisible = (on) => {
       if (previewSection) previewSection.classList.toggle("hidden", !on);
+      if (statsSection) statsSection.classList.toggle("hidden", !on);
     };
     // Reflect the active section on the (hidden) tab buttons so the sidebar's
     // aria-selected mirror highlights the right rail item. Renders nothing.
@@ -285,6 +311,7 @@ window.App = window.App || {};
     S.subscribe(() => {
       if (summaryHost) fillSummaryBar(summaryHost);
       if (insightsHost) App.insights.render(insightsHost);
+      drawStats();
       App.preview.draw(previewHost, resetAll);
       if (toolbarApi) {
         toolbarApi.updateBadges();
@@ -496,6 +523,8 @@ window.App = window.App || {};
     showUpload();
     summaryHost = null;
     insightsHost = null;
+    statsSection = null;
+    statsHost = null;
     previewHost = null;
     previewSection = null;
     toolbarApi = null;

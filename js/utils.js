@@ -99,13 +99,17 @@ window.App = window.App || {};
   }
 
   // Shared numeric aggregation for the chart builder and the group-by section.
-  // Non-numeric values are filtered out before reducing; sum/mean/median round
-  // to 4 decimals. `method` is one of count/sum/mean/average/min/max/median
+  // Blank cells ("" / null / undefined) are NOT zero: they are dropped before any
+  // numeric coercion so Number("") === 0 can't skew sum/mean/median/min/max or
+  // inflate counts; legitimate 0 values are kept. Non-numeric values are filtered
+  // out before reducing; sum/mean/median round to 4 decimals. `method` is one of
+  // count/sum/mean/average/min/max/median
   // ("average" is the chart builder's spelling of "mean").
   function aggregateValues(vals, method) {
-    const nums = vals.map(Number).filter((v) => !isNaN(v));
+    const present = vals.filter((v) => !isBlank(v));
+    const nums = present.map(Number).filter((v) => !isNaN(v));
     switch (method) {
-      case "count": return vals.length;
+      case "count": return present.length;
       case "sum": return Number(nums.reduce((s, v) => s + v, 0).toFixed(4));
       case "mean":
       case "average": return nums.length ? Number((nums.reduce((s, v) => s + v, 0) / nums.length).toFixed(4)) : 0;

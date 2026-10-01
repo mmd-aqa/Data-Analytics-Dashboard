@@ -8,6 +8,7 @@ window.App = window.App || {};
   "use strict";
   const { el, iconHTML, cardHead } = App.dom;
   const { alertBox } = App.ui;
+  const { isBlank } = App.fmt;
   const { aggregateValues } = App.stats;
   const S = App.state;
 
@@ -156,19 +157,23 @@ window.App = window.App || {};
       const warn = (msg) => { chartDiv.innerHTML = ""; chartDiv.appendChild(alertBox("warn", msg)); };
 
       let traces, lay;
+      // Histogram/box map one numeric column: colValues() is the shared cleaner
+      // that drops blank cells BEFORE Number() — blanks must not become 0.
       if (type === "histogram") {
-        const x = rows.map((r) => Number(r[xc])).filter((v) => !isNaN(v));
+        const x = S.colValues(xc, { numeric: true });
         if (!x.length) return warn(`ستون «${xc}» مقدار عددی برای رسم هیستوگرام ندارد. یک ستون عددی انتخاب کنید.`);
         traces = [{ type: "histogram", x, marker: { color: GREEN } }];
         lay = layout(`هیستوگرام ${xc}`);
       } else if (type === "box") {
-        const yvals = rows.map((r) => Number(r[yc])).filter((v) => !isNaN(v));
+        const yvals = S.colValues(yc, { numeric: true });
         if (!yvals.length) return warn(`ستون «${yc}» مقدار عددی برای نمودار جعبه‌ای ندارد.`);
         traces = [{ type: "box", y: yvals, name: yc, marker: { color: GREEN } }];
         lay = layout(`نمودار جعبه‌ای ${yc}`);
       } else if (type === "scatter") {
         const xs = [], ys = [];
         rows.forEach((r) => {
+          // Pairs must stay aligned, so skip blank cells here too (not zero).
+          if (isBlank(r[xc]) || isBlank(r[yc])) return;
           const xv = Number(r[xc]), yv = Number(r[yc]);
           if (!isNaN(xv) && !isNaN(yv)) { xs.push(xv); ys.push(yv); }
         });
