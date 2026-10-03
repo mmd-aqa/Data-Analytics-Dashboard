@@ -113,7 +113,7 @@ window.App = window.App || {};
       reader.onload = (ev) => {
         try {
           const wb = XLSX.read(new Uint8Array(ev.target.result), { type: "array" });
-          if (!wb.SheetNames.length) { showFileError("فایل اکسل هیچ برگه‌ای (sheet) ندارد."); return; }
+          if (!wb.SheetNames.length) { showFileError("فایل اکسل هیچ برگه‌ای ندارد."); return; }
           const ws = wb.Sheets[wb.SheetNames[0]];
           const json = XLSX.utils.sheet_to_json(ws, { defval: "" });
           loadData(json, file.name, false, meta);

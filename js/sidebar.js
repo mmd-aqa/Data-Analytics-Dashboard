@@ -3,8 +3,8 @@
  *
  * A compact, right-side vertical nav layered over the EXISTING dashboard without
  * changing its architecture, data flow or render logic. The dashboard is
- * tab-based: dashboard.js renders four tabs (overview, missing,
- * charts, valuecounts) in a fixed order. The rail lists those
+ * tab-based: dashboard.js renders four tabs (overview, charts,
+ * missing, valuecounts) in a fixed order. The rail lists those
  * four sections as flat icon+label items — no trees, no sub-items — and a click
  * simply activates the matching tab button that already exists, reusing its own
  * onclick (lazy render + active-state handling). Nothing here re-renders the

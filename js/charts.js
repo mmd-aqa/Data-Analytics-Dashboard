@@ -101,6 +101,9 @@ window.App = window.App || {};
     { id: "min", fa: "کمینه" },
     { id: "max", fa: "بیشینه" },
   ];
+  // Persian display name for an aggregation id (chart titles and warnings
+  // address the professor in Persian, so English ids never leak into the UI).
+  const aggFa = (id) => (AGG_METHODS.find((a) => a.id === id) || {}).fa || id;
 
   function renderBuilder(root) {
     root.innerHTML = "";
@@ -191,14 +194,14 @@ window.App = window.App || {};
         // For non-count aggregations the Y column must be numeric; otherwise every
         // group aggregates to 0 → a meaningless chart. Warn instead.
         if (method !== "count" && agg.every((d) => d.value === 0) && !S.isNumericCol(yc)) {
-          return warn(`برای تجمیع «${method}»، ستون محور Y باید عددی باشد. ستون «${yc}» عددی نیست.`);
+          return warn(`برای تجمیع «${aggFa(method)}»، ستون محور Y باید عددی باشد. ستون «${yc}» عددی نیست.`);
         }
         agg.sort((a, b) => b.value - a.value);
         if (!agg.length) return warn("داده‌ای برای نمایش وجود ندارد.");
         if (type !== "pie" && agg.length > 50) agg = agg.slice(0, 50); // keep charts readable
         const labels = agg.map((d) => d.key);
         const values = agg.map((d) => d.value);
-        const yLabel = method === "count" ? "تعداد" : `${method} ${yc}`;
+        const yLabel = method === "count" ? aggFa(method) : `${aggFa(method)} ${yc}`;
         if (type === "bar") {
           traces = [{ type: "bar", x: labels, y: values, marker: { color: GREEN } }];
           lay = layout(`${yLabel} بر حسب ${xc}`);

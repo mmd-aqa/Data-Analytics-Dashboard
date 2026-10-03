@@ -196,7 +196,7 @@ shell.appendChild(results);
 const content = new FakeNode("div"); content.id = "content"; results.appendChild(content);
 
 // Populate #content the way dashboard.js render() does (only what sidebar reads).
-const TAB_NAMES = ["overview", "missing", "charts", "valuecounts"];
+const TAB_NAMES = ["overview", "charts", "missing", "valuecounts"];
 function populateContent() {
   content.children = [];
   const datasetHeader = new FakeNode("div"); datasetHeader._top = 80; content.appendChild(datasetHeader); // first child
@@ -284,9 +284,9 @@ function clickItem(navId) {
   btn.dispatch("click", makeEvent("click", btn));
   return btn;
 }
-clickItem("charts"); // → tab index 2
-assert("charts tab (index 2) selected", tabBtns[2].getAttribute("aria-selected") === "true");
-assert("charts tab was clicked once", tabBtns[2]._clicked === 1, `clicks=${tabBtns[2]._clicked}`);
+clickItem("charts"); // → tab index 1
+assert("charts tab (index 1) selected", tabBtns[1].getAttribute("aria-selected") === "true");
+assert("charts tab was clicked once", tabBtns[1]._clicked === 1, `clicks=${tabBtns[1]._clicked}`);
 assert("clicked item marked active", aside.querySelector('.sb-item[data-nav="charts"]').classList.contains("is-active"));
 
 clickItem("valuecounts"); // → tab index 3

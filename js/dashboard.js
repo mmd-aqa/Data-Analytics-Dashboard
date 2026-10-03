@@ -10,21 +10,23 @@ window.App = window.App || {};
 
 (function (App) {
   "use strict";
-  const { $, el, iconHTML, ICONS, cardHead } = App.dom;
+  const { $, el, iconHTML, ICONS } = App.dom;
   const { alertBox, buildTable } = App.ui;
   const S = App.state;
   const stats = App.statistics;
   const charts = App.charts;
 
-  // Tab registry — order defines the tab bar. `render(panel)` fills the panel.
+  // Tab registry — order defines the (hidden) tab bar and therefore keyboard
+  // arrow order. It matches the sidebar rail order (نمای کلی، نمودارساز،
+  // مقادیر گمشده، شمارش مقادیر) so visual and keyboard order agree.
   // "overview" is the home region itself (summary + stats + preview live directly
   // on the landing view), so its panel is never rendered — the entry exists only
   // so the sidebar/home navigation can bind to a stable id.
   function tabDefs() {
     return [
       { id: "overview", name: "نمای کلی", render: () => {} },
-      { id: "missing", name: "مقادیر گمشده", render: (p) => stats.renderMissing(p) },
       { id: "charts", name: "نمودارساز", render: (p) => charts.renderBuilder(p) },
+      { id: "missing", name: "مقادیر گمشده", render: (p) => stats.renderMissing(p) },
       { id: "valuecounts", name: "شمارش مقادیر", render: renderValueCounts },
     ];
   }
@@ -76,9 +78,8 @@ window.App = window.App || {};
   // render logic — they reuse the existing tab machinery:
   let showHomeView = null;     // () => Dataset Information + Auto-insights + Data Preview
   let showAnalysisView = null; // (id) => a single analysis section; insights + preview hidden
-  // No analysis section is open on load: the landing view is Dataset Information +
-  // Auto-insights + Data Preview, and nothing is highlighted in the rail. Sections
-  // render lazily on first open. `null` = home/landing, nothing selected.
+  // Sections render lazily on first open. render() pre-selects "overview" — the
+  // landing view IS the home region, so the rail highlights نمای کلی on load.
   let activeTabId = null;
 
   // Reset-all: clear search + every filter, restoring the original dataset. A
@@ -98,8 +99,11 @@ window.App = window.App || {};
   function render() {
     const c = $("content");
     const results = $("resultsSection");
-    // Fresh load → summary-only: no analysis tab is pre-selected or pre-rendered.
-    activeTabId = null;
+    // Fresh load → the landing view IS the home region: pre-select "overview"
+    // so the sidebar rail highlights نمای کلی from the first paint (the rail
+    // mirrors each tab's aria-selected), not only after a click. Its panel
+    // stays hidden and unrendered — no analysis section is pre-rendered.
+    activeTabId = "overview";
     results.classList.remove("hidden");
     // Landing → dashboard: hide the upload card and fade the dashboard in.
     const uploadSection = $("uploadSection");
@@ -140,16 +144,12 @@ window.App = window.App || {};
     fillSummaryBar(summaryHost);
     c.appendChild(summaryHost);
 
-    // Auto-insights — analytical findings only, full width. A 16px gap keeps the
-    // rhythm tight so the Data Preview (the primary content) sits high on the page.
-    insightsHost = el("div", "mb-4");
-    c.appendChild(insightsHost);
-    App.insights.render(insightsHost);
-
-    // Descriptive statistics — the existing describe table, shown ONLY on the
+    // Descriptive statistics — the existing describe table, shown on the
     // home/overview region (toggled together with Data Preview by
     // setHomeVisible), so the mean and the statistical summary are directly
     // visible after upload and hidden while any analysis section is open.
+    // Placed before the auto-insights: the required statistics come first,
+    // secondary findings second.
     statsSection = el("div", "mb-4");
     statsSection.appendChild(el("h2", "section-title section-title--primary", `${iconHTML("analytics")}<span>خلاصه آماری</span>`));
     statsSection.appendChild(el("p", "section-desc", "میانگین و سایر آماره‌های توصیفی (تعداد، انحراف معیار، کمینه، چارک‌ها، بیشینه) برای ستون‌های عددی مجموعه‌داده"));
@@ -157,6 +157,12 @@ window.App = window.App || {};
     statsSection.appendChild(statsHost);
     drawStats();
     c.appendChild(statsSection);
+
+    // Auto-insights — analytical findings only, full width. A 16px gap keeps the
+    // rhythm tight so the Data Preview (the primary content) sits high on the page.
+    insightsHost = el("div", "mb-4");
+    c.appendChild(insightsHost);
+    App.insights.render(insightsHost);
 
     // Data preview: section title, the sticky search/filter toolbar (with its
     // live status line), then the paginated table — no repeated summary chips.
@@ -204,7 +210,9 @@ window.App = window.App || {};
       // Stable, position-independent identifier for external navigators (the
       // sidebar rail) to bind to — no reliance on tab order or DOM index.
       btn.dataset.section = def.id;
-      const panel = el("div", isActive ? "" : "hidden");
+      // The overview panel is never rendered — "Overview" simply IS the home
+      // region, so its panel stays hidden even while the tab is pre-selected.
+      const panel = el("div", isActive && def.id !== "overview" ? "" : "hidden");
       panel.setAttribute("role", "tabpanel");
       panel.dataset.section = def.id;
       panelMap[def.id] = { panel, def };
@@ -326,7 +334,6 @@ window.App = window.App || {};
 
   function renderValueCounts(root) {
     root.innerHTML = "";
-    root.appendChild(cardHead("شمارش مقادیر ستون‌ها"));
 
     const det = el("details", "expander");
     det.open = true;
@@ -361,6 +368,12 @@ window.App = window.App || {};
 
     det.appendChild(body);
     root.appendChild(det);
+
+    // Clear a previously computed table when the underlying view changes
+    // (filters/search): it would otherwise describe the pre-filter dataset.
+    // Controls keep their values, so recounting is a single click. The guard
+    // skips detached roots from a previous dataset render.
+    S.subscribe(() => { if (root.isConnected) out.innerHTML = ""; });
   }
 
   function clear() {

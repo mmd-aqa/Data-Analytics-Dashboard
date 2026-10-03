@@ -32,12 +32,25 @@ window.App = window.App || {};
     }
   }
 
+  // Display labels for the describe rows. The Persian UI shows Persian names
+  // while computation keeps the stable English keys (count/mean/std/...).
+  const STAT_FA = {
+    count: "تعداد",
+    mean: "میانگین",
+    std: "انحراف معیار",
+    min: "کمینه",
+    "25%": "چارک اول",
+    "50%": "میانه",
+    "75%": "چارک سوم",
+    max: "بیشینه",
+  };
+
   function describeRows() {
     const numCols = S.numericColumns();
     if (!numCols.length) return null;
     const stats = ["count", "mean", "std", "min", "25%", "50%", "75%", "max"];
     return stats.map((s) => {
-      const row = { "آماره": s };
+      const row = { "آماره": STAT_FA[s] };
       numCols.forEach((col) => { row[col] = computeStat(S.colValues(col, { numeric: true }), s); });
       return row;
     });

@@ -127,7 +127,7 @@ assert("Fare bounds computed", isFinite(fareOut.lower) && isFinite(fareOut.upper
 console.log("\n[describe] stats");
 const desc = App.statistics.describeRows();
 assert("describe has 8 stat rows", desc.length === 8, `${desc.length}`);
-const meanRow = desc.find((d) => d["آماره"] === "mean");
+const meanRow = desc.find((d) => d["آماره"] === "میانگین");
 assert("mean Age is plausible (20..40)", meanRow.Age > 20 && meanRow.Age < 40, `${meanRow.Age}`);
 
 console.log("\n[Phase 6/7] filters + search");
