@@ -160,23 +160,6 @@ const meta = App.state.meta();
 assert("meta has fileName", meta.name === "titanic.csv", meta.name);
 assert("meta memory estimate > 0", meta.memoryBytes > 0, `${meta.memoryBytes}`);
 
-console.log("\n[Phase 7] quality score");
-const q = App.statistics.computeQualityScore();
-assert("score within 0..100", q.score >= 0 && q.score <= 100, `${q.score}`);
-assert("rating assigned", ["عالی", "خوب", "متوسط", "ضعیف"].includes(q.rating), q.rating);
-assert("breakdown components present", ["completeness", "uniqueness", "cleanliness", "structural"].every((k) => typeof q[k] === "number"));
-assert("column quality covers all columns", q.colq.length === columns.length, `${q.colq.length}`);
-
-console.log("\n[Phase 7] constant/empty column detection");
-const constData = [
-  { a: 5, b: "x", c: "" }, { a: 5, b: "y", c: "" }, { a: 5, b: "z", c: "" },
-];
-App.state.setData(constData, ["a", "b", "c"], { fileName: "const" });
-const q2 = App.statistics.computeQualityScore();
-assert("constant column 'a' detected", q2.constantColumns.includes("a"), JSON.stringify(q2.constantColumns));
-assert("empty column 'c' detected", q2.emptyColumns.includes("c"), JSON.stringify(q2.emptyColumns));
-App.state.setData(rows, columns, { isExample: true, fileName: "titanic.csv" });
-
 console.log("\n[Phase 8] auto-insights");
 const ins = App.insights.compute();
 assert("insights produced", Array.isArray(ins) && ins.length >= 3, `${ins.length}`);

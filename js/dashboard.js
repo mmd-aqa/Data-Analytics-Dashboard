@@ -1,8 +1,7 @@
 /*
  * dashboard.js — Orchestrator. Owns the dashboard layout (header → KPI cards →
- * insights → data preview), the tab system, the preserved analysis sections
- * (overview / value-counts / group-by) and the theme toggle. The presentational
- * pieces live in single-responsibility modules under js/dashboard/:
+ * insights → data preview), the tab system and the theme toggle. The
+ * presentational pieces live in single-responsibility modules under js/dashboard/:
  *   header.js · summary.js · toolbar.js · popover.js · preview.js
  * This file holds the shared layout state and wires those modules together; it
  * does not duplicate their builders.
@@ -12,21 +11,21 @@ window.App = window.App || {};
 (function (App) {
   "use strict";
   const { $, el, iconHTML, ICONS, cardHead } = App.dom;
-  const { fmtInt } = App.fmt;
   const { alertBox, buildTable } = App.ui;
   const S = App.state;
   const stats = App.statistics;
   const charts = App.charts;
 
   // Tab registry — order defines the tab bar. `render(panel)` fills the panel.
+  // "overview" is the home region itself (summary + stats + preview live directly
+  // on the landing view), so its panel is never rendered — the entry exists only
+  // so the sidebar/home navigation can bind to a stable id.
   function tabDefs() {
     return [
-      { id: "overview", name: "نمای کلی", render: renderOverview },
+      { id: "overview", name: "نمای کلی", render: () => {} },
       { id: "missing", name: "مقادیر گمشده", render: (p) => stats.renderMissing(p) },
       { id: "charts", name: "نمودارساز", render: (p) => charts.renderBuilder(p) },
       { id: "valuecounts", name: "شمارش مقادیر", render: renderValueCounts },
-      { id: "groupby", name: "گروه‌بندی", render: renderGroupby },
-      { id: "quality", name: "کیفیت داده", render: (p) => stats.renderQuality(p) },
     ];
   }
 
@@ -192,9 +191,9 @@ window.App = window.App || {};
     const panelMap = {};
     const tabBtns = {};
     const rendered = {}; // lazy render per tab
-    // Tabs whose first render is heavy enough (chart drawing, outlier scan)
-    // to deserve a localized spinner instead of a brief freeze.
-    const HEAVY = { charts: 1, quality: 1 };
+    // Tabs whose first render is heavy enough (chart drawing) to deserve a
+    // localized spinner instead of a brief freeze.
+    const HEAVY = { charts: 1 };
 
     defs.forEach((def) => {
       const isActive = def.id === activeTabId;
@@ -305,9 +304,10 @@ window.App = window.App || {};
     // Live refresh: when filters/search change, update the header, KPIs, insights,
     // the preview, the toolbar badges/status, and (only) the data-display tabs
     // that should react to the view. Tabs that hold their own control state
-    // (chart builder, value counts, group-by) are NOT auto-re-rendered, so the
-    // user's in-tab selections survive a filter change.
-    const LIVE_TABS = { overview: 1, missing: 1, quality: 1 };
+    // (chart builder, value counts) are NOT re-rendered wholesale, so the user's
+    // in-tab selections survive a filter change — the chart builder subscribes to
+    // the state itself and redraws with its existing controls (see charts.js).
+    const LIVE_TABS = { overview: 1, missing: 1 };
     S.subscribe(() => {
       if (summaryHost) fillSummaryBar(summaryHost);
       if (insightsHost) App.insights.render(insightsHost);
@@ -322,67 +322,6 @@ window.App = window.App || {};
         active.def.render(active.panel);
       }
     });
-  }
-
-  function renderOverview(root) {
-    root.innerHTML = "";
-    root.appendChild(cardHead("نمای کلی مجموعه‌داده"));
-
-    const subNames = ["خلاصه", "ستون‌ها", "انواع داده", "سطرهای ابتدایی و انتهایی"];
-    const bar = el("div", "flex gap-2 flex-wrap mb-4");
-    const wrap = el("div");
-    const sub = [];
-    subNames.forEach((n, i) => {
-      const b = el("button", "tab-btn" + (i === 0 ? " active" : ""), n);
-      const p = el("div", i === 0 ? "" : "hidden");
-      b.onclick = () => {
-        bar.querySelectorAll(".tab-btn").forEach((x) => x.classList.remove("active"));
-        b.classList.add("active");
-        sub.forEach((x) => x.classList.add("hidden"));
-        p.classList.remove("hidden");
-      };
-      bar.appendChild(b); wrap.appendChild(p); sub.push(p);
-    });
-    root.appendChild(bar); root.appendChild(wrap);
-
-    const rows = S.getView();
-    sub[0].appendChild(el("p", "section-desc", `تعداد <b>${fmtInt(rows.length)}</b> سطر و <b>${S.columns().length}</b> ستون در نمای فعلی وجود دارد`));
-    sub[0].appendChild(el("h4", "subsection-title", "خلاصه آماری مجموعه‌داده"));
-    sub[0].appendChild(stats.buildDescribe());
-
-    sub[1].appendChild(el("h4", "subsection-title", "نام ستون‌ها"));
-    sub[1].appendChild(buildTable(S.columns().map((c) => ({ "0": c })), ["0"]));
-
-    sub[2].appendChild(el("h4", "subsection-title", "انواع داده ستون‌ها"));
-    sub[2].appendChild(buildTable(S.columns().map((c) => ({ "ستون": c, "نوع": S.dtypeOf(c) })), ["ستون", "نوع"]));
-
-    buildHeadTail(sub[3]);
-  }
-
-  function buildHeadTail(root) {
-    const rows = S.getView();
-    const max = rows.length;
-    if (max === 0) { root.appendChild(alertBox("warn", "ردیفی وجود ندارد.")); return; }
-
-    root.appendChild(el("h4", "subsection-title", "سطرهای ابتدایی"));
-    const topW = el("div", "widget mb-2");
-    topW.innerHTML = `<label for="topSlider">تعداد سطرهای ابتدایی موردنظر: <span id="topVal">5</span></label>
-      <input type="range" min="1" max="${Math.min(max, 100)}" value="5" id="topSlider" class="w-full">`;
-    root.appendChild(topW);
-    const topTbl = el("div"); root.appendChild(topTbl);
-    const drawTop = (n) => { topTbl.innerHTML = ""; topTbl.appendChild(buildTable(rows.slice(0, n), S.columns())); };
-    topW.querySelector("#topSlider").oninput = (e) => { topW.querySelector("#topVal").textContent = e.target.value; drawTop(+e.target.value); };
-    drawTop(5);
-
-    root.appendChild(el("h4", "subsection-title", "سطرهای انتهایی"));
-    const botW = el("div", "widget mb-2");
-    botW.innerHTML = `<label for="botSlider">تعداد سطرهای انتهایی موردنظر: <span id="botVal">5</span></label>
-      <input type="range" min="1" max="${Math.min(max, 100)}" value="5" id="botSlider" class="w-full">`;
-    root.appendChild(botW);
-    const botTbl = el("div"); root.appendChild(botTbl);
-    const drawBot = (n) => { botTbl.innerHTML = ""; botTbl.appendChild(buildTable(rows.slice(-n), S.columns())); };
-    botW.querySelector("#botSlider").oninput = (e) => { botW.querySelector("#botVal").textContent = e.target.value; drawBot(+e.target.value); };
-    drawBot(5);
   }
 
   function renderValueCounts(root) {
@@ -416,99 +355,8 @@ window.App = window.App || {};
       let arr = Object.entries(counts).map(([k, v]) => ({ [col]: k, count: v }));
       arr.sort((a, b) => b.count - a.count);
       arr = arr.slice(0, topN);
+      if (!arr.length) { out.appendChild(alertBox("warn", "داده‌ای برای شمارش وجود ندارد.")); return; }
       out.appendChild(buildTable(arr, [col, "count"]));
-      out.appendChild(el("h4", "subsection-title", "مصورسازی"));
-      if (!arr.length) { out.appendChild(alertBox("warn", "داده‌ای برای نمایش در نمودار وجود ندارد.")); return; }
-      const x = arr.map((r) => String(r[col])), y = arr.map((r) => r.count);
-      const d1 = el("div", "mb-4"); out.appendChild(d1);
-      charts.plot(d1, [{ type: "bar", x, y, text: y, textposition: "auto", marker: { color: charts.GREEN } }], charts.layout("نمودار میله‌ای"));
-      const d2 = el("div", "mb-4"); out.appendChild(d2);
-      charts.plot(d2, [{ type: "scatter", mode: "lines+markers+text", x, y, text: y }], charts.layout("نمودار خطی"));
-      const d3 = el("div", "mb-4"); out.appendChild(d3);
-      charts.plot(d3, [{ type: "pie", labels: x, values: y }], charts.layout("نمودار دایره‌ای"));
-    };
-
-    det.appendChild(body);
-    root.appendChild(det);
-  }
-
-  function renderGroupby(root) {
-    root.innerHTML = "";
-    root.appendChild(cardHead("گروه‌بندی"));
-    root.appendChild(el("p", "section-desc", "گروه‌بندی به شما امکان می‌دهد داده‌های خود را بر اساس دسته‌ها و گروه‌های خاص خلاصه کنید"));
-
-    const det = el("details", "expander");
-    det.open = true;
-    det.appendChild(el("summary", null, "گروه‌بندی ستون‌های شما"));
-    const body = el("div", "py-3 flex flex-col gap-4");
-
-    const grid = el("div", "grid grid-cols-1 sm:grid-cols-3 gap-4");
-    const gW = el("div", "widget");
-    gW.innerHTML = `<label>ستون (ها) را برای گروه‌بندی انتخاب کنید</label>
-      <select id="gbCols" multiple size="4">${S.columns().map((c) => `<option>${c}</option>`).join("")}</select>`;
-    const opColW = el("div", "widget");
-    opColW.innerHTML = `<label>ستون را برای عملیات انتخاب کنید</label>
-      <select id="gbOpCol">${S.columns().map((c) => `<option>${c}</option>`).join("")}</select>`;
-    const opW = el("div", "widget");
-    opW.innerHTML = `<label>عملیات را انتخاب کنید</label>
-      <select id="gbOp">${["sum", "max", "min", "mean", "median", "count"].map((o) => `<option>${o}</option>`).join("")}</select>`;
-    grid.appendChild(gW); grid.appendChild(opColW); grid.appendChild(opW);
-    body.appendChild(grid);
-
-    const btn = el("button", "btn-primary w-max", "اعمال گروه‌بندی");
-    body.appendChild(btn);
-    const out = el("div"); body.appendChild(out);
-
-    btn.onclick = () => {
-      out.innerHTML = "";
-      const gbCols = Array.from(body.querySelector("#gbCols").selectedOptions).map((o) => o.value);
-      if (!gbCols.length) { out.appendChild(alertBox("warn", "حداقل یک ستون برای گروه‌بندی انتخاب کنید.")); return; }
-      const opCol = body.querySelector("#gbOpCol").value;
-      const op = body.querySelector("#gbOp").value;
-      const result = stats.groupby(gbCols, opCol, op);
-      const cols = [...gbCols, "Result"];
-      out.appendChild(buildTable(result, cols));
-      out.appendChild(el("h4", "subsection-title", "مصورسازی داده"));
-
-      const chartW = el("div", "widget mb-3 max-w-xs");
-      chartW.innerHTML = `<label>نمودار خود را انتخاب کنید</label>
-        <select id="gbChart">${["bar", "line", "scatter", "pie", "sunburst"].map((g) => `<option>${g}</option>`).join("")}</select>`;
-      out.appendChild(chartW);
-      const chartDiv = el("div"); out.appendChild(chartDiv);
-
-      const draw = () => {
-        const g = chartW.querySelector("#gbChart").value;
-        chartDiv.innerHTML = "";
-        const x = result.map((r) => gbCols.map((c) => r[c]).join(" / "));
-        const yv = result.map((r) => r.Result);
-        if (g === "bar") {
-          charts.plot(chartDiv, [{ type: "bar", x, y: yv, marker: { color: charts.GREEN } }], charts.layout("نمودار میله‌ای"));
-        } else if (g === "line") {
-          charts.plot(chartDiv, [{ type: "scatter", mode: "lines+markers", x, y: yv }], charts.layout("نمودار خطی"));
-        } else if (g === "scatter") {
-          charts.plot(chartDiv, [{ type: "scatter", mode: "markers", x, y: yv, marker: { size: 12, color: charts.GREEN } }], charts.layout("نمودار پراکندگی"));
-        } else if (g === "pie") {
-          charts.plot(chartDiv, [{ type: "pie", labels: x, values: yv }], charts.layout("نمودار دایره‌ای"));
-        } else if (g === "sunburst") {
-          const labels = [], parents = [], values = [];
-          const seen = new Set();
-          result.forEach((r) => {
-            let parent = "";
-            gbCols.forEach((c, i) => {
-              const label = gbCols.slice(0, i + 1).map((cc) => r[cc]).join(" / ");
-              if (!seen.has(label)) {
-                seen.add(label);
-                labels.push(label); parents.push(parent);
-                values.push(i === gbCols.length - 1 ? r.Result : 0);
-              }
-              parent = label;
-            });
-          });
-          charts.plot(chartDiv, [{ type: "sunburst", labels, parents, values, branchvalues: "total" }], charts.layout("نمودار آفتاب‌پرتو"));
-        }
-      };
-      chartW.querySelector("#gbChart").onchange = draw;
-      draw();
     };
 
     det.appendChild(body);

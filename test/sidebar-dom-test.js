@@ -1,9 +1,9 @@
 /*
  * sidebar-dom-test.js — Behavioural test for js/sidebar.js against a minimal
  * fake DOM. Loads the REAL utils.js + sidebar.js, builds a dashboard-shaped DOM
- * (six [role="tab"] buttons, a tablist, panels, the dataset header + preview
+ * (four [role="tab"] buttons, a tablist, panels, the dataset header + preview
  * title), then asserts the navigation contract without a browser:
- *   • the rail builds 6 flat items (one per analysis section, no sub-trees)
+ *   • the rail builds 4 flat items (one per analysis section, no sub-trees)
  *   • clicking a rail item activates the matching EXISTING tab (by index)
  *   • the active highlight mirrors whichever tab reports aria-selected="true"
  *   • visibility follows #resultsSection
@@ -196,7 +196,7 @@ shell.appendChild(results);
 const content = new FakeNode("div"); content.id = "content"; results.appendChild(content);
 
 // Populate #content the way dashboard.js render() does (only what sidebar reads).
-const TAB_NAMES = ["overview", "missing", "charts", "valuecounts", "groupby", "quality"];
+const TAB_NAMES = ["overview", "missing", "charts", "valuecounts"];
 function populateContent() {
   content.children = [];
   const datasetHeader = new FakeNode("div"); datasetHeader._top = 80; content.appendChild(datasetHeader); // first child
@@ -264,7 +264,7 @@ console.log("\n[build] rail structure");
 const aside = document.getElementById("dashSidebar");
 assert("aside injected", !!aside);
 const items = aside.querySelectorAll(".sb-item");
-assert("6 flat nav items built", items.length === 6, `got ${items.length}`);
+assert("4 flat nav items built", items.length === 4, `got ${items.length}`);
 assert("no sub-tree categories", aside.querySelectorAll(".sb-cat").length === 0);
 assert("every item carries data-nav", items.every((n) => !!n.getAttribute("data-nav")));
 assert("toggle injected into header group", !!document.getElementById("sbToggle"));
@@ -289,8 +289,8 @@ assert("charts tab (index 2) selected", tabBtns[2].getAttribute("aria-selected")
 assert("charts tab was clicked once", tabBtns[2]._clicked === 1, `clicks=${tabBtns[2]._clicked}`);
 assert("clicked item marked active", aside.querySelector('.sb-item[data-nav="charts"]').classList.contains("is-active"));
 
-clickItem("quality"); // → tab index 5
-assert("quality tab (index 5) selected", tabBtns[5].getAttribute("aria-selected") === "true");
+clickItem("valuecounts"); // → tab index 3
+assert("valuecounts tab (index 3) selected", tabBtns[3].getAttribute("aria-selected") === "true");
 assert("only one active item at a time", aside.querySelectorAll(".sb-item.is-active").length === 1);
 
 clickItem("overview"); // home screen — routes by stable id, not position

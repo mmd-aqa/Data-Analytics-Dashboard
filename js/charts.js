@@ -104,7 +104,7 @@ window.App = window.App || {};
 
   function renderBuilder(root) {
     root.innerHTML = "";
-    root.appendChild(cardHead("نمودارساز پیشرفته"));
+    root.appendChild(cardHead("نمودارساز"));
     root.appendChild(
       el("p", "section-desc",
         "نوع نمودار، محورها و روش تجمیع را انتخاب کنید تا نمودار به‌صورت زنده ساخته شود."),
@@ -215,6 +215,25 @@ window.App = window.App || {};
 
     [typeEl, xEl, yEl, aggEl].forEach((e) => e.addEventListener("change", draw));
     draw();
+
+    // Keep the chart in sync with the current view: search/filters live on the
+    // home toolbar, so a change usually lands while this panel is hidden (the
+    // orchestrator does not re-render control-holding tabs). Redraw immediately
+    // while visible; otherwise flag it and redraw on the next reveal. The
+    // controls keep their selected values — only the underlying data refreshes.
+    let stale = false;
+    const isHidden = () => root.classList.contains("hidden");
+    S.subscribe(() => {
+      if (!root.isConnected) return;
+      if (isHidden()) { stale = true; return; }
+      draw();
+    });
+    new MutationObserver(() => {
+      if (stale && root.isConnected && !isHidden()) {
+        stale = false;
+        draw();
+      }
+    }).observe(root, { attributes: true, attributeFilter: ["class"] });
   }
 
   App.charts = {
